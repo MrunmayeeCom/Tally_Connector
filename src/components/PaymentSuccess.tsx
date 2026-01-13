@@ -5,8 +5,10 @@ import { useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getTransactionDetails } from "../api/payment";
 import { downloadInvoice } from "../api/payment";
-
+import { useNavigate } from "react-router-dom";
 export function PaymentSuccess() {
+  const navigate = useNavigate();
+
   const [params] = useSearchParams();
   const transactionId = params.get("txn");
 
@@ -29,6 +31,16 @@ export function PaymentSuccess() {
 
     fetchTransaction();
   }, [transactionId]);
+
+  const handleDownloadInvoice = () => {
+    if (!transactionId) {
+      alert("Transaction ID not found");
+      return;
+    }
+    
+    // ✅ Use the downloadInvoice function from api/payment.ts
+    downloadInvoice(transactionId);
+  };
 
   if (loading) {
     return (
@@ -98,12 +110,7 @@ export function PaymentSuccess() {
               <Button
                 variant="outline"
                 className="w-full"
-                onClick={() =>
-                  window.open(
-                    "api/payment/invoice/" + transaction.transactionId,
-                    "_blank"
-                  )
-                }
+                onClick={handleDownloadInvoice}
               >
                 <Download className="h-4 w-4 mr-2" />
                 Download Invoice
@@ -112,10 +119,8 @@ export function PaymentSuccess() {
               <Button
                 size="lg"
                 className="w-full"
-                onClick={() =>
-                  (window.location.href =
-                    "https://wonderful-daifuku-546d49.netlify.app/")
-                }
+                onClick={() => navigate("/tutorials")}
+
               >
                 Go to Dashboard
                 <ArrowRight className="h-4 w-4 ml-2" />

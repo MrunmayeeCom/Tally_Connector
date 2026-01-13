@@ -1,13 +1,15 @@
 import { motion } from 'motion/react';
 import { ChevronDown } from 'lucide-react';
 
-export function Hero() {
-  const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
+interface HeroSectionProps {
+  onGetStartedClick: () => void;
+  onLearnMoreClick: () => void;
+}
+
+export function Hero({
+  onGetStartedClick,
+  onLearnMoreClick,
+}: HeroSectionProps){
 
   return (
     <>
@@ -16,7 +18,7 @@ export function Hero() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="bg-[#002855] text-white text-center py-3 mt-16 md:mt-20"
+        className="bg-[#002855] text-white text-center py-3 mt-16 md:mt-1"
       >
         <p className="text-sm md:text-base font-medium">
           Empowering Businesses with Strength, Backed by Reliability, and Grounded in Stability.
@@ -84,7 +86,7 @@ export function Hero() {
               className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4"
             >
               <motion.button 
-                onClick={() => scrollToSection('features')}
+                onClick={onGetStartedClick}
                 whileHover={{ scale: 1.05, boxShadow: '0 10px 25px rgba(0, 102, 204, 0.3)' }}
                 whileTap={{ scale: 0.95 }}
                 className="px-8 py-4 bg-[#0066CC] text-white rounded-lg hover:bg-[#004C99] transition-all shadow-md hover:shadow-lg font-medium"
@@ -92,7 +94,7 @@ export function Hero() {
                 Get a Demo
               </motion.button>
               <motion.button 
-                onClick={() => scrollToSection('features')}
+                onClick={onLearnMoreClick}
                 whileHover={{ scale: 1.05, backgroundColor: '#F5F5F5' }}
                 whileTap={{ scale: 0.95 }}
                 className="px-8 py-4 bg-white text-[#002855] rounded-lg border-2 border-[#002855] hover:bg-gray-50 transition-all font-medium"
@@ -106,12 +108,11 @@ export function Hero() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8, duration: 0.6 }}
-              className="grid grid-cols-2 md:grid-cols-4 gap-8 pt-16 max-w-4xl mx-auto"
+              className="grid grid-cols-2 md:grid-cols-3 gap-8 pt-16 max-w-4xl mx-auto"
             >
               {[
                 { value: '99.9%', label: 'Uptime' },
-                { value: '2 min', label: 'Auto Sync' },
-                { value: '1000+', label: 'Active Users' },
+                { value: '2 min', label: 'Auto Sync' },               
                 { value: '24/7', label: 'Support' },
               ].map((stat, index) => (
                 <motion.div

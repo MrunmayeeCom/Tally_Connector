@@ -88,9 +88,15 @@ export function Partners() {
             >
               Become a partner
             </Link>
-            <div className="flex-1 md:flex-none px-8 py-4 text-center bg-white text-[#002855] font-medium border-b-4 border-white">
+            <button
+              type="button"
+              onClick={() =>
+                document.getElementById("partners")?.scrollIntoView({ behavior: "smooth" })
+              }
+              className="flex-1 md:flex-none px-8 py-4 text-center bg-white text-[#002855] font-medium border-b-4 border-white"
+            >
               Partner directory
-            </div>
+            </button>
           </div>
         </div>
       </div>

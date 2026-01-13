@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react";
-import { Routes, Route, useLocation } from "react-router-dom";
+import {
+  Routes,
+  Route,
+  useNavigate,
+  Navigate,
+  useLocation,
+} from "react-router-dom";
 
 import { Navbar } from "./components/Navbar";
 import { Hero } from "./components/Hero";
@@ -11,6 +17,10 @@ import { FAQ } from "./components/FAQ";
 import { Footer } from "./components/Footer";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { PricingSection } from "./components/PricingSection";
+import { BackgroundEffects } from "./components/BackgroundEffects";
+import { LoginModal } from "./components/LoginModal";
+import { CheckoutPage } from "./components/CheckoutPage";
+import { PaymentSuccess } from "./components/PaymentSuccess";
 
 import { PrivacyPolicy } from "./components/legal/PrivacyPolicy";
 import { TermsOfService } from "./components/legal/TermsOfService";
@@ -19,140 +29,207 @@ import { Security } from "./components/legal/Security";
 import { Partners } from "./components/Partners";
 import { BecomePartner } from "./components/BecomePartnerPage";
 
-/* -------------------- Layout -------------------- */
+import { Toaster } from "./components/ui/sonner";
+import Tutorial_page from "./components/Tutorial_page";
 
-function MainLayout({ children }: { children: React.ReactNode }) {
-  const [scrolled, setScrolled] = useState(false);
+type BillingCycle = "monthly" | "quarterly" | "yearly";
+
+/* ---------------- SCROLL HANDLER ---------------- */
+
+function SectionRedirect({ sectionId }: { sectionId: string }) {
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 50);
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
+    navigate("/", { replace: true });
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        const el = document.getElementById(sectionId);
+        if (!el) return;
+
+        const yOffset = -80;
+        const y =
+          el.getBoundingClientRect().top +
+          window.pageYOffset +
+          yOffset;
+
+        window.scrollTo({ top: y, behavior: "smooth" });
+      });
+    });
+  }, [navigate, sectionId]);
+
+  return null;
+}
+
+/* ---------------- MAIN APP ---------------- */
+
+export default function App() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState("");
+  const [billingCycle, setBillingCycle] =
+    useState<BillingCycle>("monthly");
+  const [pendingCheckout, setPendingCheckout] = useState(false);
+
+  useEffect(() => {
+    window.history.scrollRestoration = "manual";
   }, []);
 
-  return (
-    <div className="min-h-screen">
-      <Navbar scrolled={scrolled} />
-      {children}
-      <Footer />
+  const handleAdminLogin = () => {
+    if (!pendingCheckout) return;
+    const planSlug = selectedPlan.toLowerCase().replace(/\s+/g, "-");
+    navigate(`/checkout/${planSlug}`);
+    setPendingCheckout(false);
+  };
+
+  const handlePlanSelect = (plan: string, cycle: BillingCycle) => {
+    setSelectedPlan(plan);
+    setBillingCycle(cycle);
+    setPendingCheckout(true);
+    setLoginModalOpen(true);
+  };
+
+  const handleGetStartedClick = () => {
+    const el = document.getElementById("pricing");
+    if (el) {
+      const yOffset = -80;
+      const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({ top: y, behavior: "smooth" });
+    }
+  };
+
+  const handleLearnMoreClick = () => {
+    const el = document.getElementById("features");
+    if (el) {
+      const yOffset = -80;
+      const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({ top: y, behavior: "smooth" });
+    }
+  };
+
+  /* ---------------- HOME PAGE ---------------- */
+
+  const HomePage = () => (
+    <div className="min-h-screen bg-[#EBF5FB] relative">
+      <BackgroundEffects />
+
+      <main className="pt-20">
+        <section id="home">
+          <Hero
+            onGetStartedClick={handleGetStartedClick}
+            onLearnMoreClick={handleLearnMoreClick}
+          />
+        </section>
+
+        <section id="features" className="scroll-mt-24">
+          <Features />
+        </section>
+
+        <section id="pricing" className="scroll-mt-24">
+          <PricingSection onPlanSelect={handlePlanSelect} />
+        </section>
+
+        <section id="user-side" className="scroll-mt-24">
+          <UserFeatures />
+        </section>
+
+        <section id="admin-panel" className="scroll-mt-24">
+          <AdminFeatures />
+        </section>
+
+        <section id="technical" className="scroll-mt-24">
+          <TechnicalDetails />
+        </section>
+
+        <section id="faq" className="scroll-mt-24">
+          <FAQ />
+        </section>
+
+        <section id="partners" className="scroll-mt-24">
+          <Partners />
+        </section>
+
+        <Footer />
+      </main>
+
       <ScrollToTop />
     </div>
   );
-}
 
-/* -------------------- Pages -------------------- */
+  /* ---------------- ROUTE-BASED BACKGROUND ---------------- */
 
-function HomePage() {
+  const isTutorialPage = location.pathname === "/tutorials";
+
+  /* ---------------- HEADER VISIBILITY ---------------- */
+
+  const hideNavbarRoutes = ["/tutorials"];
+  const hideNavbar = hideNavbarRoutes.includes(location.pathname);
+
   return (
-    <div className="bg-[#EBF5FB]">
-      <Hero />
-      <Features />
-      <UserFeatures />
-      <AdminFeatures />
-      <PricingSection/>
-      <TechnicalDetails />
-      <FAQ />
+    <div
+      className={`min-h-screen ${
+        isTutorialPage
+          ? "bg-gradient-to-br from-cyan-50 via-white to-cyan-100"
+          : "bg-[#EBF5FB]"
+      }`}
+    >
+      {/* Navbar */}
+      {!hideNavbar && (
+        <Navbar onLoginClick={() => setLoginModalOpen(true)} />
+      )}
+
+      <Routes>
+        {/* Main page */}
+        <Route path="/" element={<HomePage />} />
+
+        {/* SEO-friendly virtual routes */}
+        <Route path="/features" element={<SectionRedirect sectionId="features" />} />
+        <Route path="/pricing" element={<SectionRedirect sectionId="pricing" />} />
+        <Route path="/user-side" element={<SectionRedirect sectionId="user-side" />} />
+        <Route path="/admin-panel" element={<SectionRedirect sectionId="admin-panel" />} />
+        <Route path="/technical" element={<SectionRedirect sectionId="technical" />} />
+        <Route path="/faq" element={<SectionRedirect sectionId="faq" />} />
+        <Route path="/partners" element={<SectionRedirect sectionId="partners" />} />
+        <Route path="/become-partner" element={<BecomePartner />} />
+
+        {/* Checkout */}
+        <Route
+          path="/checkout/:plan"
+          element={
+            <CheckoutPage
+              selectedPlan={selectedPlan}
+              initialBillingCycle={billingCycle}
+              onBack={() => navigate("/")}
+              onProceedToPayment={() => {}}
+            />
+          }
+        />
+
+        {/* Payment Success */}
+        <Route path="/payment-success" element={<PaymentSuccess />} />
+
+        {/* Tutorial Page */}
+        <Route path="/tutorials" element={<Tutorial_page />} />
+
+        {/* Legal pages */}
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms-of-service" element={<TermsOfService />} />
+        <Route path="/cookie-policy" element={<CookiePolicy />} />
+        <Route path="/security" element={<Security />} />
+
+        {/* Fallback */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+
+      <LoginModal
+        open={loginModalOpen}
+        onOpenChange={setLoginModalOpen}
+        onAdminLogin={handleAdminLogin}
+      />
+
+      <Toaster />
     </div>
-  );
-}
-
-function PartnersPage() {
-  return (
-    <div className="bg-white">
-      <Partners />
-    </div>
-  );
-}
-
-function BecomePartnerPage() {
-  return (
-    <div className="bg-white">
-      <BecomePartner />
-    </div>
-  );
-}
-
-/* -------------------- App -------------------- */
-
-export default function App() {
-  const location = useLocation();
-
-  // Scroll to section when navigating with state
-  useEffect(() => {
-    if (location.state?.scrollTo) {
-      setTimeout(() => {
-        document
-          .getElementById(location.state.scrollTo)
-          ?.scrollIntoView({ behavior: "smooth" });
-      }, 100);
-    }
-  }, [location]);
-
-  return (
-    <Routes>
-      <Route
-        path="/"
-        element={
-          <MainLayout>
-            <HomePage />
-          </MainLayout>
-        }
-      />
-
-      <Route
-        path="/partners"
-        element={
-          <MainLayout>
-            <PartnersPage />
-          </MainLayout>
-        }
-      />
-
-      <Route
-        path="/become-partner"
-        element={
-          <MainLayout>
-            <BecomePartnerPage />
-          </MainLayout>
-        }
-      />
-
-      {/* Legal pages */}
-      <Route
-        path="/privacy-policy"
-        element={
-          <MainLayout>
-            <PrivacyPolicy />
-          </MainLayout>
-        }
-      />
-
-      <Route
-        path="/terms-of-service"
-        element={
-          <MainLayout>
-            <TermsOfService />
-          </MainLayout>
-        }
-      />
-
-      <Route
-        path="/cookie-policy"
-        element={
-          <MainLayout>
-            <CookiePolicy />
-          </MainLayout>
-        }
-      />
-
-      <Route
-        path="/security"
-        element={
-          <MainLayout>
-            <Security />
-          </MainLayout>
-        }
-      />
-    </Routes>
   );
 }

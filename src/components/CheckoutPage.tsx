@@ -31,6 +31,7 @@ export function CheckoutPage({
   onProceedToPayment,
 }: CheckoutPageProps) {
   const [billingCycle, setBillingCycle] = useState<BillingCycle>(initialBillingCycle);
+  const [planName, setPlanName] = useState("");
 
   const [formData, setFormData] = useState({
     companyName: "",
@@ -77,12 +78,16 @@ export function CheckoutPage({
       return;
     }
 
+    if (!formData.companyName || !formData.email || !formData.phone) {
+      alert("Please fill all required fields");
+      return;
+    }
+
     setSubmitting(true);
 
     try {
       // Backend allows only monthly / yearly
-      const backendBillingCycle =
-        billingCycle === "quarterly" ? "monthly" : billingCycle;
+      const backendBillingCycle = billingCycle;
 
       console.log("🔵 Step 1: Checking customer existence...");
       // 1️⃣ Ensure customer exists in LMS
@@ -111,7 +116,7 @@ export function CheckoutPage({
         });
 
         alert("Free plan activated successfully 🎉");
-        window.location.replace("https://geo-track-em3s.onrender.com");
+        window.location.href = "/payment-success?free=true";
         return;
       }
 
@@ -171,7 +176,7 @@ export function CheckoutPage({
         userId,
         licenseId: lmsPlan.licenseId,
         billingCycle,
-        amount: getTotal() * 100,
+        amount: getTotal(),
       });
 
       console.log("📦 Razorpay Order:", order);
@@ -201,7 +206,11 @@ export function CheckoutPage({
           email: formData.email,
           contact: formData.phone,
         },
-        handler: async (response: any) => {
+        handler: async (response: {
+          razorpay_payment_id: string;
+          razorpay_order_id: string;
+          razorpay_signature: string;
+        }) => {
           console.log("✅ Payment successful, verifying...");
           await verifyPayment({
             transactionId,
@@ -293,6 +302,7 @@ export function CheckoutPage({
           licenseId: matched._id,
           monthlyPrice: lt.price?.amount ?? 0,
         });
+        setPlanName(lt.name);
 
       } catch (err) {
         console.error("Failed to load checkout plan", err);
@@ -469,7 +479,7 @@ export function CheckoutPage({
                 <div>
                   <p className="text-sm text-muted-foreground mb-2">Selected Plan</p>
                   <div className="flex items-center justify-between">
-                    <span>{selectedPlan}</span>
+                    <span>{planName}</span>
                     <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full text-sm">
                       {getBillingText()}
                     </span>
