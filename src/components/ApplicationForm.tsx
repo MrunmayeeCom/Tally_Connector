@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "motion/react";
 import axios from "axios";
+import API from "../api/AxiosInstance";
 
 const ApplicationForm = () => {
   const [formData, setFormData] = useState({
@@ -62,12 +63,12 @@ const ApplicationForm = () => {
         motivation: formData.message,
       },
 
-      source: "partner_program_landing_page",
+      source: "tally Connector",
     };
 
     try {
-      await axios.post(
-        "https://sj7sxs2n-4000.inc1.devtunnels.ms/api/partner-program/create",
+      await API.post(
+        "/api/partner-program/create",
         payload
       );
 
