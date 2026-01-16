@@ -1,25 +1,26 @@
 import { useState, useEffect } from "react";
 import { Button } from "./ui/button";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Separator } from "./ui/separator";
-import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { ArrowLeft, Building2, Mail, Phone, MapPin, CreditCard } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
 import { purchaseLicense } from "../api/license";
 import { createOrder, verifyPayment } from "../api/payment";
 import { checkCustomerExists, syncCustomer } from "../api/customerSync";
-import { loadRazorpay } from "../utils/loadRazorpay"
+import { loadRazorpay } from "../utils/loadRazorpay";
+import { getStoredUser } from "../api/auth";
 
-type BillingCycle = "monthly" | "quarterly" | "yearly";
+type BillingCycle = "monthly" | "quarterly" | "half-yearly" | "yearly";
 
 interface CheckoutPageProps {
   selectedPlan: string;
-  initialBillingCycle: "monthly" | "quarterly" | "yearly";
+  initialBillingCycle: "monthly" | "quarterly" | "half-yearly" | "yearly";
   onBack: () => void;
   onProceedToPayment: (
-    billingCycle: "monthly" | "quarterly" | "yearly",
+    billingCycle: "monthly" | "quarterly" | "half-yearly" | "yearly",
     formData: any
   ) => void;
 }
@@ -30,12 +31,15 @@ export function CheckoutPage({
   onBack,
   onProceedToPayment,
 }: CheckoutPageProps) {
+  const navigate = useNavigate();
+
+  const loggedInUser = getStoredUser();
   const [billingCycle, setBillingCycle] = useState<BillingCycle>(initialBillingCycle);
   const [planName, setPlanName] = useState("");
 
   const [formData, setFormData] = useState({
     companyName: "",
-    email: "",
+    email: loggedInUser?.email || "",
     phone: "",
     address: "",
     city: "",
@@ -53,7 +57,7 @@ export function CheckoutPage({
 
   const [loading, setLoading] = useState(true);
 
-  /* ---------------- PRICE LOGIC ---------------- */
+  /* ---------------- PRICE LOGIC (FIXED) ---------------- */
 
   const getPrice = () => {
     if (!lmsPlan) return 0;
@@ -61,11 +65,12 @@ export function CheckoutPage({
     const base = lmsPlan.monthlyPrice;
 
     if (billingCycle === "monthly") return base;
-    if (billingCycle === "quarterly") return base * 3 * 0.9;
-    return base * 12 * 0.8;
+    if (billingCycle === "quarterly") return Math.round(base * 3 * 0.95); // 5% discount
+    if (billingCycle === "half-yearly") return Math.round(base * 6 * 0.90); // 10% discount
+    return Math.round(base * 12 * 0.8); // 20% discount for yearly
   };
 
-  const getTax = () => getPrice() * 0.18;
+  const getTax = () => Math.round(getPrice() * 0.18);
   const getTotal = () => getPrice() + getTax();
 
   /* ---------------- HANDLERS ---------------- */
@@ -87,16 +92,18 @@ export function CheckoutPage({
 
     try {
       // Backend allows only monthly / yearly
-      const backendBillingCycle = billingCycle;
+      const backendBillingCycle = 
+        billingCycle === "quarterly" || billingCycle === "half-yearly" 
+          ? "monthly" 
+          : billingCycle;
 
-      console.log("🔵 Step 1: Checking customer existence...");
       // 1️⃣ Ensure customer exists in LMS
-      const exists = await checkCustomerExists(formData.email);
+      const exists = await checkCustomerExists(loggedInUser.email);
       if (!exists) {
         console.log("🔵 Step 1a: Creating customer...");
         await syncCustomer({
           name: formData.companyName,
-          email: formData.email,
+          email: loggedInUser.email,
           source: "Tally",
         });
       }
@@ -108,7 +115,7 @@ export function CheckoutPage({
         console.log("🟢 Free plan detected, activating...");
         await purchaseLicense({
           name: formData.companyName,
-          email: formData.email,
+          email: loggedInUser.email,
           licenseId: lmsPlan.licenseId, 
           billingCycle: "monthly",
           amount: 0,
@@ -116,7 +123,7 @@ export function CheckoutPage({
         });
 
         alert("Free plan activated successfully 🎉");
-        window.location.href = "/payment-success?free=true";
+        navigate("/payment-success?free=true");
         return;
       }
 
@@ -124,53 +131,24 @@ export function CheckoutPage({
         🟢 PAID PLAN FLOW
       ====================================================== */
 
-      console.log("🔵 Step 2: Creating pending transaction in LMS...");
       // 2️⃣ Create PENDING transaction in LMS FIRST
       const purchaseRes = await purchaseLicense({
         name: formData.companyName,
-        email: formData.email,
+        email: loggedInUser.email,
         licenseId: lmsPlan.licenseId,
         billingCycle: backendBillingCycle,
         amount: getTotal(),
         currency: "INR",
       });
 
-      console.log("📦 Purchase License Full Response:", purchaseRes);
-      console.log("📦 Response Keys:", Object.keys(purchaseRes || {}));
+      const { data } = purchaseRes;
 
-      // Handle different response structures
-      const responseData = purchaseRes?.data || purchaseRes;
-      console.log("📦 Response Data:", responseData);
-      console.log("📦 Response Data Keys:", Object.keys(responseData || {}));
-      
-      // Try multiple possible paths for transactionId and userId
-      const transactionId = 
-        responseData?.transactionId || 
-        responseData?.transaction?._id || 
-        responseData?.transaction?.id ||
-        responseData?._id;
-        
-      const userId = 
-        responseData?.userId || 
-        responseData?.user?._id || 
-        responseData?.user?.id ||
-        responseData?.customerId ||
-        responseData?.customer?._id;
-
-      console.log("🔍 Extracted transactionId:", transactionId);
-      console.log("🔍 Extracted userId:", userId);
-
-      if (!transactionId || !userId) {
-        console.error("❌ Full response structure:", JSON.stringify(purchaseRes, null, 2));
-        throw new Error(
-          `Transaction data missing from LMS.\n` +
-          `transactionId: ${transactionId}\n` +
-          `userId: ${userId}\n` +
-          `Full response keys: ${Object.keys(responseData || {}).join(', ')}`
-        );
+      if (!data?.transactionId || !data?.userId) {
+        throw new Error("Transaction data missing from LMS");
       }
 
-      console.log("🔵 Step 3: Creating Razorpay order...");
+      const { transactionId, userId } = data;
+
       // 3️⃣ Create Razorpay order using LMS userId
       const order = await createOrder({
         userId,
@@ -179,13 +157,10 @@ export function CheckoutPage({
         amount: getTotal(),
       });
 
-      console.log("📦 Razorpay Order:", order);
-
       if (!order?.orderId) {
         throw new Error("Failed to create Razorpay order");
       }
 
-      console.log("🔵 Step 4: Loading Razorpay SDK...");
       // 4️⃣ Load Razorpay SDK
       const loaded = await loadRazorpay();
       if (!loaded) {
@@ -193,7 +168,6 @@ export function CheckoutPage({
         return;
       }
 
-      console.log("🔵 Step 5: Opening Razorpay popup...");
       // 5️⃣ Open Razorpay popup
       const rzp = new (window as any).Razorpay({
         key: order.key,
@@ -206,30 +180,36 @@ export function CheckoutPage({
           email: formData.email,
           contact: formData.phone,
         },
-        handler: async (response: {
-          razorpay_payment_id: string;
-          razorpay_order_id: string;
-          razorpay_signature: string;
-        }) => {
-          console.log("✅ Payment successful, verifying...");
-          await verifyPayment({
-            transactionId,
-            razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_order_id: response.razorpay_order_id,
-            razorpay_signature: response.razorpay_signature,
-          });
+        handler: async (response: any) => {
+          try {
+            console.log("✅ Payment successful, verifying...");
+            await verifyPayment({
+              transactionId,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_signature: response.razorpay_signature,
+            });
 
-          window.location.href = `/payment-success?txn=${transactionId}&plan=${encodeURIComponent(
-            selectedPlan
-          )}&cycle=${billingCycle}`;
+            navigate(`/payment-success?txn=${transactionId}&plan=${encodeURIComponent(
+              selectedPlan
+            )}&cycle=${billingCycle}`);
+          } catch (verifyError) {
+            console.error("Payment verification failed:", verifyError);
+            alert("Payment verification failed. Please contact support with transaction ID: " + transactionId);
+          }
+        },
+        modal: {
+          ondismiss: () => {
+            console.log("Payment cancelled by user");
+          }
         },
         theme: { color: "#2563eb" },
       });
 
       rzp.open();
     } catch (err: any) {
-      console.error("❌ Payment error:", err);
-      console.error("❌ Error stack:", err.stack);
+      console.error("Payment error:", err);
+      console.error("Error stack:", err.stack);
 
       const message =
         err?.response?.data?.message ||
@@ -252,6 +232,8 @@ export function CheckoutPage({
         return "Monthly";
       case "quarterly":
         return "Quarterly";
+      case "half-yearly":
+        return "Half-Yearly";
       case "yearly":
         return "Yearly";
     }
@@ -262,6 +244,8 @@ export function CheckoutPage({
       case "monthly":
         return 0;
       case "quarterly":
+        return 5;
+      case "half-yearly":
         return 10;
       case "yearly":
         return 20;
@@ -269,6 +253,15 @@ export function CheckoutPage({
   };
 
   /* ---------------- LMS LOAD ---------------- */
+
+  useEffect(() => {
+    if (!loggedInUser?.email) return;
+
+    setFormData(prev => ({
+      ...prev,
+      email: loggedInUser.email,
+    }));
+  }, [loggedInUser?.email]);
 
   useEffect(() => {
     const loadPlanFromLMS = async () => {
@@ -329,7 +322,7 @@ export function CheckoutPage({
         </Button>
 
         <div className="text-center mb-8">
-          <h1 className="mb-2">Complete Your Order</h1>
+          <h1 className="text-3xl font-bold mb-2">Complete Your Order</h1>
           <p className="text-muted-foreground">
             Just one step away from transforming your field sales
           </p>
@@ -453,17 +446,17 @@ export function CheckoutPage({
                       />
                     </div>
                   </div>
-                <div className="pt-4 flex justify-end">
-                  <Button
-                    type="submit"
-                    size="lg"
-                    className="gap-2"
-                    disabled={submitting}
-                  >
-                    <CreditCard className="h-4 w-4" />
-                    {submitting ? "Processing..." : "Proceed to Payment"}
-                  </Button>
-                </div>
+                  <div className="pt-4 flex justify-end">
+                    <Button
+                      type="submit"
+                      size="lg"
+                      className="gap-2"
+                      disabled={submitting}
+                    >
+                      <CreditCard className="h-4 w-4" />
+                      {submitting ? "Processing..." : "Proceed to Payment"}
+                    </Button>
+                  </div>
                 </form>
               </CardContent>
             </Card>
@@ -479,7 +472,7 @@ export function CheckoutPage({
                 <div>
                   <p className="text-sm text-muted-foreground mb-2">Selected Plan</p>
                   <div className="flex items-center justify-between">
-                    <span>{planName}</span>
+                    <span className="font-medium">{planName}</span>
                     <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full text-sm">
                       {getBillingText()}
                     </span>
@@ -489,15 +482,19 @@ export function CheckoutPage({
                 <div>
                   <p className="text-sm text-muted-foreground mb-3">Billing Cycle</p>
                   <Tabs value={billingCycle} onValueChange={(value) => setBillingCycle(value as BillingCycle)}>
-                    <TabsList className="grid w-full grid-cols-3">
+                    <TabsList className="grid w-full grid-cols-4">
                       <TabsTrigger value="monthly" className="text-xs">Monthly</TabsTrigger>
                       <TabsTrigger value="quarterly" className="text-xs">
                         Quarterly
-                        <span className="ml-1 text-[10px] text-green-600 dark:text-green-400">-10%</span>
+                        <span className="ml-1 text-[10px] text-emerald-600 dark:text-emerald-400"></span>
+                      </TabsTrigger>
+                      <TabsTrigger value="half-yearly" className="text-xs">
+                        Half-Yearly
+                        <span className="ml-1 text-[10px] text-emerald-600 dark:text-emerald-400"></span>
                       </TabsTrigger>
                       <TabsTrigger value="yearly" className="text-xs">
                         Yearly
-                        <span className="ml-1 text-[10px] text-green-600 dark:text-green-400">-20%</span>
+                        <span className="ml-1 text-[10px] text-emerald-600 dark:text-emerald-400"></span>
                       </TabsTrigger>
                     </TabsList>
                   </Tabs>
@@ -515,7 +512,7 @@ export function CheckoutPage({
                     <span>₹{getTax().toLocaleString()}</span>
                   </div>
                   {getSavingsPercent() > 0 && (
-                    <div className="flex justify-between text-sm text-green-600 dark:text-green-400">
+                    <div className="flex justify-between text-sm text-emerald-600 dark:text-emerald-400">
                       <span>Discount ({getSavingsPercent()}%)</span>
                       <span>You Save!</span>
                     </div>
@@ -525,15 +522,8 @@ export function CheckoutPage({
                 <Separator />
 
                 <div className="flex justify-between items-baseline">
-                  <span>Total Amount</span>
-                  <span className="text-2xl">₹{getTotal().toLocaleString()}</span>
-                </div>
-
-                <div className="bg-blue-50 dark:bg-blue-950 p-4 rounded-lg space-y-2">
-                  <p className="text-sm">14-Day Free Trial</p>
-                  <p className="text-xs text-muted-foreground">
-                    You won't be charged until your trial ends. Cancel anytime during the trial period.
-                  </p>
+                  <span className="text-lg font-semibold">Total Amount</span>
+                  <span className="text-2xl font-bold">₹{getTotal().toLocaleString()}</span>
                 </div>
 
                 <div className="space-y-2 text-xs text-muted-foreground">

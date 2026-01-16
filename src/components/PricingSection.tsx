@@ -13,24 +13,25 @@ import { useEffect, useState } from "react";
 interface PricingSectionProps {
   onPlanSelect: (
     plan: string,
-    billingCycle: "monthly" | "quarterly" | "yearly"
+    billingCycle: "monthly" | "quarterly" | "half-yearly" | "yearly"
   ) => void;
 }
 
-type UIBillingCycle = "monthly" | "quarterly" | "yearly";
+type BillingCycle = "monthly" | "quarterly" | "half-yearly" | "yearly";
 
 interface Plan {
   licenseType: string;
   name: string;
   description: string;
   price: number;
-  billingPeriod: "monthly" | "quarterly" | "yearly";
+  billingPeriod: "monthly" | "quarterly" | "half-yearly" | "yearly";
   features: {
     featureSlug: string;
     uiLabel: string;
   }[];
   popular: boolean;
   isFree: boolean;
+  isEnterprise: boolean;
   icon: any;
 }
 
@@ -50,29 +51,40 @@ const PLAN_UI_META: Record<string, { icon: any; popular?: boolean }> = {
 
 export function PricingSection({ onPlanSelect }: PricingSectionProps) {
   const [billingCycle, setBillingCycle] =
-    useState<UIBillingCycle>("monthly");
+    useState<BillingCycle>("monthly");
   const [plans, setPlans] = useState<Plan[]>([]);
   const [loading, setLoading] = useState(true);
 
   const getPrice = (plan: Plan) => {
-  if (plan.isFree) return 0;
+    if (plan.isFree) return 0;
 
-  if (billingCycle === "monthly") return plan.price;
-  if (billingCycle === "quarterly") return plan.price * 3 * 0.9;
-  return plan.price * 12 * 0.8;
+    if (billingCycle === "monthly") return plan.price;
+    if (billingCycle === "quarterly") return (plan.price * 3 * 0.95); // 5% discount
+    if (billingCycle === "half-yearly") return (plan.price * 6 * 0.90); // 10% discount
+    return plan.price * 12 * 0.8;
   };
-
 
   const getBillingText = () => {
     if (billingCycle === "monthly") return "/month";
     if (billingCycle === "quarterly") return "/quarter";
+    if (billingCycle === "half-yearly") return "/6 months";
     return "/year";
   };
 
   const getDiscountText = () => {
-    if (billingCycle === "quarterly") return "Save 10%";
+    if (billingCycle === "quarterly") return "Save 5%";
+    if (billingCycle === "half-yearly") return "Save 10%";
     if (billingCycle === "yearly") return "Save 20%";
     return "";
+  };
+
+  const handlePlanClick = (plan: Plan) => {
+    if (plan.isEnterprise) {
+      // Open contact sales link in new tab or handle as needed
+      window.open("/contact-sales", "_blank");
+    } else {
+      onPlanSelect(plan.licenseType, billingCycle);
+    }
   };
 
   useEffect(() => {
@@ -106,6 +118,7 @@ export function PricingSection({ onPlanSelect }: PricingSectionProps) {
               features: lt.features ?? [],
               popular: meta.popular ?? false,
               isFree: (lt.price?.amount ?? 0) === 0,
+              isEnterprise: lt.name.toLowerCase() === "enterprise",
               icon: meta.icon || Star,
             };
           })
@@ -141,13 +154,25 @@ export function PricingSection({ onPlanSelect }: PricingSectionProps) {
 
           <Tabs
             value={billingCycle}
-            onValueChange={(v) => setBillingCycle(v as UIBillingCycle)}
+            onValueChange={(v) => setBillingCycle(v as BillingCycle)}
             className="w-fit mx-auto"
           >
-            <TabsList className="grid grid-cols-3">
-              <TabsTrigger value="monthly">Monthly</TabsTrigger>
-              <TabsTrigger value="quarterly">Quarterly -10%</TabsTrigger>
-              <TabsTrigger value="yearly">Yearly -20%</TabsTrigger>
+            <TabsList className="inline-flex h-auto p-1">
+              <TabsTrigger value="monthly" className="px-4 py-2">
+                Monthly
+              </TabsTrigger>
+              <TabsTrigger value="quarterly" className="px-4 py-2">
+                Quarterly{" "}
+                <span className="ml-1 text-xs text-emerald-600 font-medium">-5%</span>
+              </TabsTrigger>
+              <TabsTrigger value="half-yearly" className="px-4 py-2">
+                Half-Yearly{" "}
+                <span className="ml-1 text-xs text-emerald-600 font-medium">-10%</span>
+              </TabsTrigger>
+              <TabsTrigger value="yearly" className="px-4 py-2">
+                Yearly{" "}
+                <span className="ml-1 text-xs text-emerald-600 font-medium">-20%</span>
+              </TabsTrigger>
             </TabsList>
           </Tabs>
         </div>
@@ -165,7 +190,7 @@ export function PricingSection({ onPlanSelect }: PricingSectionProps) {
               <Card
                 key={plan.licenseType}
                 className={`relative hover:scale-105 transition-all duration-300 ${
-                plan.popular ? "border-accent shadow-xl lg:scale-105" : ""
+                  plan.popular ? "border-accent shadow-xl lg:scale-105" : ""
                 }`}
                 style={{ animationDelay: `${index * 100}ms` }}
               >
@@ -200,8 +225,8 @@ export function PricingSection({ onPlanSelect }: PricingSectionProps) {
                       )}
                     </div>
 
-                    {!plan.isFree && getDiscountText() && (
-                      <p className="text-sm text-green-600 mt-1">
+                    {!plan.isFree && !plan.isEnterprise && getDiscountText() && (
+                      <p className="text-sm text-emerald-600 mt-1">
                         {getDiscountText()}
                       </p>
                     )}
@@ -212,23 +237,25 @@ export function PricingSection({ onPlanSelect }: PricingSectionProps) {
                   <Button
                     className="w-full"
                     variant={plan.popular ? "default" : "outline"}
-                    onClick={() =>
-                      onPlanSelect(plan.licenseType, billingCycle)
-                    }
+                    onClick={() => handlePlanClick(plan)}
                   >
-                    {plan.isFree ? "Get Started Free" : "Buy Now"}
+                    {plan.isFree
+                      ? "Get Started Free"
+                      : plan.isEnterprise
+                      ? "Contact Sales"
+                      : "Buy Now"}
                   </Button>
 
                   <div className="space-y-3">
                     <p className="text-sm">Includes:</p>
                     {plan.features.map((feature) => (
                       <div key={feature.featureSlug} className="flex items-start gap-2">
-                          <Check className="h-5 w-5 text-accent mt-0.5" />
-                          <span className="text-sm text-muted-foreground">
+                        <Check className="h-5 w-5 text-accent mt-0.5 flex-shrink-0" />
+                        <span className="text-sm text-muted-foreground">
                           {feature.uiLabel}
-                          </span>
+                        </span>
                       </div>
-                      ))}
+                    ))}
                   </div>
                 </CardContent>
               </Card>

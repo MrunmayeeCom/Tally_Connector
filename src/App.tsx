@@ -32,7 +32,7 @@ import { BecomePartner } from "./components/BecomePartnerPage";
 import { Toaster } from "./components/ui/sonner";
 import Tutorial_page from "./components/Tutorial_page";
 
-type BillingCycle = "monthly" | "quarterly" | "yearly";
+type BillingCycle = "monthly" | "quarterly" | "half-yearly" | "yearly";
 
 /* ---------------- SCROLL HANDLER ---------------- */
 
