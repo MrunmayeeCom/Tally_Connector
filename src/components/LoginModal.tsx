@@ -169,7 +169,7 @@ export function LoginModal({ open, onOpenChange, onAdminLogin, onLoginSuccess }:
               </div>
               <Button type="submit" className="w-full">
                 <ShieldCheck className="h-4 w-4 mr-2" />
-                Sign In as Admin
+                Sign In
               </Button>
             </form>
           </CardContent>
