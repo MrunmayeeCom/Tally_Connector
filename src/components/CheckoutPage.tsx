@@ -1,16 +1,16 @@
 import { useState, useEffect } from "react";
-import { Button } from "./ui/button";
 import { useNavigate } from "react-router-dom";
+import { Button } from "./ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Separator } from "./ui/separator";
-import { ArrowLeft, Building2, Mail, Phone, MapPin, CreditCard } from "lucide-react";
+import { ArrowLeft, Building2, Mail, Phone, MapPin, CreditCard, Users } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
 import { purchaseLicense } from "../api/license";
 import { createOrder, verifyPayment } from "../api/payment";
 import { checkCustomerExists, syncCustomer } from "../api/customerSync";
-import { loadRazorpay } from "../utils/loadRazorpay";
+import { loadRazorpay } from "../utils/loadRazorpay"
 import { getStoredUser } from "../api/auth";
 
 type BillingCycle = "monthly" | "quarterly" | "half-yearly" | "yearly";
@@ -35,11 +35,10 @@ export function CheckoutPage({
 
   const loggedInUser = getStoredUser();
   const [billingCycle, setBillingCycle] = useState<BillingCycle>(initialBillingCycle);
-  const [planName, setPlanName] = useState("");
 
   const [formData, setFormData] = useState({
     companyName: "",
-    email: loggedInUser?.email || "",
+    email: "",
     phone: "",
     address: "",
     city: "",
@@ -48,32 +47,55 @@ export function CheckoutPage({
     gstNumber: "",
   });
 
-  const [submitting, setSubmitting] = useState(false);
-
   const [lmsPlan, setLmsPlan] = useState<{
     licenseId: string;
-    monthlyPrice: number;
+    planName: string;   
+    pricePerUser: number; // Price per user per month
+    includedUsers: number; // Number of users included in the plan
   } | null>(null);
 
   const [loading, setLoading] = useState(true);
 
-  /* ---------------- PRICE LOGIC (FIXED) ---------------- */
-
-  const getPrice = () => {
+  // Calculate base monthly cost (price per user × number of users)
+  const getMonthlyBaseCost = () => {
     if (!lmsPlan) return 0;
-
-    const base = lmsPlan.monthlyPrice;
-
-    if (billingCycle === "monthly") return base;
-    if (billingCycle === "quarterly") return Math.round(base * 3 * 0.95); // 5% discount
-    if (billingCycle === "half-yearly") return Math.round(base * 6 * 0.90); // 10% discount
-    return Math.round(base * 12 * 0.8); // 20% discount for yearly
+    return lmsPlan.pricePerUser * lmsPlan.includedUsers;
   };
 
-  const getTax = () => Math.round(getPrice() * 0.18);
-  const getTotal = () => getPrice() + getTax();
+  // Calculate subtotal based on billing cycle BEFORE discount
+  const getSubtotal = () => {
+    const monthlyBase = getMonthlyBaseCost();
+    
+    if (billingCycle === "monthly") return monthlyBase;
+    if (billingCycle === "quarterly") return monthlyBase * 3;
+    if (billingCycle === "half-yearly") return monthlyBase * 6;
+    return monthlyBase * 12;
+  };
 
-  /* ---------------- HANDLERS ---------------- */
+  // Calculate discount amount
+  const getDiscount = () => {
+    const subtotal = getSubtotal();
+    
+    if (billingCycle === "quarterly") return subtotal * 0.05; // 5% discount
+    if (billingCycle === "half-yearly") return subtotal * 0.10; // 10% discount
+    if (billingCycle === "yearly") return subtotal * 0.20; // 20% discount
+    return 0;
+  };
+
+  // Calculate price after discount
+  const getPriceAfterDiscount = () => {
+    return getSubtotal() - getDiscount();
+  };
+
+  // Calculate GST on discounted price
+  const getTax = () => {
+    return Math.round(getPriceAfterDiscount() * 0.18);
+  };
+
+  // Calculate final total
+  const getTotal = () => {
+    return Math.round(getPriceAfterDiscount() + getTax());
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,36 +105,24 @@ export function CheckoutPage({
       return;
     }
 
-    if (!formData.companyName || !formData.email || !formData.phone) {
-      alert("Please fill all required fields");
-      return;
-    }
-
-    setSubmitting(true);
-
     try {
-      // Backend allows only monthly / yearly
+      // Map UI billing cycles to backend billing cycles
       const backendBillingCycle = 
         billingCycle === "quarterly" || billingCycle === "half-yearly" 
           ? "monthly" 
           : billingCycle;
 
-      // 1️⃣ Ensure customer exists in LMS
       const exists = await checkCustomerExists(loggedInUser.email);
       if (!exists) {
-        console.log("🔵 Step 1a: Creating customer...");
         await syncCustomer({
           name: formData.companyName,
           email: loggedInUser.email,
-          source: "Tally",
+          source: "TallyConnect",
         });
       }
 
-      /* ======================================================
-        🔴 FREE PLAN FLOW (NO RAZORPAY)
-      ====================================================== */
-      if (lmsPlan.monthlyPrice === 0) {
-        console.log("🟢 Free plan detected, activating...");
+      // Handle free plan
+      if (lmsPlan.pricePerUser === 0) {
         await purchaseLicense({
           name: formData.companyName,
           email: loggedInUser.email,
@@ -123,15 +133,10 @@ export function CheckoutPage({
         });
 
         alert("Free plan activated successfully 🎉");
-        navigate("/payment-success?free=true");
+        window.location.href = "/payment-success?free=true";
         return;
       }
 
-      /* ======================================================
-        🟢 PAID PLAN FLOW
-      ====================================================== */
-
-      // 2️⃣ Create PENDING transaction in LMS FIRST
       const purchaseRes = await purchaseLicense({
         name: formData.companyName,
         email: loggedInUser.email,
@@ -149,40 +154,36 @@ export function CheckoutPage({
 
       const { transactionId, userId } = data;
 
-      // 3️⃣ Create Razorpay order using LMS userId
       const order = await createOrder({
         userId,
         licenseId: lmsPlan.licenseId,
         billingCycle,
-        amount: getTotal(),
+        amount: getTotal() * 100, // Convert to paise
       });
 
       if (!order?.orderId) {
         throw new Error("Failed to create Razorpay order");
       }
 
-      // 4️⃣ Load Razorpay SDK
       const loaded = await loadRazorpay();
       if (!loaded) {
         alert("Failed to load Razorpay");
         return;
       }
 
-      // 5️⃣ Open Razorpay popup
       const rzp = new (window as any).Razorpay({
         key: order.key,
         amount: order.amount,
         currency: order.currency,
         order_id: order.orderId,
-        name: "Tally",
+        name: "TallyConnect",
         prefill: {
           name: formData.companyName,
-          email: formData.email,
+          email: loggedInUser.email,
           contact: formData.phone,
         },
         handler: async (response: any) => {
           try {
-            console.log("✅ Payment successful, verifying...");
             await verifyPayment({
               transactionId,
               razorpay_payment_id: response.razorpay_payment_id,
@@ -209,16 +210,8 @@ export function CheckoutPage({
       rzp.open();
     } catch (err: any) {
       console.error("Payment error:", err);
-      console.error("Error stack:", err.stack);
-
-      const message =
-        err?.response?.data?.message ||
-        err?.message ||
-        "Something went wrong. Please try again.";
-
+      const message = err?.response?.data?.message || "Something went wrong. Please try again.";
       alert(message);
-    } finally {
-      setSubmitting(false);
     }
   };
 
@@ -228,31 +221,30 @@ export function CheckoutPage({
 
   const getBillingText = () => {
     switch (billingCycle) {
-      case "monthly":
-        return "Monthly";
-      case "quarterly":
-        return "Quarterly";
-      case "half-yearly":
-        return "Half-Yearly";
-      case "yearly":
-        return "Yearly";
+      case "monthly": return "Monthly";
+      case "quarterly": return "Quarterly";
+      case "half-yearly": return "Half-Yearly";
+      case "yearly": return "Yearly";
     }
   };
 
   const getSavingsPercent = () => {
     switch (billingCycle) {
-      case "monthly":
-        return 0;
-      case "quarterly":
-        return 5;
-      case "half-yearly":
-        return 10;
-      case "yearly":
-        return 20;
+      case "monthly": return 0;
+      case "quarterly": return 5;
+      case "half-yearly": return 10;
+      case "yearly": return 20;
     }
   };
 
-  /* ---------------- LMS LOAD ---------------- */
+  const getBillingPeriod = () => {
+    switch (billingCycle) {
+      case "monthly": return "1 month";
+      case "quarterly": return "3 months";
+      case "half-yearly": return "6 months";
+      case "yearly": return "12 months";
+    }
+  };
 
   useEffect(() => {
     if (!loggedInUser?.email) return;
@@ -267,7 +259,7 @@ export function CheckoutPage({
     const loadPlanFromLMS = async () => {
       try {
         const res = await fetch(
-          "https://lisence-system.onrender.com/api/license/licenses-by-product/695902cfc240b17f16c3d716",
+          "http://localhost:4000/api/license/public/licenses-by-product/695902cfc240b17f16c3d716",
           {
             headers: {
               "x-api-key": "my-secret-key-123",
@@ -276,27 +268,143 @@ export function CheckoutPage({
         );
 
         const data = await res.json();
-        console.log("CHECKOUT RAW LMS RESPONSE:", data);
 
-        const licenses = data.licenses || data.data || data || [];
-
-        const matched = licenses.find((lic: any) => {
-          const lt = lic.licenseTypeId || lic.licenseType;
-          return lt?._id === selectedPlan;
-        });
+        const matched = data.licenses.find(
+          (lic: any) => lic?.licenseType?._id === selectedPlan
+        );
 
         if (!matched) {
           throw new Error("Selected plan not found in LMS");
         }
 
-        const lt = matched.licenseTypeId || matched.licenseType;
+        console.log("📦 Matched License:", matched);
+        console.log("🎯 License Type:", matched.licenseType);
+        // console.log("✨ Raw Features:", matched.licenseType.features);
+        
+        // Extract user count from features
+        let userCount = 1; // Default fallback
+        const rawFeatures = matched.licenseType.features || [];
+        
+        // Method 1: Check if features is an array (v1 format with feature registry)
+        if (Array.isArray(rawFeatures)) {
+          // Collect all potential user count features
+          const userFeatures = [];
+          
+          for (const feature of rawFeatures) {
+            if (typeof feature === "object") {
+              // Feature registry format - check all possible field names
+              const label = (feature.uiLabel || feature.displayName || "").toLowerCase();
+              const key = (feature.featureKey || "").toLowerCase();
+              const slug = (feature.featureSlug || "").toLowerCase();
+              const value = feature.limitValue ?? feature.value;
+              
+              // console.log("🔍 Checking feature:", { 
+              //   label, 
+              //   key, 
+              //   slug, 
+              //   type: feature.featureType, 
+              //   value: value,
+              //   displayName: feature.displayName 
+              // });
+              
+              // Look for user-specific features with specific keywords
+              if (feature.featureType === "limit" && typeof value === "number") {
+                // Priority keywords for user count
+                const isUserFeature = 
+                  slug === "user-limit" || 
+                  key === "user-limit" ||
+                  slug.includes("user") || 
+                  key.includes("user") || 
+                  key.includes("seat") ||
+                  slug.includes("seat") ||
+                  label.includes("user") || 
+                  label.includes("seat") ||
+                  (label.includes("includes") && label.includes("user"));
+                
+                if (isUserFeature) {
+                  userFeatures.push({
+                    key: slug || key || label,
+                    value: value,
+                    priority: (slug === "user-limit" || key === "user-limit" || slug === "users" || key === "users") ? 1 : 2
+                  });
+                }
+              }
+            } else if (typeof feature === "string") {
+              // Legacy string format: "Includes 10 users"
+              const match = feature.match(/(\d+)\s*users?/i);
+              if (match) {
+                userFeatures.push({
+                  key: "string-match",
+                  value: parseInt(match[1]),
+                  priority: 1
+                });
+                // console.log("✅ Found users in string feature:", match[1]);
+              }
+            }
+          }
+          
+          // Sort by priority and pick the highest value with highest priority
+          if (userFeatures.length > 0) {
+            userFeatures.sort((a, b) => {
+              if (a.priority !== b.priority) return a.priority - b.priority;
+              return b.value - a.value; // Higher value first
+            });
+            userCount = userFeatures[0].value;
+            console.log("✅ Selected user count:", userCount, "from:", userFeatures[0].key);
+          }
+        } 
+        // Method 2: Check if features is an object/map (v2 format - validatedFeatureMap)
+        else if (typeof rawFeatures === "object" && rawFeatures !== null) {
+          console.log("🔍 Processing features as object/map");
+          
+          // Collect all potential user count features
+          const userFeatures = [];
+          
+          // Loop through the feature map keys
+          for (const [slug, value] of Object.entries(rawFeatures)) {
+            const slugLower = slug.toLowerCase();
+            
+            console.log("🔍 Checking feature key:", slug, "value:", value, "type:", typeof value);
+            
+            // Check if this is a user-related feature with specific keywords
+            const isUserFeature = 
+              slugLower === "user-limit" || 
+              slugLower === "users" || 
+              slugLower === "user" ||
+              slugLower === "seats" ||
+              slugLower.includes("user-limit") ||
+              slugLower.includes("user-count") ||
+              (slugLower.includes("user") && !slugLower.includes("admin") && !slugLower.includes("panel"));
+            
+            if (isUserFeature && typeof value === "number" && value > 0) {
+              userFeatures.push({
+                key: slug,
+                value: value,
+                priority: (slugLower === "user-limit" || slugLower === "users") ? 1 : 2
+              });
+              console.log("✅ Found potential user feature:", slug, "=", value);
+            }
+          }
+          
+          // Sort and pick the best match
+          if (userFeatures.length > 0) {
+            userFeatures.sort((a, b) => {
+              if (a.priority !== b.priority) return a.priority - b.priority;
+              return b.value - a.value; // Higher value first
+            });
+            userCount = userFeatures[0].value;
+            console.log("✅ Selected user count:", userCount, "from key:", userFeatures[0].key);
+          }
+        }
+
+        console.log("🎯 Final user count:", userCount);
 
         setLmsPlan({
           licenseId: matched._id,
-          monthlyPrice: lt.price?.amount ?? 0,
+          planName: matched.licenseType.name, 
+          pricePerUser: matched.licenseType.price.amount, // Price per user per month
+          includedUsers: userCount, // Number of users in the plan
         });
-        setPlanName(lt.name);
-
       } catch (err) {
         console.error("Failed to load checkout plan", err);
       } finally {
@@ -307,29 +415,33 @@ export function CheckoutPage({
     loadPlanFromLMS();
   }, [selectedPlan]);
 
-  if (loading || !lmsPlan) return null;
+  if (loading || !lmsPlan) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="h-8 w-8 border-4 border-blue-300 border-t-blue-600 rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-muted-foreground">Loading checkout...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white dark:from-gray-900 dark:to-background py-12">
       <div className="container mx-auto px-4 max-w-7xl">
-        <Button 
-          variant="ghost" 
-          onClick={onBack}
-          className="mb-6"
-        >
+        <Button variant="ghost" onClick={onBack} className="mb-6">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Plans
         </Button>
 
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-2">Complete Your Order</h1>
+          <h1 className="mb-2">Complete Your Order</h1>
           <p className="text-muted-foreground">
-            Just one step away from transforming your field sales
+            Seamlessly connect your Tally with modern business tools
           </p>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
-          {/* Left Side - Form */}
           <div className="lg:col-span-2 space-y-6">
             <Card>
               <CardHeader>
@@ -365,9 +477,8 @@ export function CheckoutPage({
                           type="email"
                           placeholder="company@example.com"
                           value={formData.email}
-                          onChange={(e) => handleInputChange('email', e.target.value)}
-                          className="pl-10"
-                          required
+                          readOnly
+                          className="pl-10 bg-muted cursor-not-allowed"
                         />
                       </div>
                     </div>
@@ -446,15 +557,11 @@ export function CheckoutPage({
                       />
                     </div>
                   </div>
+
                   <div className="pt-4 flex justify-end">
-                    <Button
-                      type="submit"
-                      size="lg"
-                      className="gap-2"
-                      disabled={submitting}
-                    >
+                    <Button type="submit" size="lg" className="gap-2">
                       <CreditCard className="h-4 w-4" />
-                      {submitting ? "Processing..." : "Proceed to Payment"}
+                      Proceed to Payment
                     </Button>
                   </div>
                 </form>
@@ -462,7 +569,6 @@ export function CheckoutPage({
             </Card>
           </div>
 
-          {/* Right Side - Order Summary */}
           <div className="lg:col-span-1">
             <Card className="sticky top-6">
               <CardHeader>
@@ -471,30 +577,40 @@ export function CheckoutPage({
               <CardContent className="space-y-6">
                 <div>
                   <p className="text-sm text-muted-foreground mb-2">Selected Plan</p>
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium">{planName}</span>
-                    <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full text-sm">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900 
+                 text-blue-700 dark:text-blue-300 
+                 rounded-full text-sm font-medium">{lmsPlan.planName}</span>
+                    <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full text-sm font-medium">
                       {getBillingText()}
                     </span>
+                  </div>
+                  
+                  {/* Show included users */}
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Users className="h-4 w-4" />
+                    <span>Includes {lmsPlan.includedUsers} users</span>
                   </div>
                 </div>
 
                 <div>
                   <p className="text-sm text-muted-foreground mb-3">Billing Cycle</p>
                   <Tabs value={billingCycle} onValueChange={(value) => setBillingCycle(value as BillingCycle)}>
-                    <TabsList className="grid w-full grid-cols-4">
-                      <TabsTrigger value="monthly" className="text-xs">Monthly</TabsTrigger>
+                    <TabsList className="w-full grid-cols-4">
+                      <TabsTrigger value="monthly" className="text-xs">
+                        Monthly
+                      </TabsTrigger>
                       <TabsTrigger value="quarterly" className="text-xs">
                         Quarterly
-                        <span className="ml-1 text-[10px] text-emerald-600 dark:text-emerald-400"></span>
+                        <span className="ml-1 text-[10px] text-green-600 dark:text-green-400">-5%</span>
                       </TabsTrigger>
                       <TabsTrigger value="half-yearly" className="text-xs">
                         Half-Yearly
-                        <span className="ml-1 text-[10px] text-emerald-600 dark:text-emerald-400"></span>
+                        <span className="ml-1 text-[10px] text-green-600 dark:text-green-400">-10%</span>
                       </TabsTrigger>
                       <TabsTrigger value="yearly" className="text-xs">
                         Yearly
-                        <span className="ml-1 text-[10px] text-emerald-600 dark:text-emerald-400"></span>
+                        <span className="ml-1 text-[10px] text-green-600 dark:text-green-400">-20%</span>
                       </TabsTrigger>
                     </TabsList>
                   </Tabs>
@@ -504,26 +620,45 @@ export function CheckoutPage({
 
                 <div className="space-y-3">
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Plan Price</span>
-                    <span>₹{getPrice().toLocaleString()}</span>
+                    <span className="text-muted-foreground">Price per user/month</span>
+                    <span>₹{lmsPlan.pricePerUser.toLocaleString('en-IN')}</span>
                   </div>
+                  
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">GST (18%)</span>
-                    <span>₹{getTax().toLocaleString()}</span>
+                    <span className="text-muted-foreground">Number of users</span>
+                    <span>×{lmsPlan.includedUsers}</span>
                   </div>
+                  
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Billing period</span>
+                    <span>{getBillingPeriod()}</span>
+                  </div>
+                  
+                  <Separator className="my-2" />
+                  
+                  <div className="flex justify-between text-sm font-medium">
+                    <span className="text-muted-foreground">Subtotal</span>
+                    <span>₹{getSubtotal().toLocaleString('en-IN')}</span>
+                  </div>
+                  
                   {getSavingsPercent() > 0 && (
-                    <div className="flex justify-between text-sm text-emerald-600 dark:text-emerald-400">
+                    <div className="flex justify-between text-sm text-green-600 dark:text-green-400 font-medium">
                       <span>Discount ({getSavingsPercent()}%)</span>
-                      <span>You Save!</span>
+                      <span>-₹{getDiscount().toLocaleString('en-IN')}</span>
                     </div>
                   )}
+                  
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">GST (18%)</span>
+                    <span>₹{getTax().toLocaleString('en-IN')}</span>
+                  </div>
                 </div>
 
                 <Separator />
 
                 <div className="flex justify-between items-baseline">
-                  <span className="text-lg font-semibold">Total Amount</span>
-                  <span className="text-2xl font-bold">₹{getTotal().toLocaleString()}</span>
+                  <span className="font-semibold">Total Amount</span>
+                  <span className="text-2xl font-bold">₹{getTotal().toLocaleString('en-IN')}</span>
                 </div>
 
                 <div className="space-y-2 text-xs text-muted-foreground">

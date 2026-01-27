@@ -65,9 +65,9 @@ export function PricingSection({ onPlanSelect }: PricingSectionProps) {
   };
 
   const getBillingText = () => {
-    if (billingCycle === "monthly") return "/month";
-    if (billingCycle === "quarterly") return "/quarter";
-    if (billingCycle === "half-yearly") return "/6 months";
+    if (billingCycle === "monthly") return "/user/month";
+    if (billingCycle === "quarterly") return "/user/quarter";
+    if (billingCycle === "half-yearly") return "/user/6 months";
     return "/year";
   };
 
@@ -91,7 +91,7 @@ export function PricingSection({ onPlanSelect }: PricingSectionProps) {
     const loadPlans = async () => {
       try {
         const res = await fetch(
-          "https://lisence-system.onrender.com/api/license/licenses-by-product/695902cfc240b17f16c3d716",
+          "http://localhost:4000/api/license/public/licenses-by-product/695902cfc240b17f16c3d716",
           {
             headers: { "x-api-key": "my-secret-key-123" },
           }
