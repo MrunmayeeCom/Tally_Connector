@@ -583,7 +583,7 @@ export default function TutorialPage() {
   <button
     onClick={() =>
       (window.location.href =
-        'https://frontend-8x7e.onrender.com/')
+        'https://tally-connect-frontend.onrender.com/')
     }
     style={{
       padding: '1.25rem 3.5rem',   

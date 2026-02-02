@@ -89,12 +89,12 @@ export function CheckoutPage({
 
   // Calculate GST on discounted price
   const getTax = () => {
-    return Math.round(getPriceAfterDiscount() * 0.18);
+    return (getPriceAfterDiscount() * 0.18);
   };
 
   // Calculate final total
   const getTotal = () => {
-    return Math.round(getPriceAfterDiscount() + getTax());
+    return (getPriceAfterDiscount() + getTax());
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

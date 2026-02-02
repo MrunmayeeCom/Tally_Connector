@@ -77,6 +77,31 @@ export default function App() {
     window.history.scrollRestoration = "manual";
   }, []);
 
+  /* ---------------- SCROLL TO PRICING ---------------- */
+  const scrollToPricing = () => {
+    // If not on home page, navigate to home first
+    if (location.pathname !== "/") {
+      navigate("/");
+      // Wait for navigation to complete, then scroll
+      setTimeout(() => {
+        const el = document.getElementById("pricing");
+        if (el) {
+          const yOffset = -80;
+          const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+          window.scrollTo({ top: y, behavior: "smooth" });
+        }
+      }, 100);
+    } else {
+      // Already on home page, just scroll
+      const el = document.getElementById("pricing");
+      if (el) {
+        const yOffset = -80;
+        const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+        window.scrollTo({ top: y, behavior: "smooth" });
+      }
+    }
+  };
+
   const handleAdminLogin = () => {
     if (!pendingCheckout) return;
     const planSlug = selectedPlan.toLowerCase().replace(/\s+/g, "-");
@@ -227,6 +252,8 @@ export default function App() {
         open={loginModalOpen}
         onOpenChange={setLoginModalOpen}
         onAdminLogin={handleAdminLogin}
+        onLoginSuccess={() => setLoginModalOpen(false)}
+        onNavigateToPricing={scrollToPricing}
       />
 
       <Toaster />

@@ -13,16 +13,67 @@ interface LoginModalProps {
   onOpenChange: (open: boolean) => void;
   onAdminLogin: (type: "admin" | "customer", name: string) => void;
   onLoginSuccess?: () => void;
+  onNavigateToPricing?: () => void;
 }
 
-export function LoginModal({ open, onOpenChange, onAdminLogin, onLoginSuccess }: LoginModalProps) {
+export function LoginModal({ open, onOpenChange, onAdminLogin, onLoginSuccess, onNavigateToPricing }: LoginModalProps) {
   const [adminEmail, setAdminEmail] = useState("");
   const [adminPassword, setAdminPassword] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // ⚠️ FUNCTION NAME UNCHANGED
+  const checkActiveLicense = async (email: string): Promise<boolean> => {
+    try {
+      console.log('Checking active license for:', email);
+      const response = await fetch(
+        `https://lisence-system.onrender.com/api/external/actve-license/${email}?productId=695902cfc240b17f16c3d716`,
+        {
+          headers: {
+            "x-api-key": "my-secret-key-123",
+          },
+        }
+      );
+
+      console.log('License check response status:', response.status);
+      
+      if (response.ok) {
+        const data = await response.json();
+        console.log('License check response data:', data);
+        
+        // Check if activeLicense exists and status is 'active'
+        const hasLicense = data.activeLicense && data.activeLicense.status === 'active';
+        console.log('Has active license:', hasLicense);
+        return hasLicense;
+      }
+      console.log('License check failed - response not ok');
+      return false;
+    } catch (error) {
+      console.error("Error checking active license:", error);
+      return false;
+    }
+  };
+
+  const handlePostLoginActions = async (email: string) => {
+    // Check if user has active license
+    const hasActiveLicense = await checkActiveLicense(email);
+
+    // Close the modal
+    onOpenChange(false);
+    onLoginSuccess?.();
+
+    // Small delay to ensure modal closes before action
+    setTimeout(() => {
+      if (hasActiveLicense) {
+        // Redirect to admin dashboard in new tab
+        window.open("https://tally-connect-frontend.onrender.com", "_blank");
+      } else {
+        // Navigate to pricing section
+        onNavigateToPricing?.();
+      }
+    }, 100);
+  };
+
   const handleAdminLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -43,6 +94,7 @@ export function LoginModal({ open, onOpenChange, onAdminLogin, onLoginSuccess }:
         if (!exists) {
           toast.error("Account not found. Please create an account.");
           setIsSignUp(true); // 🔁 switch to signup
+          setLoading(false);
           return;
         }
 
@@ -55,6 +107,7 @@ export function LoginModal({ open, onOpenChange, onAdminLogin, onLoginSuccess }:
       if (isSignUp) {
         if (!name) {
           toast.error("Name is required to create account");
+          setLoading(false);
           return;
         }
 
@@ -76,13 +129,14 @@ export function LoginModal({ open, onOpenChange, onAdminLogin, onLoginSuccess }:
         })
       );
 
-      onOpenChange(false);
-
-      // 🔥 DO NOT CHANGE THIS CALL
+      // 🔥 Call the parent handler
       onAdminLogin("admin", name || adminEmail.split("@")[0]);
 
-      // Optional extra callback
-      onLoginSuccess?.();
+      // Dispatch event to notify Navbar of login status change
+      window.dispatchEvent(new Event('userLoginStatusChanged'));
+
+      // ✅ CHECK LICENSE AND REDIRECT
+      await handlePostLoginActions(adminEmail);
 
     } catch (err: any) {
       console.error(err);
@@ -96,15 +150,14 @@ export function LoginModal({ open, onOpenChange, onAdminLogin, onLoginSuccess }:
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Login to Tally Connector</DialogTitle>
+          <DialogTitle>{isSignUp ? "Create Account" : "Login to Tally Connector"}</DialogTitle>
           <DialogDescription>
-            Sign in to continue
+            {isSignUp ? "Sign up to get started" : "Sign in to continue"}
           </DialogDescription>
         </DialogHeader>
 
         <Card>
           <CardHeader>
-            {/* <CardTitle>Admin Portal</CardTitle> */}
             <CardDescription>
               Enter your credentials to continue
             </CardDescription>
@@ -167,10 +220,21 @@ export function LoginModal({ open, onOpenChange, onAdminLogin, onLoginSuccess }:
                   Forgot password?
                 </a>
               </div>
-              <Button type="submit" className="w-full">
+              <Button type="submit" className="w-full" disabled={loading}>
                 <ShieldCheck className="h-4 w-4 mr-2" />
-                Sign In
+                {loading ? "Processing..." : isSignUp ? "Create Account" : "Sign In"}
               </Button>
+              
+              {/* Toggle between sign in and sign up */}
+              <div className="text-center text-sm">
+                <button
+                  type="button"
+                  onClick={() => setIsSignUp(!isSignUp)}
+                  className="text-primary hover:underline"
+                >
+                  {isSignUp ? "Already have an account? Sign in" : "Don't have an account? Sign up"}
+                </button>
+              </div>
             </form>
           </CardContent>
         </Card>
