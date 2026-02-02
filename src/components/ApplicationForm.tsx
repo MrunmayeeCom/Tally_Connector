@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { motion } from "motion/react";
-import axios from "axios";
-import API from "../api/AxiosInstance";
+import { submitPartnerApplication } from "../api/partnerProgram";
 
 const ApplicationForm = () => {
   const [formData, setFormData] = useState({
@@ -46,7 +45,7 @@ const ApplicationForm = () => {
 
       companyInformation: {
         companyName: formData.companyName,
-        website: formData.website,
+        website: formData.website || "",
         country: formData.country,
         city: formData.city,
       },
@@ -63,14 +62,11 @@ const ApplicationForm = () => {
         motivation: formData.message,
       },
 
-      source: "tally Connector",
+      source: "tally",
     };
 
     try {
-      await API.post(
-        "/api/partner-program/create",
-        payload
-      );
+      await submitPartnerApplication(payload);
 
       alert("Application submitted successfully!");
 
@@ -90,10 +86,14 @@ const ApplicationForm = () => {
         message: "",
       });
     } catch (error: any) {
-      alert(
-        error?.response?.data?.message ||
-          "Submission failed. Please try again."
-      );
+      console.error("Partner application failed:", error);
+      console.error("Error response:", error.response?.data);
+      
+      const errorMessage = error.response?.data?.message 
+        || error.message 
+        || "Submission failed. Please try again.";
+      
+      alert(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -266,7 +266,7 @@ const ApplicationForm = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-4 bg-[#0066CC] text-white rounded-lg font-semibold hover:bg-[#004C99]"
+              className="w-full py-4 bg-[#0066CC] text-white rounded-lg font-semibold hover:bg-[#004C99] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {isSubmitting ? "Submitting..." : "Submit Application"}
             </button>
