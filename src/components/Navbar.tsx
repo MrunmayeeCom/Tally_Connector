@@ -81,7 +81,8 @@ export function Navbar({ scrolled }: NavbarProps) {
               </button>
             ))}
             <button
-              onClick={() => scrollToSection('faq')}
+              onClick={() => {
+                window.location.href = "https://tally-connect-frontend.onrender.com";}}
               className="px-6 py-2 bg-[#0066CC] text-white rounded-lg hover:bg-[#004C99] transition-all font-medium"
             >
               Login
@@ -125,12 +126,6 @@ export function Navbar({ scrolled }: NavbarProps) {
                 className="block w-full text-left text-[#002855] hover:text-[#00BCD4] transition-colors py-2 font-medium"
               >
                 Partners
-              </button>
-              <button
-                onClick={() => scrollToSection('faq')}
-                className="w-full px-6 py-2 bg-[#0066CC] text-white rounded-lg hover:bg-[#004C99] transition-all font-medium"
-              >
-                Login
               </button>
             </div>
           </motion.div>

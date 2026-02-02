@@ -106,11 +106,6 @@ export function CheckoutPage({
     }
 
     try {
-      // Map UI billing cycles to backend billing cycles
-      const backendBillingCycle = 
-        billingCycle === "quarterly" || billingCycle === "half-yearly" 
-          ? "monthly" 
-          : billingCycle;
 
       const exists = await checkCustomerExists(loggedInUser.email);
       if (!exists) {
@@ -141,12 +136,12 @@ export function CheckoutPage({
         name: formData.companyName,
         email: loggedInUser.email,
         licenseId: lmsPlan.licenseId,
-        billingCycle: backendBillingCycle,
+        billingCycle: billingCycle,
         amount: getTotal(),
         currency: "INR",
       });
-
-      const { data } = purchaseRes;
+      
+      const data = purchaseRes.data || purchaseRes;
 
       if (!data?.transactionId || !data?.userId) {
         throw new Error("Transaction data missing from LMS");
@@ -209,8 +204,7 @@ export function CheckoutPage({
 
       rzp.open();
     } catch (err: any) {
-      console.error("Payment error:", err);
-      const message = err?.response?.data?.message || "Something went wrong. Please try again.";
+      const message = err?.response?.data?.message || err?.message || "Something went wrong. Please try again.";
       alert(message);
     }
   };
@@ -259,7 +253,7 @@ export function CheckoutPage({
     const loadPlanFromLMS = async () => {
       try {
         const res = await fetch(
-          "http://localhost:4000/api/license/public/licenses-by-product/695902cfc240b17f16c3d716",
+          "https://lisence-system.onrender.com/api/license/public/licenses-by-product/695902cfc240b17f16c3d716",
           {
             headers: {
               "x-api-key": "my-secret-key-123",
