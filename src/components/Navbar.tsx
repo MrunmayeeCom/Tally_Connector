@@ -1,5 +1,5 @@
-import { Menu, X } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { Menu, X, ChevronDown, User, LogOut, LayoutDashboard } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 
@@ -10,6 +10,7 @@ interface NavbarProps {
 
 export function Navbar({ scrolled, onLoginClick }: NavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [hasActiveLicense, setHasActiveLicense] = useState(false);
   const [hasAnyPlan, setHasAnyPlan] = useState(false);
@@ -17,12 +18,13 @@ export function Navbar({ scrolled, onLoginClick }: NavbarProps) {
   const [userName, setUserName] = useState("");
   const location = useLocation();
   const navigate = useNavigate();
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const navItems = [
     { label: 'Features', href: 'features', id: 'features' },
     { label: 'Pricing', href: 'pricing', id: 'pricing' },
-    { label: 'User Side', href: 'user-features', id: 'user-features' },
-    { label: 'Admin Panel', href: 'admin-features', id: 'admin-features' },
+    { label: 'User Side', href: 'user-side', id: 'user-side' },
+    { label: 'Admin Panel', href: 'admin-panel', id: 'admin-panel' },
     { label: 'Technical', href: 'technical', id: 'technical' },
     { label: 'Partners', href: 'partners', id: 'partners' },
     { label: 'FAQ', href: 'faq', id: 'faq' },
@@ -42,6 +44,20 @@ export function Navbar({ scrolled, onLoginClick }: NavbarProps) {
     return () => {
       window.removeEventListener('userLoginStatusChanged', handleLoginStatusChange);
       window.removeEventListener('storage', handleLoginStatusChange);
+    };
+  }, []);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
 
@@ -107,48 +123,62 @@ export function Navbar({ scrolled, onLoginClick }: NavbarProps) {
     }
   };
 
-  const scrollToSection = (sectionId: string) => {
+  const scrollToSection = (sectionId: string, href: string) => {
     // If not on home page, navigate to home first
     if (location.pathname !== '/') {
-      navigate('/', { state: { scrollTo: sectionId } });
+      navigate('/');
+      
+      // After navigation, update URL and scroll
+      setTimeout(() => {
+        window.history.pushState({}, '', `/${href}`);
+        
+        const element = document.getElementById(sectionId);
+        if (element) {
+          const yOffset = -80;
+          const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+          window.scrollTo({ top: y, behavior: 'smooth' });
+        }
+      }, 100);
     } else {
+      // Update URL without navigation - URL stays permanently
+      window.history.pushState({}, '', `/${href}`);
+      
+      // Scroll to section
       const element = document.getElementById(sectionId);
       if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
+        const yOffset = -80;
+        const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+        window.scrollTo({ top: y, behavior: 'smooth' });
       }
     }
     setMobileMenuOpen(false);
   };
 
   const handleNavClick = (item: typeof navItems[0]) => {
-    scrollToSection(item.id);
+    scrollToSection(item.id, item.href);
   };
 
-  const handleLoginButtonClick = () => {
-    if (!isLoggedIn) {
-      // Not logged in - open login modal
-      onLoginClick();
-    } else if (hasActiveLicense) {
-      // Logged in with active license - go to dashboard
-      window.open("https://tally-connect-frontend.onrender.com", "_blank");
-    } else {
-      // Logged in without license - go to pricing
-      scrollToSection("pricing");
-    }
+  const handleDashboardClick = () => {
+    window.open("https://tally-connect-frontend.onrender.com", "_blank");
+    setDropdownOpen(false);
     setMobileMenuOpen(false);
   };
 
   const getLoginButtonText = () => {
-    if (!isLoggedIn) {
-      return "Login";
-    } else if (hasActiveLicense) {
+    if (hasActiveLicense) {
       return "Dashboard";
     } else if (hasAnyPlan) {
-      // User has a plan but it's not active (expired/cancelled)
       return "Upgrade";
     } else {
-      // User is logged in but has never had a plan
       return "Get Started";
+    }
+  };
+
+  const handleLoginButtonClick = () => {
+    if (hasActiveLicense) {
+      handleDashboardClick();
+    } else {
+      scrollToSection("pricing", "pricing");
     }
   };
 
@@ -159,8 +189,20 @@ export function Navbar({ scrolled, onLoginClick }: NavbarProps) {
     setHasAnyPlan(false);
     setUserEmail("");
     setUserName("");
+    setDropdownOpen(false);
     window.dispatchEvent(new Event('userLoginStatusChanged'));
     setMobileMenuOpen(false);
+  };
+
+  // Get user initials
+  const getUserInitials = () => {
+    if (!userName) return "U";
+    return userName
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
   };
 
   return (
@@ -172,9 +214,12 @@ export function Navbar({ scrolled, onLoginClick }: NavbarProps) {
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 md:h-20">
+        <div className="flex items-center h-16 md:h-20">
           {/* Logo */}
-          <Link to="/">
+          <div onClick={() => {
+            window.history.pushState({}, '', '/');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}>
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -189,10 +234,10 @@ export function Navbar({ scrolled, onLoginClick }: NavbarProps) {
                 Tally Connect
               </span>
             </motion.div>
-          </Link>
+          </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          {/* Desktop Navigation - Centered */}
+          <div className="hidden md:flex items-center justify-center flex-1 space-x-8">
             {navItems.map((item) => (
               <button
                 key={item.label}
@@ -202,37 +247,96 @@ export function Navbar({ scrolled, onLoginClick }: NavbarProps) {
                 {item.label}
               </button>
             ))}
-            
-            {isLoggedIn && (
-              <span className="text-[#002855] text-sm">
-                {userName}
-              </span>
-            )}
-            
-            <button
-              onClick={handleLoginButtonClick}
-              className="px-6 py-2 bg-[#0066CC] text-white rounded-lg hover:bg-[#004C99] transition-all font-medium"
-            >
-              {getLoginButtonText()}
-            </button>
+          </div>
 
-            {isLoggedIn && (
+          {/* Right side - User dropdown or Login */}
+          <div className="hidden md:flex items-center">
+            {isLoggedIn ? (
+              <div className="flex items-center gap-3">
+                {/* User Dropdown */}
+                <div className="relative" ref={dropdownRef}>
+                  <button
+                    onClick={() => setDropdownOpen(!dropdownOpen)}
+                    className="w-11 h-11 rounded-full bg-gradient-to-br from-[#0066CC] to-[#004C99] flex items-center justify-center text-white font-semibold text-sm hover:scale-105 transition-transform border-2 border-transparent hover:border-[#00BCD4] shadow-md"
+                  >
+                    {getUserInitials()}
+                  </button>
+
+                  <AnimatePresence>
+                    {dropdownOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.2 }}
+                        className="absolute right-0 mt-3 w-72 bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden"
+                      >
+                        {/* Dropdown Header */}
+                        <div className="p-4 border-b border-gray-100 bg-gradient-to-br from-gray-50 to-white">
+                          <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#0066CC] to-[#004C99] flex items-center justify-center text-white font-semibold flex-shrink-0">
+                              {getUserInitials()}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-semibold text-[#002855] text-base truncate">
+                                {userName}
+                              </p>
+                              <p className="text-sm text-gray-600 truncate">
+                                {userEmail}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Dropdown Body */}
+                        <div className="p-2">
+                          {/* Only show Dashboard button if user has active license */}
+                          {hasActiveLicense && (
+                            <>
+                              <button
+                                onClick={handleDashboardClick}
+                                className="w-full flex items-center gap-3 px-4 py-3 text-[#002855] hover:bg-gray-50 rounded-lg transition-colors text-left"
+                              >
+                                <LayoutDashboard size={20} className="flex-shrink-0" />
+                                <span className="font-medium">Dashboard</span>
+                              </button>
+
+                              <div className="my-2 border-t border-gray-100"></div>
+                            </>
+                          )}
+
+                          <button
+                            onClick={handleLogout}
+                            className="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors text-left"
+                          >
+                            <LogOut size={20} className="flex-shrink-0" />
+                            <span className="font-medium">Logout</span>
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </div>
+            ) : (
               <button
-                onClick={handleLogout}
-                className="text-[#002855] hover:text-[#00BCD4] transition-colors font-medium"
+                onClick={onLoginClick}
+                className="px-6 py-2 bg-[#0066CC] text-white rounded-lg hover:bg-[#004C99] transition-all font-medium"
               >
-                Logout
+                Login
               </button>
             )}
           </div>
 
           {/* Mobile menu button */}
-          <button
-            className="md:hidden text-[#002855]"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+          <div className="md:hidden ml-auto">
+            <button
+              className="text-[#002855]"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -256,25 +360,56 @@ export function Navbar({ scrolled, onLoginClick }: NavbarProps) {
                 </button>
               ))}
               
-              {isLoggedIn && (
-                <div className="text-[#002855] text-sm py-2">
-                  Logged in as: {userName}
-                </div>
-              )}
-              
-              <button
-                onClick={handleLoginButtonClick}
-                className="w-full px-6 py-2 bg-[#0066CC] text-white rounded-lg hover:bg-[#004C99] transition-all font-medium text-center"
-              >
-                {getLoginButtonText()}
-              </button>
+              {isLoggedIn ? (
+                <>
+                  <div className="pt-3 pb-2 border-t border-gray-200">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#0066CC] to-[#004C99] flex items-center justify-center text-white font-semibold text-sm">
+                        {getUserInitials()}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-[#002855] text-sm truncate">
+                          {userName}
+                        </p>
+                        <p className="text-xs text-gray-600 truncate">
+                          {userEmail}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
 
-              {isLoggedIn && (
+                  <button
+                    onClick={handleLoginButtonClick}
+                    className="w-full px-6 py-2 bg-[#0066CC] text-white rounded-lg hover:bg-[#004C99] transition-all font-medium text-center"
+                  >
+                    {getLoginButtonText()}
+                  </button>
+
+                  {/* Only show Dashboard button in mobile if user has active license */}
+                  {hasActiveLicense && (
+                    <button
+                      onClick={handleDashboardClick}
+                      className="w-full flex items-center justify-center gap-2 px-6 py-2 text-[#002855] border border-[#0066CC] rounded-lg hover:bg-gray-50 transition-all font-medium"
+                    >
+                      <LayoutDashboard size={18} />
+                      Dashboard
+                    </button>
+                  )}
+
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center justify-center gap-2 px-6 py-2 text-red-600 border border-red-600 rounded-lg hover:bg-red-50 transition-all font-medium"
+                  >
+                    <LogOut size={18} />
+                    Logout
+                  </button>
+                </>
+              ) : (
                 <button
-                  onClick={handleLogout}
-                  className="w-full text-left text-[#002855] hover:text-[#00BCD4] transition-colors py-2 font-medium"
+                  onClick={onLoginClick}
+                  className="w-full px-6 py-2 bg-[#0066CC] text-white rounded-lg hover:bg-[#004C99] transition-all font-medium text-center"
                 >
-                  Logout
+                  Login
                 </button>
               )}
             </div>

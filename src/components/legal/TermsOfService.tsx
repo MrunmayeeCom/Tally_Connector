@@ -27,7 +27,7 @@ export function TermsOfService() {
               1. Acceptance of Terms
             </h2>
             <p className="text-gray-700 leading-relaxed">
-              By accessing and using Trackon, you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to these terms, please do not use our services.
+              By accessing and using Tally Connector, you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to these terms, please do not use our services.
             </p>
           </section>
           
@@ -36,7 +36,7 @@ export function TermsOfService() {
               2. Use License
             </h2>
             <p className="text-gray-700 leading-relaxed mb-4">
-              Permission is granted to temporarily access Trackon for personal, non-commercial transitory viewing only. This is the grant of a license, not a transfer of title, and under this license you may not:
+              Permission is granted to temporarily access Tally Connector for personal, non-commercial transitory viewing only. This is the grant of a license, not a transfer of title, and under this license you may not:
             </p>
             <ul className="list-disc pl-6 text-gray-700 space-y-2">
               <li>Modify or copy the materials</li>
@@ -70,7 +70,7 @@ export function TermsOfService() {
               5. Limitation of Liability
             </h2>
             <p className="text-gray-700 leading-relaxed">
-              In no event shall Trackon or its suppliers be liable for any damages arising out of the use or inability to use our services, even if we have been notified of the possibility of such damages.
+              In no event shall Tally Connector or its suppliers be liable for any damages arising out of the use or inability to use our services, even if we have been notified of the possibility of such damages.
             </p>
           </section>
           
@@ -88,7 +88,7 @@ export function TermsOfService() {
               7. Contact Information
             </h2>
             <p className="text-gray-700 leading-relaxed">
-              Questions about the Terms of Service should be sent to us at legal@trackon.com.
+              Questions about the Terms of Service should be sent to us at legal@tallyconnector.com.
             </p>
           </section>
         </div>

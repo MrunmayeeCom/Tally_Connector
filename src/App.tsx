@@ -34,33 +34,6 @@ import Tutorial_page from "./components/Tutorial_page";
 
 type BillingCycle = "monthly" | "quarterly" | "half-yearly" | "yearly";
 
-/* ---------------- SCROLL HANDLER ---------------- */
-
-function SectionRedirect({ sectionId }: { sectionId: string }) {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    navigate("/", { replace: true });
-
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        const el = document.getElementById(sectionId);
-        if (!el) return;
-
-        const yOffset = -80;
-        const y =
-          el.getBoundingClientRect().top +
-          window.pageYOffset +
-          yOffset;
-
-        window.scrollTo({ top: y, behavior: "smooth" });
-      });
-    });
-  }, [navigate, sectionId]);
-
-  return null;
-}
-
 /* ---------------- MAIN APP ---------------- */
 
 export default function App() {
@@ -76,6 +49,34 @@ export default function App() {
   useEffect(() => {
     window.history.scrollRestoration = "manual";
   }, []);
+
+  // Handle initial URL-based scrolling when component mounts or route changes
+  useEffect(() => {
+    // Map of routes to section IDs
+    const sectionMap: Record<string, string> = {
+      '/features': 'features',
+      '/pricing': 'pricing',
+      '/user-side': 'user-side',
+      '/admin-panel': 'admin-panel',
+      '/technical': 'technical',
+      '/partners': 'partners',
+      '/faq': 'faq',
+    };
+
+    const sectionId = sectionMap[location.pathname];
+    
+    if (sectionId) {
+      // Small delay to ensure DOM is ready
+      setTimeout(() => {
+        const element = document.getElementById(sectionId);
+        if (element) {
+          const yOffset = -80;
+          const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+          window.scrollTo({ top: y, behavior: 'smooth' });
+        }
+      }, 100);
+    }
+  }, [location.pathname]);
 
   /* ---------------- SCROLL TO PRICING ---------------- */
   const scrollToPricing = () => {
@@ -104,16 +105,31 @@ export default function App() {
 
   const handleAdminLogin = () => {
     if (!pendingCheckout) return;
-    const planSlug = selectedPlan.toLowerCase().replace(/\s+/g, "-");
-    navigate(`/checkout/${planSlug}`);
-    setPendingCheckout(false);
+    
+    // Small delay to ensure modal closes and state updates
+    setTimeout(() => {
+      const planSlug = selectedPlan.toLowerCase().replace(/\s+/g, "-");
+      navigate(`/checkout/${planSlug}`);
+      setPendingCheckout(false);
+    }, 100);
   };
 
   const handlePlanSelect = (plan: string, cycle: BillingCycle) => {
     setSelectedPlan(plan);
     setBillingCycle(cycle);
-    setPendingCheckout(true);
-    setLoginModalOpen(true);
+    
+    // Check if user is already logged in
+    const user = localStorage.getItem('user');
+    
+    if (user) {
+      // User is logged in, navigate directly to checkout
+      const planSlug = plan.toLowerCase().replace(/\s+/g, "-");
+      navigate(`/checkout/${planSlug}`);
+    } else {
+      // User not logged in, show login modal
+      setPendingCheckout(true);
+      setLoginModalOpen(true);
+    }
   };
 
   const handleGetStartedClick = () => {
@@ -168,12 +184,12 @@ export default function App() {
           <TechnicalDetails />
         </section>
 
-        <section id="faq" className="scroll-mt-24">
-          <FAQ />
-        </section>
-
         <section id="partners" className="scroll-mt-24">
           <Partners />
+        </section>
+
+        <section id="faq" className="scroll-mt-24">
+          <FAQ />
         </section>
 
         <Footer />
@@ -206,17 +222,17 @@ export default function App() {
       )}
 
       <Routes>
-        {/* Main page */}
+        {/* Main page - handles all section routes */}
         <Route path="/" element={<HomePage />} />
-
-        {/* SEO-friendly virtual routes */}
-        <Route path="/features" element={<SectionRedirect sectionId="features" />} />
-        <Route path="/pricing" element={<SectionRedirect sectionId="pricing" />} />
-        <Route path="/user-side" element={<SectionRedirect sectionId="user-side" />} />
-        <Route path="/admin-panel" element={<SectionRedirect sectionId="admin-panel" />} />
-        <Route path="/technical" element={<SectionRedirect sectionId="technical" />} />
-        <Route path="/faq" element={<SectionRedirect sectionId="faq" />} />
-        <Route path="/partners" element={<SectionRedirect sectionId="partners" />} />
+        <Route path="/features" element={<HomePage />} />
+        <Route path="/pricing" element={<HomePage />} />
+        <Route path="/user-side" element={<HomePage />} />
+        <Route path="/admin-panel" element={<HomePage />} />
+        <Route path="/technical" element={<HomePage />} />
+        <Route path="/partners" element={<HomePage />} />
+        <Route path="/faq" element={<HomePage />} />
+        
+        {/* Separate pages */}
         <Route path="/become-partner" element={<BecomePartner />} />
 
         {/* Checkout */}

@@ -96,7 +96,7 @@ export function CookiePolicy() {
               6. Contact Us
             </h2>
             <p className="text-gray-700 leading-relaxed">
-              If you have questions about our use of cookies, please contact us at cookies@trackon.com.
+              If you have questions about our use of cookies, please contact us at cookies@tallyconnector.com.
             </p>
           </section>
         </div>

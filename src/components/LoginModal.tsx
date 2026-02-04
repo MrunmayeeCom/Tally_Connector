@@ -6,7 +6,7 @@ import { Label } from "./ui/label";
 import { Button } from "./ui/button";
 import { Mail, Lock, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
-import { syncCustomer, checkCustomerExists } from "../api/customerSync";
+import { syncCustomer, checkCustomerExists, loginCustomer } from "../api/customerSync";
 
 interface LoginModalProps {
   open: boolean;
@@ -22,6 +22,8 @@ export function LoginModal({ open, onOpenChange, onAdminLogin, onLoginSuccess, o
   const [isSignUp, setIsSignUp] = useState(false);
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
+  const [hasLoginError, setHasLoginError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const checkActiveLicense = async (email: string): Promise<boolean> => {
     try {
@@ -76,9 +78,11 @@ export function LoginModal({ open, onOpenChange, onAdminLogin, onLoginSuccess, o
 
   const handleAdminLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setHasLoginError(false); // Reset error state
+    setErrorMessage("");
 
-    if (!adminEmail) {
-      toast.error("Email is required");
+    if (!adminEmail || !adminPassword) {
+      toast.error("Email and password are required");
       return;
     }
 
@@ -89,16 +93,69 @@ export function LoginModal({ open, onOpenChange, onAdminLogin, onLoginSuccess, o
       // SIGN IN FLOW
       // ----------------------------
       if (!isSignUp) {
+        // STEP 1: Check if email exists in database
         const exists = await checkCustomerExists(adminEmail);
 
         if (!exists) {
+          // Email doesn't exist - redirect to sign up
           toast.error("Account not found. Please create an account.");
-          setIsSignUp(true); // 🔁 switch to signup
+          setIsSignUp(true);
+          setHasLoginError(true);
+          setErrorMessage("Account not found");
           setLoading(false);
           return;
         }
 
-        toast.success("Login successful");
+        // STEP 2: Email exists - now validate password
+        try {
+          const loginResponse = await loginCustomer({
+            email: adminEmail,
+            password: adminPassword,
+          });
+
+          if (!loginResponse.success) {
+            setHasLoginError(true);
+            setErrorMessage("Invalid credentials");
+            toast.error("Invalid password");
+            setLoading(false);
+            return;
+          }
+
+          toast.success("Login successful");
+
+          // Store user data from successful login
+          if (loginResponse.customer) {
+            localStorage.setItem(
+              "user",
+              JSON.stringify({
+                name: loginResponse.customer.name,
+                email: loginResponse.customer.email,
+              })
+            );
+
+            // Call the parent handler
+            onAdminLogin("admin", loginResponse.customer.name);
+
+            // Dispatch event to notify Navbar of login status change
+            window.dispatchEvent(new Event('userLoginStatusChanged'));
+
+            // ✅ CHECK LICENSE AND REDIRECT
+            await handlePostLoginActions(adminEmail);
+          }
+        } catch (loginError: any) {
+          // Handle password validation errors
+          console.error("Login error:", loginError);
+          setHasLoginError(true);
+          setErrorMessage("Invalid credentials");
+          
+          if (loginError.response?.status === 401) {
+            toast.error("Invalid password");
+          } else {
+            toast.error(loginError.message || "Login failed");
+          }
+          setLoading(false);
+          return;
+        }
       }
 
       // ----------------------------
@@ -111,39 +168,77 @@ export function LoginModal({ open, onOpenChange, onAdminLogin, onLoginSuccess, o
           return;
         }
 
+        // Check if customer already exists
+        const exists = await checkCustomerExists(adminEmail);
+        if (exists) {
+          toast.error("Account already exists. Please sign in.");
+          setIsSignUp(false);
+          setLoading(false);
+          return;
+        }
+
+        // Create new customer with password
         await syncCustomer({
           name,
           email: adminEmail,
           source: "Tally",
+          password: adminPassword,
         });
 
         toast.success("Account created successfully");
+
+        // Store user data
+        localStorage.setItem(
+          "user",
+          JSON.stringify({
+            name: name,
+            email: adminEmail,
+          })
+        );
+
+        // Call the parent handler
+        onAdminLogin("admin", name);
+
+        // Dispatch event to notify Navbar of login status change
+        window.dispatchEvent(new Event('userLoginStatusChanged'));
+
+        // ✅ CHECK LICENSE AND REDIRECT
+        await handlePostLoginActions(adminEmail);
       }
 
-      // ✅ TEMP SESSION (required for checkout)
-      localStorage.setItem(
-        "user",
-        JSON.stringify({
-          name: name || adminEmail.split("@")[0],
-          email: adminEmail,
-        })
-      );
-
-      // 🔥 Call the parent handler
-      onAdminLogin("admin", name || adminEmail.split("@")[0]);
-
-      // Dispatch event to notify Navbar of login status change
-      window.dispatchEvent(new Event('userLoginStatusChanged'));
-
-      // ✅ CHECK LICENSE AND REDIRECT
-      await handlePostLoginActions(adminEmail);
+      // Check if there's a selected plan to redirect to checkout
+      const selectedPlan = localStorage.getItem('selectedPlan');
+      if (selectedPlan) {
+        const { plan, billingCycle } = JSON.parse(selectedPlan);
+        localStorage.removeItem('selectedPlan');
+        // Navigate to checkout
+        // Example: window.location.href = `/checkout?plan=${plan}&billing=${billingCycle}`;
+      }
 
     } catch (err: any) {
-      console.error(err);
-      toast.error(err.message || "Something went wrong");
+      console.error("General error:", err);
+      setHasLoginError(true);
+      
+      // More specific error handling
+      if (err.response?.status === 401) {
+        setErrorMessage("Invalid credentials");
+        toast.error("Invalid password");
+      } else {
+        setErrorMessage("Something went wrong");
+        toast.error(err.message || "Something went wrong");
+      }
     } finally {
       setLoading(false);
     }
+  };
+
+  // Reset error state when switching between sign in/sign up
+  const toggleSignUpMode = () => {
+    setIsSignUp(!isSignUp);
+    setHasLoginError(false);
+    setErrorMessage("");
+    setAdminPassword(""); // Clear password when switching modes
+    setName(""); // Clear name when switching modes
   };
 
   return (
@@ -158,8 +253,8 @@ export function LoginModal({ open, onOpenChange, onAdminLogin, onLoginSuccess, o
 
         <Card>
           <CardHeader>
-            <CardDescription>
-              Enter your credentials to continue
+            <CardDescription className={hasLoginError ? "text-red-500 font-medium" : ""}>
+              {hasLoginError && errorMessage ? errorMessage : "Enter your credentials to continue"}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -188,8 +283,12 @@ export function LoginModal({ open, onOpenChange, onAdminLogin, onLoginSuccess, o
                     type="email"
                     placeholder="admin@tally.com"
                     value={adminEmail}
-                    onChange={(e) => setAdminEmail(e.target.value)}
-                    className="pl-10"
+                    onChange={(e) => {
+                      setAdminEmail(e.target.value);
+                      setHasLoginError(false);
+                      setErrorMessage("");
+                    }}
+                    className={`pl-10 ${hasLoginError ? 'border-red-500' : ''}`}
                     required
                   />
                 </div>
@@ -203,23 +302,31 @@ export function LoginModal({ open, onOpenChange, onAdminLogin, onLoginSuccess, o
                     type="password"
                     placeholder="••••••••"
                     value={adminPassword}
-                    onChange={(e) => setAdminPassword(e.target.value)}
-                    className="pl-10"
+                    onChange={(e) => {
+                      setAdminPassword(e.target.value);
+                      setHasLoginError(false);
+                      setErrorMessage("");
+                    }}
+                    className={`pl-10 ${hasLoginError ? 'border-red-500' : ''}`}
                     required
                   />
                 </div>
               </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <input type="checkbox" id="admin-remember" className="rounded" />
-                  <Label htmlFor="admin-remember" className="text-sm cursor-pointer">
-                    Remember me
-                  </Label>
+              
+              {!isSignUp && (
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <input type="checkbox" id="admin-remember" className="rounded" />
+                    <Label htmlFor="admin-remember" className="text-sm cursor-pointer">
+                      Remember me
+                    </Label>
+                  </div>
+                  <a href="#" className="text-sm text-primary hover:underline">
+                    Forgot password?
+                  </a>
                 </div>
-                <a href="#" className="text-sm text-primary hover:underline">
-                  Forgot password?
-                </a>
-              </div>
+              )}
+              
               <Button type="submit" className="w-full" disabled={loading}>
                 <ShieldCheck className="h-4 w-4 mr-2" />
                 {loading ? "Processing..." : isSignUp ? "Create Account" : "Sign In"}
@@ -229,7 +336,7 @@ export function LoginModal({ open, onOpenChange, onAdminLogin, onLoginSuccess, o
               <div className="text-center text-sm">
                 <button
                   type="button"
-                  onClick={() => setIsSignUp(!isSignUp)}
+                  onClick={toggleSignUpMode}
                   className="text-primary hover:underline"
                 >
                   {isSignUp ? "Already have an account? Sign in" : "Don't have an account? Sign up"}

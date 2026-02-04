@@ -87,7 +87,7 @@ export function Security() {
                   Compliance & Certifications
                 </h2>
                 <p className="text-gray-700 leading-relaxed mb-4">
-                  Trackon is committed to maintaining the highest security standards and complying with relevant regulations:
+                  Tally Connector is committed to maintaining the highest security standards and complying with relevant regulations:
                 </p>
                 <ul className="list-disc pl-6 text-gray-700 space-y-2">
                   <li>SOC 2 Type II certified</li>
@@ -123,7 +123,7 @@ export function Security() {
               Responsible Disclosure
             </h2>
             <p className="text-gray-700 leading-relaxed">
-              If you discover a security vulnerability in our system, please report it to security@trackon.com. We appreciate responsible disclosure and will work with you to address any issues promptly.
+              If you discover a security vulnerability in our system, please report it to security@tallyconnector.com. We appreciate responsible disclosure and will work with you to address any issues promptly.
             </p>
           </section>
           
@@ -132,7 +132,7 @@ export function Security() {
               Questions?
             </h2>
             <p className="text-gray-700 leading-relaxed">
-              If you have any questions about our security practices, please contact our security team at security@trackon.com.
+              If you have any questions about our security practices, please contact our security team at security@tallyconnector.com.
             </p>
           </section>
         </div>

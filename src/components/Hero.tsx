@@ -38,7 +38,7 @@ export function Hero({
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl mx-auto leading-tight"
+              className="text-4xl sm:text-5xl md:text-5xl lg:text-8xl mx-auto leading-tight"
             >
               <motion.span
                 initial={{ opacity: 0, x: -20 }}
@@ -72,7 +72,7 @@ export function Hero({
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.6 }}
-              className="text-[#5A6C7D] text-lg sm:text-xl md:text-2xl max-w-3xl mx-auto leading-relaxed"
+              className="text-[#5A6C7D] text-lg sm:text-xl md:text-2xl max-w-2xl mx-auto leading-relaxed"
             >
               Streamline operations, boost productivity, and scale faster with
               Tally Connect — trusted by SMEs and enterprises across industries.

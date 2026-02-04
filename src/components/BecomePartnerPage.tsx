@@ -1,11 +1,19 @@
 import { motion } from 'motion/react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { CheckCircle, Globe, TrendingUp, Users, Award, Briefcase, Target, Zap } from 'lucide-react';
 import ApplicationForm from './ApplicationForm';
 
 export function BecomePartner() {
+  const navigate = useNavigate();
 
+  const handlePartnersClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    
+    // Navigate to /partners route
+    // App.tsx will handle the scrolling automatically
+    navigate('/partners');
+  };
 
   const partnerBenefits = [
     {
@@ -89,12 +97,12 @@ export function BecomePartner() {
             <div className="flex-1 md:flex-none px-8 py-4 text-center bg-white text-[#002855] font-medium border-b-4 border-white">
               Become a partner
             </div>
-            <Link
-              to="/partners"
+            <button
+              onClick={handlePartnersClick}
               className="flex-1 md:flex-none px-8 py-4 text-center text-white hover:bg-white/10 transition-colors font-medium border-b-4 border-transparent hover:border-white"
             >
               Partner directory
-            </Link>
+            </button>
           </div>
         </div>
       </div>

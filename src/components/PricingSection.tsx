@@ -67,8 +67,8 @@ export function PricingSection({ onPlanSelect }: PricingSectionProps) {
   const getBillingText = () => {
     if (billingCycle === "monthly") return "/user/month";
     if (billingCycle === "quarterly") return "/user/quarter";
-    if (billingCycle === "half-yearly") return "/user/6 months";
-    return "/year";
+    if (billingCycle === "half-yearly") return "/user/half-yearly";
+    return "/user/year";
   };
 
   const getDiscountText = () => {
@@ -195,7 +195,7 @@ export function PricingSection({ onPlanSelect }: PricingSectionProps) {
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-accent text-white px-4 py-1 rounded-full text-sm">
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-accent text-white px-3 py-1 rounded-full text-sm">
                     Most Popular
                   </div>
                 )}
@@ -212,10 +212,10 @@ export function PricingSection({ onPlanSelect }: PricingSectionProps) {
                   <div className="pt-4">
                     <div className="flex items-baseline gap-2">
                       {plan.isFree ? (
-                        <span className="text-4xl">Free</span>
+                        <span className="font-bold text-xl">Free</span>
                       ) : (
                         <>
-                          <span className="text-4xl">
+                          <span className="font-bold text-xl">
                             ₹{getPrice(plan).toLocaleString()}
                           </span>
                           <span className="text-muted-foreground">
@@ -225,7 +225,7 @@ export function PricingSection({ onPlanSelect }: PricingSectionProps) {
                       )}
                     </div>
 
-                    {!plan.isFree && !plan.isEnterprise && getDiscountText() && (
+                    {!plan.isFree && getDiscountText() && (
                       <p className="text-sm text-emerald-600 mt-1">
                         {getDiscountText()}
                       </p>

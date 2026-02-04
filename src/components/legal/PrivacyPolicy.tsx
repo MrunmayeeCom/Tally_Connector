@@ -27,7 +27,7 @@ export function PrivacyPolicy() {
               1. Information We Collect
             </h2>
             <p className="text-gray-700 leading-relaxed">
-              We collect information that you provide directly to us when using Trackon, including your name, email address, company information, and usage data. We also automatically collect certain information about your device and how you interact with our services.
+              We collect information that you provide directly to us when using Tally Connector, including your name, email address, company information, and usage data. We also automatically collect certain information about your device and how you interact with our services.
             </p>
           </section>
           
@@ -70,7 +70,7 @@ export function PrivacyPolicy() {
               5. Your Rights
             </h2>
             <p className="text-gray-700 leading-relaxed">
-              You have the right to access, correct, or delete your personal information. You may also object to or restrict certain processing of your information. To exercise these rights, please contact us at privacy@trackon.com.
+              You have the right to access, correct, or delete your personal information. You may also object to or restrict certain processing of your information. To exercise these rights, please contact us at privacy@tallyconnector.com.
             </p>
           </section>
           
@@ -79,7 +79,7 @@ export function PrivacyPolicy() {
               6. Contact Us
             </h2>
             <p className="text-gray-700 leading-relaxed">
-              If you have any questions about this Privacy Policy, please contact us at privacy@trackon.com.
+              If you have any questions about this Privacy Policy, please contact us at privacy@tallyconnector.com.
             </p>
           </section>
         </div>
