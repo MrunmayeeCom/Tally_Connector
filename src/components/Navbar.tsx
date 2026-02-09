@@ -159,7 +159,7 @@ export function Navbar({ scrolled, onLoginClick }: NavbarProps) {
   };
 
   const handleDashboardClick = () => {
-    window.open("https://tally-connect-frontend.onrender.com", "_blank");
+    window.open("https://tally-connect-yu2q.onrender.com", "_blank");
     setDropdownOpen(false);
     setMobileMenuOpen(false);
   };

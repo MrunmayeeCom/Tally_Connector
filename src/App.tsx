@@ -31,6 +31,7 @@ import { BecomePartner } from "./components/BecomePartnerPage";
 
 import { Toaster } from "./components/ui/sonner";
 import Tutorial_page from "./components/Tutorial_page";
+import { ContactSupportPage } from "./components/ContactPage";
 
 type BillingCycle = "monthly" | "quarterly" | "half-yearly" | "yearly";
 
@@ -150,6 +151,12 @@ export default function App() {
     }
   };
 
+  const handleFooterNavigate = (
+    page: "privacy" | "terms" | "cookies" | "security"
+  ) => {
+    navigate(`/${page}`);
+  };
+
   /* ---------------- HOME PAGE ---------------- */
 
   const HomePage = () => (
@@ -192,7 +199,7 @@ export default function App() {
           <FAQ />
         </section>
 
-        <Footer />
+        <Footer onNavigate={handleFooterNavigate} />
       </main>
 
       <ScrollToTop />
@@ -255,10 +262,20 @@ export default function App() {
         <Route path="/tutorials" element={<Tutorial_page />} />
 
         {/* Legal pages */}
-        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-        <Route path="/terms-of-service" element={<TermsOfService />} />
-        <Route path="/cookie-policy" element={<CookiePolicy />} />
-        <Route path="/security" element={<Security />} />
+        <Route path="/privacy" element={<PrivacyPolicy onBack={() => navigate("/")} />} />
+        <Route path="/terms" element={<TermsOfService onBack={() => navigate("/")} />} />
+        <Route path="/cookies" element={<CookiePolicy onBack={() => navigate("/")} />} />
+        <Route path="/security" element={<Security onBack={() => navigate("/")} />} />
+
+        <Route
+          path="/contact"
+          element={
+            <>
+              <ContactSupportPage onBack={() => navigate("/")} />
+              <Footer onNavigate={handleFooterNavigate} />
+            </>
+          }
+        />
 
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />

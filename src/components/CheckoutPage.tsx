@@ -106,16 +106,6 @@ export function CheckoutPage({
     }
 
     try {
-
-      const exists = await checkCustomerExists(loggedInUser.email);
-      if (!exists) {
-        await syncCustomer({
-          name: formData.companyName,
-          email: loggedInUser.email,
-          source: "TallyConnect",
-        });
-      }
-
       // Handle free plan
       if (lmsPlan.pricePerUser === 0) {
         await purchaseLicense({

@@ -1,4 +1,5 @@
 import { motion } from 'motion/react';
+import { useNavigate } from "react-router-dom";
 import { ChevronDown } from 'lucide-react';
 
 interface HeroSectionProps {
@@ -11,6 +12,7 @@ export function Hero({
   onLearnMoreClick,
 }: HeroSectionProps){
 
+  const navigate = useNavigate();
   return (
     <>
       {/* Navy tagline bar */}
@@ -86,7 +88,7 @@ export function Hero({
               className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4"
             >
               <motion.button 
-                onClick={onGetStartedClick}
+                onClick={() => navigate('/contact')}
                 whileHover={{ scale: 1.05, boxShadow: '0 10px 25px rgba(0, 102, 204, 0.3)' }}
                 whileTap={{ scale: 0.95 }}
                 className="px-8 py-4 bg-[#0066CC] text-white rounded-lg hover:bg-[#004C99] transition-all shadow-md hover:shadow-lg font-medium"

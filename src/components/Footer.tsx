@@ -1,6 +1,10 @@
 import { Link } from 'react-router-dom';
 
-export function Footer() {
+interface FooterProps {
+  onNavigate: (page: 'privacy' | 'terms' | 'cookies' | 'security') => void;
+}
+
+export function Footer({ onNavigate }: FooterProps) {
   return (
     <footer className="relative py-8 border-t border-gray-200 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -12,30 +16,30 @@ export function Footer() {
             Powered by Averlon.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6 text-sm">
-            <Link 
-              to="/privacy-policy" 
-              className="text-[#00BCD4] hover:text-[#0066CC] transition-colors font-medium"
+            <button 
+              onClick={() => onNavigate('privacy')} 
+              className="hover:text-accent transition-all duration-300 hover:scale-110"
             >
               Privacy Policy
-            </Link>
-            <Link 
-              to="/terms-of-service" 
-              className="text-[#00BCD4] hover:text-[#0066CC] transition-colors font-medium"
+            </button>
+            <button 
+              onClick={() => onNavigate('terms')} 
+              className="hover:text-accent transition-all duration-300 hover:scale-110"
             >
               Terms of Service
-            </Link>
-            <Link 
-              to="/cookie-policy" 
-              className="text-[#00BCD4] hover:text-[#0066CC] transition-colors font-medium"
+            </button>
+            <button 
+              onClick={() => onNavigate('cookies')} 
+              className="hover:text-accent transition-all duration-300 hover:scale-110"
             >
               Cookie Policy
-            </Link>
-            <Link 
-              to="/security" 
-              className="text-[#00BCD4] hover:text-[#0066CC] transition-colors font-medium"
+            </button>
+            <button 
+              onClick={() => onNavigate('security')} 
+              className="hover:text-accent transition-all duration-300 hover:scale-110"
             >
               Security
-            </Link>
+            </button>
           </div>
         </div>
       </div>

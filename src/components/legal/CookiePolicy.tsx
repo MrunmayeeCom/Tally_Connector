@@ -1,10 +1,16 @@
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
+import { Button } from "../ui/button";
 
-export function CookiePolicy() {
+interface CookiePolicyProps {
+  onBack: () => void;
+}
+
+export function CookiePolicy({ onBack }: CookiePolicyProps) {
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <Button variant="ghost" onClick={onBack} className="mb-6"></Button>
         <Link 
           to="/" 
           className="inline-flex items-center gap-2 text-cyan-600 hover:text-cyan-700 transition-colors mb-8"

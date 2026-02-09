@@ -68,7 +68,7 @@ export function LoginModal({ open, onOpenChange, onAdminLogin, onLoginSuccess, o
     setTimeout(() => {
       if (hasActiveLicense) {
         // Redirect to admin dashboard in new tab
-        window.open("https://tally-connect-frontend.onrender.com", "_blank");
+        window.open("https://tally-connect-yu2q.onrender.com", "_blank");
       } else {
         // Navigate to pricing section
         onNavigateToPricing?.();
