@@ -6,17 +6,38 @@ import { useEffect, useState } from "react";
 import { getTransactionDetails } from "../api/payment";
 import { downloadInvoice } from "../api/payment";
 import { useNavigate } from "react-router-dom";
+
 export function PaymentSuccess() {
   const navigate = useNavigate();
 
   const [params] = useSearchParams();
   const transactionId = params.get("txn");
+  const planId = params.get("plan");
+  const cycle = params.get("cycle");
+  const isFree = params.get("free") === "true";
 
   const [loading, setLoading] = useState(true);
   const [transaction, setTransaction] = useState<any>(null);
 
   useEffect(() => {
-    if (!transactionId) return;
+    // For free plans, skip transaction fetch and show success immediately
+    if (isFree) {
+      setTransaction({
+        plan: "Free Plan",
+        amount: 0,
+        status: "Active",
+        createdAt: new Date().toISOString(),
+        transactionId: transactionId || "free-plan",
+      });
+      setLoading(false);
+      return;
+    }
+
+    // For paid plans, fetch transaction details
+    if (!transactionId) {
+      setLoading(false);
+      return;
+    }
 
     const fetchTransaction = async () => {
       try {
@@ -30,7 +51,7 @@ export function PaymentSuccess() {
     };
 
     fetchTransaction();
-  }, [transactionId]);
+  }, [transactionId, isFree]);
 
   const handleDownloadInvoice = () => {
     if (!transactionId) {
@@ -38,7 +59,12 @@ export function PaymentSuccess() {
       return;
     }
     
-    // ✅ Use the downloadInvoice function from api/payment.ts
+    // Don't allow invoice download for free plans
+    if (isFree) {
+      alert("Invoices are not available for free plans");
+      return;
+    }
+    
     downloadInvoice(transactionId);
   };
 
@@ -70,13 +96,15 @@ export function PaymentSuccess() {
             </div>
 
             <div>
-              <h1 className="text-3xl">Payment Successful!</h1>
+              <h1 className="text-3xl">
+                {isFree ? "Free Plan Activated!" : "Payment Successful!"}
+              </h1>
               <p className="text-muted-foreground">
                 Your subscription is now active
               </p>
             </div>
 
-            {/* ✅ REAL TRANSACTION DATA */}
+            {/* ✅ TRANSACTION DATA */}
             <div className="bg-blue-50 p-6 rounded-lg text-left space-y-3">
               <h3 className="text-lg">Order Details</h3>
 
@@ -88,7 +116,7 @@ export function PaymentSuccess() {
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Amount</span>
                 <span>
-                  ₹{(transaction.amount).toFixed(2)}
+                  {isFree ? "Free" : `₹${(transaction.amount).toFixed(2)}`}
                 </span>
               </div>
 
@@ -107,20 +135,22 @@ export function PaymentSuccess() {
 
             {/* ✅ ACTIONS */}
             <div className="space-y-3">
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={handleDownloadInvoice}
-              >
-                <Download className="h-4 w-4 mr-2" />
-                Download Invoice
-              </Button>
+              {/* Only show download invoice button for paid plans */}
+              {!isFree && (
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={handleDownloadInvoice}
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Download Invoice
+                </Button>
+              )}
 
               <Button
                 size="lg"
                 className="w-full"
                 onClick={() => navigate("/tutorials")}
-
               >
                 Go to tutorial
                 <ArrowRight className="h-4 w-4 ml-2" />
@@ -136,7 +166,7 @@ export function PaymentSuccess() {
         <div className="mt-8 text-center text-sm text-muted-foreground">
           Questions? Email{" "}
           <a
-            href="mailto:support@trackon.com"
+            href="mailto:support@tallyconnector.com"
             className="text-blue-600 hover:underline"
           >
             support@tallyconnector.com

@@ -108,7 +108,7 @@ export function CheckoutPage({
     try {
       // Handle free plan
       if (lmsPlan.pricePerUser === 0) {
-        await purchaseLicense({
+        const purchaseRes = await purchaseLicense({
           name: formData.companyName,
           email: loggedInUser.email,
           licenseId: lmsPlan.licenseId, 
@@ -117,8 +117,12 @@ export function CheckoutPage({
           currency: "INR",
         });
 
-        alert("Free plan activated successfully 🎉");
-        window.location.href = "/payment-success?free=true";
+        const data = purchaseRes.data || purchaseRes;
+        const transactionId = data?.transactionId || "free-plan";
+
+        navigate(`/payment-success?txn=${transactionId}&plan=${encodeURIComponent(
+          lmsPlan.planName
+        )}&free=true`);  
         return;
       }
 
