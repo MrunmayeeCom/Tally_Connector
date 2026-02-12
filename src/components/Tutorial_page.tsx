@@ -1,24 +1,26 @@
-import { motion } from 'motion/react'
-import { useState } from 'react'
+import { motion, AnimatePresence, useScroll, useTransform } from 'motion/react'
+import { useState, useEffect, useRef } from 'react'
 import {
+  ArrowUp,
+  ArrowDown,
   ArrowRight,
   CheckCircle,
   UserPlus,
   Settings,
   Shield,
   Users,
-  UserCircle,
-  CheckCircle2,
-  CreditCard,
   HardDrive,
   Play,
   ExternalLink,
   UserCheck,
+  Sparkles,
+  Zap,
+  Eye,
+  Info
 } from 'lucide-react'
 
-import { TutorialVideo } from './TutorialVideo'
+import TutorialVideo from './TutorialVideo'
 import { Footer } from './Footer'
-
 
 import login_page from './assets/login_page.png'
 import dashboard_page from './assets/dashboard_page.png'
@@ -28,603 +30,1720 @@ import add_user from './assets/add_user.png'
 import user_created from './assets/user_created.png'
 import save_changes from './assets/save_changes.png'
 
+type ScreenshotStyle = {
+  bg: string
+  border: string
+  shadow: string
+}
+
+const CARD_PALETTE: ScreenshotStyle[] = [
+  { bg: '#e0f2fe', border: '#38bdf8', shadow: 'rgba(56,189,248,0.25)' },   // sky blue
+  { bg: '#fce7f3', border: '#f472b6', shadow: 'rgba(244,114,182,0.25)' },  // pink
+  { bg: '#dcfce7', border: '#4ade80', shadow: 'rgba(74,222,128,0.25)' },   // green
+  { bg: '#ede9fe', border: '#a78bfa', shadow: 'rgba(167,139,250,0.25)' },  // violet
+  { bg: '#fff7ed', border: '#fb923c', shadow: 'rgba(251,146,60,0.25)' },   // orange
+  { bg: '#fef9c3', border: '#facc15', shadow: 'rgba(250,204,21,0.25)' },   // yellow
+  { bg: '#ccfbf1', border: '#2dd4bf', shadow: 'rgba(45,212,191,0.25)' },   // teal
+  { bg: '#fee2e2', border: '#f87171', shadow: 'rgba(248,113,113,0.25)' },  // red
+  { bg: '#ecf3e4', border: '#7a8f3a', shadow: 'rgba(122,143,58,0.25)' }, // olive green
+  
+]
+
+// Wraps around only if you ever have more cards than palette entries.
+const getScreenshotStyle = (index: number) => {
+  return CARD_PALETTE[index % CARD_PALETTE.length]
+}
+
+
+
 /* ======================
    TUTORIAL DATA
 ====================== */
 
-const tutorialSections = [
+type TutorialStep = {
+  number: number
+  title: string
+  description: string
+  icon: React.ForwardRefExoticComponent<any>
+  iconColor: string
+  image: string
+  details: string[]
+}
+
+type TutorialSection = {
+  sectionId: number
+  sectionTitle: string
+  sectionDescription: string
+  steps: TutorialStep[]
+}
+
+const tutorialSections: TutorialSection[] = [
   {
     sectionId: 1,
-    sectionTitle: '🧑‍💼1: Admin Registration & License Setup',
+    sectionTitle: '1: Admin Registration & License Setup',
     sectionDescription:
       'Initial system onboarding where the Admin registers, activates the license, and securely sets up credentials.',
     steps: [
       {
         number: 1,
-        title: 'Admin Registration',
+        title: 'Admin Registration, License Activation & Credential Setup',
         description:
-          'The Admin registers on the Tally Connector portal to initialize the system.',
-        icon: UserPlus,
-        iconColor: '#2196F3',
-        image: login_page,
-      },
-      {
-        number: 2,
-        title: 'License Activation',
-        description:
-          'A valid license is activated to enable dashboard access.',
-        icon: CreditCard,
-        iconColor: '#4CAF50',
-        image: login_page,
-      },
-      {
-        number: 3,
-        title: 'Admin Credentials Creation',
-        description:
-          'Admin ID and password are finalized for secure access.',
+          'The Admin completes registration, license activation, and secure credential setup to access the dashboard.',
         icon: Shield,
         iconColor: '#1976D2',
         image: login_page,
-      },
-      {
-        number: 4,
-        title: 'Secure Credential Storage',
-        description:
-          'Credentials are securely stored with role-based access control.',
-        icon: HardDrive,
-        iconColor: '#607D8B',
-        image: login_page,
+        details: [
+          'Admin completes registration process',
+          'Admin license gets activated',
+          'Admin ID and password setup',
+          'Credentials securely stored for authentication',
+        ],
       },
     ],
   },
   {
     sectionId: 2,
-    sectionTitle: '🖥️ 2: Agent Setup & Authentication',
+    sectionTitle: '2: Agent Setup & Authentication',
     sectionDescription:
-      'Agent installation and authentication for real-time sync.',
+      'Agent installation and authentication for real-time synchronization.',
     steps: [
       {
-        number: 5,
-        title: 'Download Agent',
+        number: 2,
+        title: 'Agent Download, Installation & Authentication',
         description:
-          'Admin downloads the Tally Connector Agent from the dashboard.',
+          'The Admin downloads, installs, and authenticates the desktop agent to enable secure real-time data synchronization.',
         icon: Users,
         iconColor: '#673AB7',
         image: dashboard_page,
-      },
-      {
-        number: 6,
-        title: 'Install Agent',
-        description:
-          'Agent is installed on the system running Tally Prime.',
-        icon: Settings,
-        iconColor: '#009688',
-        image: dashboard_page,
-      },
-      {
-        number: 7,
-        title: 'Agent Login',
-        description:
-          'Agent logs in using Admin credentials.',
-        icon: UserCircle,
-        iconColor: '#3F51B5',
-        image: login_page,
-      },
-      {
-        number: 8,
-        title: 'Credential Validation',
-        description:
-          'Credentials are validated and sync begins.',
-        icon: CheckCircle2,
-        iconColor: '#4CAF50',
-        image: dashboard_page,
+        details: [
+          'Admin downloads the desktop agent',
+          'Agent installation on the system',
+          'Agent login with Admin ID and password',
+          'Credentials validated - Access Denied if invalid',
+        ],
       },
     ],
   },
   {
     sectionId: 3,
-    sectionTitle: '🔄 3: Data Sync & Login Routing',
-    sectionDescription:
-      'Data synchronization and login routing.',
+    sectionTitle: '3: Data Sync & Login Routing',
+    sectionDescription: 'Data synchronization and login routing.',
     steps: [
       {
         number: 9,
         title: 'Data Synchronization',
         description:
-          'Data is synced from Tally Prime to the cloud.',
+          'Financial data including ledgers, vouchers, inventory, and reports are securely synchronized from Tally Prime to the cloud dashboard.',
         icon: HardDrive,
         iconColor: '#0288D1',
         image: dashboard_page,
+        details: [
+          'Data sync initiated by Agent',
+          'Pulls data from Tally Prime',
+          'Data stored in Admin-specific database',
+          'Reliable data transfer process',
+        ],
       },
       {
         number: 10,
         title: 'Login Redirection',
         description:
-          'Users are redirected to the login screen.',
+          'After synchronization, users are redirected to the login screen, ensuring role-based access to dashboards and reports.',
         icon: ArrowRight,
         iconColor: '#455A64',
         image: login_page,
+        details: [
+          'Automatic login redirection',
+          'Login type determined: Admin or User',
+          'Admin routed to Admin Dashboard',
+          'User routed to User Dashboard',
+        ],
       },
     ],
   },
-  
-{
-  sectionId: 4,
-  sectionTitle: '🔐 4: Role-Based Access Control',
-  sectionDescription:
-    'Admins define and manage user roles, permissions, and dashboard access to ensure secure and controlled system usage.',
-  steps: [
-    {
-      number: 11,
-      title: 'User Management Dashboard',
-      description:
-        'Admins access the User Management page to view all registered users along with their email IDs and current access status. This screen serves as the central hub for managing company access and permissions.',
-      icon: Users,
-      iconColor: '#6A1B9A',
-      image: user_management_page, // Screenshot 1
-    },
-    {
-      number: 12,
-      title: 'Create New User',
-      description:
-        'Admins click on the "Create User" button to add a new user. A modal appears where details such as employee name, email address, company name, and temporary password are entered.',
-      icon: UserPlus,
-      iconColor: '#1976D2',
-      image: add_user, // Screenshot 3
-    },
-    {
-      number: 13,
-      title: 'Assign User Access',
-      description:
-        'Once a user is created, Admins can configure access settings by selecting the user and navigating to the permissions screen for role-based control.',
-      icon: UserCheck,
-      iconColor: '#2E7D32',
-      image: user_created, // Screenshot 1
-    },
-    {
-      number: 14,
-      title: 'Dashboard Permissions Configuration',
-      description:
-        'Admins configure dashboard widget visibility for the selected user. Access toggles allow enabling or disabling widgets such as Total Receivables, Total Payables, Pending Bills, Income vs Expense Charts, and more.',
-      icon: Settings,
-      iconColor: '#EF6C00',
-      image: save_changes, 
-    },
-    {
-      number: 15,
-      title: 'Save Permission Changes',
-      description:
-        'After configuring permissions, Admins save the changes to apply role-based access instantly. The user will only see the widgets and data they are authorized to access.',
-      icon: CheckCircle,
-      iconColor: '#4CAF50',
-      image: permission_page, 
-    },
-  ],
-}
-]
+  {
+    sectionId: 4,
+    sectionTitle: '4: Role-Based Access Control',
+    sectionDescription:
+      'Admins define and manage user roles, permissions, and dashboard access to ensure secure and controlled system usage.',
+    steps: [
+      {
+        number: 11,
+        title: 'User Management Dashboard',
+        description:
+          'Admins view all registered users, including their email IDs and access status. This dashboard serves as the central hub for managing users.',
+        icon: Users,
+        iconColor: '#6A1B9A',
+        image: user_management_page,
+        details: [
+          'Centralized user overview',
+          'User status visibility',
+          'Centralized user management hub',
+          'User management controls',
+        ],
+      },
+      {
+        number: 12,
+        title: 'Create New User',
+        description:
+          'Admins add users by entering employee details such as name, email address, company name, and a temporary password through a secure modal.',
+        details: [
+          'Add new user profiles',
+          'Basic employee information setup',
+          'Temporary credential assignment',
+          'User appears in management list',
+        ],
+          icon: UserPlus,
+        iconColor: '#EC4899',
+        image: add_user,
+        
+      },
+      {
+        number: 13,
+        title: 'Assign User Access',
+        description:
+          'Once added, the user appears in the list, allowing Admins to proceed with permission configuration and role assignment.',
+        icon: UserCheck,
+        iconColor: '#2E7D32',
+        image: user_created,
+        details: [
+          'Configure permissions per user',
+          'Role assignment & access level control',
+          'Proceed to permission configuration',
+          'Dashboard visibility management',
+        ],
+      },
+      {
+        number: 14,
+        title: 'Dashboard Permissions Configuration',
+        description:
+          'Admins enable or disable dashboard widgets such as Receivables, Payables, Pending Bills, and Income vs Expense charts using simple toggle controls.',
+        icon: Settings,
+        iconColor: '#EF6C00',
+        image: save_changes,
+        details: [
+          'Widget access control',
+          'Toggle-based settings',
+          'Custom dashboard visibility',
+          'Flexible configuration options',
+        ],
+      },
+      {
+        number: 15,
+        title: 'Save Permission Changes',
+        description:
+          'After reviewing permissions, Admins save changes to instantly enforce role-based access. Users will only see authorized data and widgets.',
+        icon: CheckCircle,
+        iconColor: '#4CAF50',
+        image: permission_page,
+        details: [
+          'Save configuration updates',
+          'Instant permission enforcement',
+          'User sees only enabled pages & data',
+          'Secure access confirmation',
+        ],
+      },
+    ],
+  },
+];
 
+// Floating Navigation Buttons Component
+const FloatingNavButtons = ({ onScrollToTop, onScrollToBottom, showTop, showBottom }) => {
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        right: '2rem',
+        bottom: '2rem',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '1rem',
+        zIndex: 1000,
+      }}
+    >
+      <AnimatePresence>
+        {showTop && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.8, y: 20 }}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={onScrollToTop}
+            style={{
+              width: '60px',
+              height: '60px',
+              borderRadius: '50%',
+              background: 'linear-gradient(135deg, rgb(59, 130, 246), rgb(29, 78, 216))',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 8px 24px rgba(59, 130, 246, 0.4), 0 0 0 4px rgba(59, 130, 246, 0.1)',
+              position: 'relative',
+              overflow: 'hidden',
+            }}
+          >
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                background: 'linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent)',
+                animation: 'shimmer 2s infinite',
+              }}
+            />
+            <ArrowUp color="white" size={28} strokeWidth={2.5} />
+          </motion.button>
+        )}
+      </AnimatePresence>
 
-/* ======================
-   PAGE
-====================== */
+      <AnimatePresence>
+        {showBottom && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8, y: -20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.8, y: -20 }}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={onScrollToBottom}
+            style={{
+              width: '60px',
+              height: '60px',
+              borderRadius: '50%',
+              background: 'linear-gradient(135deg, rgb(6, 182, 212), rgb(13, 148, 136))',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 8px 24px rgba(6, 182, 212, 0.4), 0 0 0 4px rgba(6, 182, 212, 0.1)',
+              position: 'relative',
+              overflow: 'hidden',
+            }}
+          >
+            <div
+              style={{
+                position: 'absolute',
+                inset: 0,
+                background: 'linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent)',
+                animation: 'shimmer 2s infinite',
+              }}
+            />
+            <ArrowDown color="white" size={28} strokeWidth={2.5} />
+          </motion.button>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
 
-export default function TutorialPage() {
-  const [hoveredCard, setHoveredCard] = useState<number | null>(null);
+// Enhanced Step Component with Premium Design
+const ScrollingStoryStep = ({ step, isMobile, isTablet, activeImageIndex, stepIndex, totalSteps }) => {
+  const isCompactStep = step.number === 16 || step.number === 18;
+
+  const imageRef = useRef(null);
+  const popRef = useRef(null);
+  const stepRef = useRef(null);
+  const [showPopup, setShowPopup] = useState(false);
+  const [isInView, setIsInView] = useState(false);
+  const { scrollYProgress } = useScroll({
+    target: stepRef,
+    offset: ["start end", "end start"]
+  });
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsInView(entry.isIntersecting);
+      },
+      { threshold: 0.3 }
+    );
+
+    if (stepRef.current) {
+      observer.observe(stepRef.current);
+    }
+
+    return () => {
+      if (stepRef.current) {
+        observer.unobserve(stepRef.current);
+      }
+    };
+  }, []);
+     // Mobile popup handling with scroll threshold
+useEffect(() => {
+  if (!isMobile) return;
+  let lastScrollY = window.scrollY;
+  const scrollThreshold = 50; 
+
+  const handleClickOutside = (event) => {
+    if (
+      showPopup &&
+      imageRef.current &&
+      popRef.current &&
+      !imageRef.current.contains(event.target) &&
+      !popRef.current.contains(event.target)
+    ) {
+      setShowPopup(false);
+    }
+  };
+
+  const handleScroll = () => {
+    if (showPopup) {
+      const currentScrollY = window.scrollY;
+      const scrollDelta = Math.abs(currentScrollY - lastScrollY);
+      
+      if (scrollDelta > scrollThreshold) {
+        setShowPopup(false);
+      }
+    }
+  };
+
+  if (showPopup) {
+    lastScrollY = window.scrollY; // Set initial scroll position when popup opens
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+    window.addEventListener('scroll', handleScroll, true);
+  }
+
+  return () => {
+    document.removeEventListener('mousedown', handleClickOutside);
+    document.removeEventListener('touchstart', handleClickOutside);
+    window.removeEventListener('scroll', handleScroll, true);
+  };
+}, [showPopup, isMobile]);
+  const imageOnLeft = step.number % 2 === 1;
+
+  const imageX = useTransform(
+    scrollYProgress,
+    [0, 0.3, 0.7, 1],
+    imageOnLeft ? [-80, 0, 0, -80] : [80, 0, 0, 80]
+  );
+  const imageOpacity = useTransform(scrollYProgress, [0, 0.25, 0.5, 0.75, 1], [0, 1, 1, 1, 0]);
+  const imageScale = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0.92, 1, 1, 0.92]);
+
+  const textX = useTransform(
+    scrollYProgress,
+    [0, 0.3, 0.7, 1],
+    imageOnLeft ? [80, 0, 0, 80] : [-80, 0, 0, -80]
+  );
+  const textOpacity = useTransform(scrollYProgress, [0, 0.25, 0.5, 0.75, 1], [0, 1, 1, 1, 0]);
+
+  const Icon = step.icon;
+  const images = step.multiImages ? step.images : [step.image];
+
+  // Progress indicator
+  const progressPercentage = ((stepIndex + 1) / totalSteps) * 100;
 
   return (
-    <div style={{ minHeight: '100vh', background: 'white', position: 'relative' }}>
-      {/* Background */}
-      <div style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom right, white, rgb(236, 254, 255), white)', opacity: 0.8 }} />
+    <div
+      ref={stepRef}
+      style={{
+        minHeight: isCompactStep
+       ? isMobile ? '70vh' : '60vh'
+         : isMobile ? '85vh' : '75vh',
+
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: isMobile ? '2rem 1rem' : '3rem 2rem',
+        position: 'relative',
+        width: '100%',
+      }}
+    >
+      {/* Animated background gradient */}
+      <motion.div
+        animate={isInView ? {
+          background: [
+            `radial-gradient(circle at ${imageOnLeft ? '20%' : '80%'} 50%, ${step.iconColor}08, transparent 60%)`,
+            `radial-gradient(circle at ${imageOnLeft ? '30%' : '70%'} 60%, ${step.iconColor}12, transparent 70%)`,
+            `radial-gradient(circle at ${imageOnLeft ? '20%' : '80%'} 50%, ${step.iconColor}08, transparent 60%)`,
+          ]
+        } : {}}
+        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        style={{
+          position: 'absolute',
+          inset: 0,
+          overflow: 'hidden',
+          pointerEvents: 'none',
+          zIndex: 0,
+        }}
+      />
+
+      {/* Progress indicator line */}
+      <div
+        style={{
+          position: 'absolute',
+          left: isMobile ? '1rem' : '3rem',
+          top: 0,
+          bottom: 0,
+          width: '2px',
+          background: 'linear-gradient(to bottom, transparent, rgba(203, 213, 225, 0.3), transparent)',
+          zIndex: 0,
+        }}
+      >
+        <motion.div
+          initial={{ scaleY: 0 }}
+          animate={isInView ? { scaleY: 1 } : { scaleY: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          style={{
+            width: '100%',
+            height: '100%',
+            background: `linear-gradient(to bottom, ${step.iconColor}, ${step.iconColor}80)`,
+            transformOrigin: 'top',
+          }}
+        />
       </div>
 
-      <div style={{ position: 'relative', zIndex: 10 }}>
-        {/* Hero Section with Left-Right Layout */}
-        <section style={{ padding: '3rem 1rem' }}>
-          <div style={{ maxWidth: '80rem', margin: '0 auto' }}>
-            <div style={{ 
-              display: 'grid', 
-              gridTemplateColumns: '1.2fr 1fr', 
-              gap: '6rem', 
-              alignItems: 'center' 
-            }}>
-              {/* LEFT: Text Content */}
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-                {/*<img src={logoImage} alt="WorkEye Logo" style={{ width: '7.5rem', height: '7.5rem', objectFit: 'contain' }} />*/}
-                </div>
-                
-                <h1 style={{ fontSize: '3.25rem', fontWeight: 800,marginBottom: '1.5rem',lineHeight: '1.1',letterSpacing: '-0.02em' }}>
-                  <span style={{ color: 'rgb(6, 182, 212)',fontWeight: 900 }}>Explore Tally Connect</span>{' '}
-                  <span style={{ color: 'rgb(30, 41, 59)' }}>with Detailed Step-by-Step Tutorials</span>
-                </h1>
-                
-                <p style={{ fontSize: '1.25rem',color: 'rgb(75, 85, 99)',marginBottom: '2rem',lineHeight: '1.7',maxWidth: '42rem' }}>
-                  Learn how to streamline operations, boost productivity, and scale faster with comprehensive tutorials covering setup, configuration, and advanced features.
+      <div
+        style={{
+          maxWidth: '1300px',
+          width: '100%',
+          display: 'grid',
+          gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+          gap: isMobile ? '2rem' : '4rem',
+          alignItems: 'center',
+          position: 'relative',
+          zIndex: 1,
+          margin: '0 auto',
+          padding: '0 1rem',
+        }}
+      >
+        {/* Image Side */}
+        <motion.div
+          style={{
+            x: isMobile ? 0 : imageX,
+            scale: imageScale,
+            opacity: imageOpacity,
+            order: isMobile ? 1 : imageOnLeft ? 1 : 2,
+            position: 'relative',
+            background: `linear-gradient(135deg, ${step.iconColor}05, ${step.iconColor}02)`,
+            borderRadius: '32px',
+            padding: isMobile ? '2rem 1.5rem' : '3rem 2rem',
+          }}
+        >
+          {/* Animated floating particles */}
+          {[...Array(5)].map((_, i) => (
+            <motion.div
+              key={i}
+              animate={{
+                y: [0, -30, 0],
+                x: [0, Math.sin(i) * 20, 0],
+                opacity: [0.3, 0.6, 0.3],
+              }}
+              transition={{
+                duration: 3 + i * 0.5,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: i * 0.3,
+              }}
+              style={{
+                position: 'absolute',
+                width: '8px',
+                height: '8px',
+                borderRadius: '50%',
+                background: step.iconColor,
+                top: `${20 + i * 15}%`,
+                left: imageOnLeft ? `${10 + i * 5}%` : `${80 - i * 5}%`,
+                filter: 'blur(1px)',
+                zIndex: 0,
+                boxShadow: `0 0 20px ${step.iconColor}`,
+              }}
+            />
+          ))}
+
+          {/* Rotating gradient ring */}
+          <motion.div
+            animate={isInView ? {
+              rotate: [0, 360],
+              scale: [1, 1.1, 1],
+            } : {}}
+            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+            style={{
+              position: 'absolute',
+              top: '-40px',
+              right: '-40px',
+              width: '120px',
+              height: '120px',
+              borderRadius: '50%',
+              background: `conic-gradient(from 0deg, ${step.iconColor}20, transparent, ${step.iconColor}20)`,
+              filter: 'blur(30px)',
+              zIndex: -1,
+            }}
+          />
+
+          {/* Pulsing glow effect */}
+          <motion.div
+            animate={isInView ? {
+              scale: [1, 1.2, 1],
+              opacity: [0.2, 0.4, 0.2],
+            } : {}}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: '90%',
+              height: '90%',
+              borderRadius: '30px',
+              background: `radial-gradient(circle, ${step.iconColor}15, transparent 70%)`,
+              filter: 'blur(40px)',
+              zIndex: -1,
+            }}
+          />
+
+          <motion.div
+            whileHover={{ scale: 1.02, rotate: imageOnLeft ? -2 : 2 }}
+            transition={{ duration: 0.3 }}
+            style={{ 
+              position: 'relative',
+              minHeight: isMobile ? '400px' : '550px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            {/* Light background card behind mockup */}
+            <div
+              style={{
+                position: 'absolute',
+                inset: -15,
+                borderRadius: '28px',
+                background: `linear-gradient(135deg, ${step.iconColor}08, ${step.iconColor}05)`,
+                zIndex: -1,
+              }}
+            />
+
+            <AnimatePresence mode="wait">
+              <motion.img
+              ref={imageRef}
+              key={activeImageIndex[step.number] ?? 0}
+              src={images[activeImageIndex[step.number] ?? 0]}
+              alt={step.title}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5, ease: "easeInOut" }}
+              whileHover={{ 
+                scale: 1.03,
+                rotateY: 5,
+                rotateX: 5,
+              }}
+              onMouseEnter={() => !isMobile && setShowPopup(true)}
+              onMouseLeave={() => !isMobile && setShowPopup(false)}
+              onClick={() => {
+                if (isMobile) {
+                  setShowPopup(!showPopup);
+                }
+              }}
+              style={{
+                width: '100%',
+                maxWidth: isCompactStep
+  ? (isMobile ? '320px' : isTablet ? '380px' : '320px')
+  : (isMobile ? '420px' : isTablet ? '500px' : '500px'),
+
+                height: 'auto',
+                margin: '0 auto',
+                display: 'block',
+                filter: 'drop-shadow(0 20px 50px rgba(0,0,0,0.18))',
+                borderRadius: '20px',
+                cursor: 'pointer',
+                border: `3px solid ${step.iconColor}40`,
+                transformStyle: 'preserve-3d',
+                aspectRatio: 'auto',
+                objectFit: 'contain',
+              }}
+            />
+            </AnimatePresence>
+
+            {/* Image overlay effect on hover with animated icon */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileHover={{ opacity: 1 }}
+              style={{
+                position: 'absolute',
+                inset: 0,
+                background: `linear-gradient(135deg, ${step.iconColor}20, ${step.iconColor}10)`,
+                borderRadius: '20px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                pointerEvents: 'none',
+                backdropFilter: 'blur(2px)',
+              }}
+            >
+              <motion.div
+                animate={{
+                  scale: [1, 1.2, 1],
+                  rotate: [0, 10, -10, 0],
+                }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                <Eye color="white" size={48} strokeWidth={2.5} 
+                  style={{ filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))' }} 
+                />
+              </motion.div>
+            </motion.div>
+
+            {/* Corner accent decorations */}
+            <motion.div
+              animate={{
+                scale: [1, 1.1, 1],
+                opacity: [0.5, 0.8, 0.5],
+              }}
+              transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
+              style={{
+                position: 'absolute',
+                top: -10,
+                left: -10,
+                width: '40px',
+                height: '40px',
+                border: `3px solid ${step.iconColor}`,
+                borderRight: 'none',
+                borderBottom: 'none',
+                borderRadius: '20px 0 0 0',
+              }}
+            />
+            <motion.div
+              animate={{
+                scale: [1, 1.1, 1],
+                opacity: [0.5, 0.8, 0.5],
+              }}
+              transition={{ duration: 2, repeat: Infinity, delay: 0.7 }}
+              style={{
+                position: 'absolute',
+                bottom: -10,
+                right: -10,
+                width: '40px',
+                height: '40px',
+                border: `3px solid ${step.iconColor}`,
+                borderLeft: 'none',
+                borderTop: 'none',
+                borderRadius: '0 0 20px 0',
+              }}
+            />
+          </motion.div>
+
+          {/* Enhanced Popup */}
+          <AnimatePresence>
+            {showPopup && (
+            <motion.div
+                initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: 10 }}
+                transition={{ duration: 0.3, type: "spring", stiffness: 300, damping: 25 }}
+                style={{
+                  position: isMobile ? 'relative' : 'absolute',
+                  bottom: isMobile ? 'auto' : '80px',
+                  top: isMobile ? 'auto' : 'auto',
+                  left: isMobile ? '0' : (imageOnLeft ? '0' : 'auto'),
+                  right: isMobile ? '0' : (imageOnLeft ? 'auto' : '0'),
+                  width: isMobile ? 'auto' : '320px',
+                  maxWidth: isMobile ? 'none' : '320px',
+                  marginTop: isMobile ? '1.5rem' : '0',
+                  background: 'linear-gradient(135deg, rgb(15, 23, 42), rgb(30, 41, 59))',
+                  borderRadius: '1.5rem',
+                  padding: isMobile ? '1.5rem' : '1.75rem',
+                  boxShadow: '0 25px 50px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.1), 0 0 30px rgba(59, 130, 246, 0.3)',
+                  color: 'white',
+                  zIndex: 1000,
+                  pointerEvents: isMobile ? 'auto' : 'none',
+                  backdropFilter: 'blur(20px)',
+                  border: `1px solid ${step.iconColor}40`,
+                }}
+              >
+                {/* Sparkle effect */}
+                <motion.div
+                  animate={{
+                    scale: [1, 1.2, 1],
+                    opacity: [0.5, 1, 0.5],
+                  }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                  style={{
+                    position: 'absolute',
+                    top: '10px',
+                    right: '10px',
+                  }}
+                >
+                  <Sparkles color={step.iconColor} size={20} />
+                </motion.div>
+
+                {/* Step badge - Enhanced with vibrant color */}
+                <motion.div
+                  style={{
+                    position: 'absolute',
+                    top: '-26px',
+                    left: '-26px',
+                    width: '56px',
+                    height: '56px',
+                    borderRadius: '50%',
+                    background: step.iconColor,
+                    boxShadow: `0 0 0 6px ${step.iconColor}99, 0 12px 25px rgba(0,0,0,0.35)`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '20px',
+                    fontWeight: 700,
+                    color: 'white',
+                    zIndex: 20
+                  }}
+                >
+                  {step.number}
+                </motion.div>
+
+                <div
+                  ref={popRef}
+                  style={{
+                    width: isMobile ? '3rem' : '3.5rem',
+                    height: isMobile ? '3rem' : '3.5rem',
+                    borderRadius: '1rem',
+                    background: `linear-gradient(135deg, ${step.iconColor}, ${step.iconColor}dd)`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginBottom: '1rem',
+                    boxShadow: `0 8px 20px ${step.iconColor}40`,
+                  }}
+                >
+  <Icon color="white" size={isMobile ? 20 : 24} strokeWidth={2.5} />
+</div>
+
+                <h4
+                  style={{
+                    fontSize: isMobile ? '1.1rem' : '1.25rem',
+                    fontWeight: 700,
+                    marginBottom: '0.6rem',
+                    fontFamily: '"Poppins", sans-serif',
+                    lineHeight: 1.3,
+                  }}
+                >
+                  {step.title}
+                </h4>
+
+                <p
+                  style={{
+                    fontSize: isMobile ? '0.9rem' : '0.95rem',
+                    color: 'rgba(255,255,255,0.9)',
+                    lineHeight: 1.6,
+                    fontFamily: '"Inter", sans-serif',
+                  }}
+                >
+                  {step.description}
                 </p>
 
-                {/* Feature List */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                {/*{step.details && (
+                  <ul
+                    style={{
+                      marginTop: '1rem',
+                      paddingLeft: '0',
+                      listStyle: 'none',
+                    }}
+                  >
+                    {step.details.map((d, i) => (
+                      <motion.li
+                        key={i}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: i * 0.1 }}
+                        style={{
+                          fontSize: isMobile ? '0.8rem' : '0.85rem',
+                          color: 'rgba(255,255,255,0.8)',
+                          marginBottom: '0.5rem',
+                          fontFamily: '"Inter", sans-serif',
+                          display: 'flex',
+                          alignItems: 'flex-start',
+                          gap: '0.5rem',
+                        }}
+                      >
+                        <Zap size={14} color={step.iconColor} style={{ marginTop: '2px', flexShrink: 0 }} />
+                        <span>{d}</span>
+                      </motion.li>
+                    ))}
+                  </ul>
+                )}*/}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
+
+        {/* Text Side - Enhanced */}
+        <motion.div
+          style={{
+            x: isMobile ? 0 : textX,
+            opacity: textOpacity,
+            order: isMobile ? 2 : imageOnLeft ? 2 : 1,
+            position: 'relative',
+            marginLeft: !isMobile && imageOnLeft ? '4rem' : '0',
+            marginRight: !isMobile && !imageOnLeft ? '4rem' : '0',
+          }}
+        >
+  <motion.div
+  initial={{ opacity: 0, y: 20 }}
+  animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+  whileHover={{ y: -4 }}
+  transition={{ type: 'spring', stiffness: 260, damping: 22 }}
+  style={{
+    background:
+      'linear-gradient(135deg, rgba(255,255,255,0.65), rgba(248,250,252,0.55))',
+    padding: isMobile ? '1.6rem' : '2rem',
+    borderRadius: '20px',
+    border: '1px solid rgba(255, 255, 255, 0.35)',
+    boxShadow: `
+      inset 0 1px 0 rgba(255, 255, 255, 0.35),
+      0 25px 60px rgba(0, 0, 0, 0.18),
+      0 10px 25px rgba(0, 0, 0, 0.12)
+    `,
+    backdropFilter: 'blur(14px) saturate(120%)',
+    WebkitBackdropFilter: 'blur(14px) saturate(120%)',
+    position: 'relative',
+    width: '100%',
+    maxWidth: isMobile ? '100%' : '500px',
+
+  }}
+>
+
+            {/* Animated corner decoration */}
+            <motion.div
+              animate={{
+                rotate: [0, 90, 180, 270, 360],
+              }}
+              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+              style={{
+                position: 'absolute',
+                top: '-50px',
+                right: '-50px',
+                width: '150px',
+                height: '150px',
+                background: `conic-gradient(from 0deg, ${step.iconColor}15, transparent, ${step.iconColor}15)`,
+                borderRadius: '50%',
+                filter: 'blur(40px)',
+                
+              }}
+            />
+
+            {/* Header with icon and step number */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: '1.25rem',
+                position: 'relative',
+                
+                zIndex: 1,
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <motion.div
+                  whileHover={{ scale: 1.12, rotate: 360 }}
+                  transition={{ duration: 0.6, ease: "easeInOut" }}
+                  style={{
+                    width: isMobile ? '56px' : '64px',
+                    height: isMobile ? '56px' : '64px',
+                    borderRadius: '16px',
+                    background: `linear-gradient(135deg, ${step.iconColor}, ${step.iconColor}dd)`,
+                    backgroundColor: step.iconColor,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: `0 12px 28px ${step.iconColor}40, 0 0 20px ${step.iconColor}20`,
+                    position: 'relative',
+                    overflow: 'visible',
+                  }}
+                >
+                  <Icon 
+                    color="white" 
+                    size={isMobile ? 28 : 32} 
+                    strokeWidth={2.5}
+                    style={{ 
+                      position: 'relative', 
+                      zIndex: 3,
+                      filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'
+                    }}
+                  />
+                  
+                  {/* Pulse effect */}
+                  <motion.div
+                    animate={{
+                      scale: [1, 1.3, 1],
+                      opacity: [0.5, 0, 0.5],
+                    }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    style={{
+                      position: 'absolute',
+                      inset: -4,
+                      borderRadius: '16px',
+                      border: `2px solid ${step.iconColor}`,
+                      zIndex: 1,
+                    }}
+                  />
+                </motion.div>
+
+                <div>
+                  <div
+                    style={{
+                      fontSize: isMobile ? '0.75rem' : '0.8rem',
+                      fontWeight: 700,
+                      color: step.iconColor,
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.1em',
+                      marginBottom: '0.25rem',
+                    }}
+                  >
+                    Step {step.number} of {totalSteps}
+                  </div>
+                  <div
+                    style={{
+                      width: '60px',
+                      height: '3px',
+                      background: `linear-gradient(to right, ${step.iconColor}, transparent)`,
+                      borderRadius: '2px',
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Large step number - UPDATED to match reference */}
+              <motion.div
+  whileHover={{ scale: 1.1 }}
+  style={{
+    width: isMobile ? '52px' : '64px',
+    height: isMobile ? '52px' : '64px',
+    borderRadius: '16px',
+    background: step.iconColor,
+    border: '2px solid white',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontFamily: '"Poppins", sans-serif',
+    fontSize: isMobile ? '22px' : '28px',
+    fontWeight: 800,
+    color: 'white',
+    boxShadow: `0 0 0 2px white,
+      0 8px 20px ${step.iconColor},
+      0 18px 40px rgba(0,0,0,0.2),
+      inset 0 2px 0 rgba(255,255,255,0.5)
+    `,
+  }}
+>
+  {step.number}
+</motion.div>
+            </div>
+
+            {/* Title */}
+            <h4
+              style={{
+                fontFamily: '"Poppins", sans-serif',
+                fontSize: isMobile ? '22px' : isTablet ? '26px' : '30px',
+                fontWeight: 700,
+                color: 'rgb(20, 47, 83)',
+                lineHeight: 1.3,
+                marginBottom: '1rem',
+                position: 'relative',
+                zIndex: 1,
+              }}
+            >
+              {step.title}
+            </h4>
+
+            {/* Description */}
+           {/*<p
+              style={{
+                fontFamily: '"Inter", sans-serif',
+                fontSize: isMobile ? '15px' : '16px',
+                color: 'rgb(71, 85, 105)',
+                lineHeight: 1.7,
+                marginBottom: step.details ? '1.25rem' : '0',
+                position: 'relative',
+                zIndex: 1,
+              }}
+            >
+              {step.description}
+            </p>*/}
+
+            {/* Details */}
+            {step.details && (
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0.75rem',
+                  position: 'relative',
+                  zIndex: 1,
+                }}
+              >
+                {step.details.map((detail, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -20 }}
+                    transition={{ delay: 0.1 * i, duration: 0.4 }}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: '0.75rem',
+                      padding: '0.75rem 1rem',
+                      background: `linear-gradient(90deg, ${step.iconColor}08, transparent)`,
+                      borderRadius: '12px',
+                      borderLeft: `4px solid ${step.iconColor}`,
+                      boxShadow: `0 2px 8px ${step.iconColor}10`,
+                    }}
+                  >
+                    <CheckCircle
+                      size={18}
+                      color={step.iconColor}
+                      style={{ marginTop: '2px', flexShrink: 0 }}
+                    />
+                    <span
+                      style={{
+                        fontSize: isMobile ? '14px' : '15px',
+                        color: 'rgb(100, 116, 139)',
+                        lineHeight: 1.6,
+                        fontFamily: '"Inter", sans-serif',
+                      }}
+                    >
+                      {detail}
+                    </span>
+                  </motion.div>
+                ))}
+              </div>
+            )}
+
+            
+            {/* Progress bar */}
+<motion.div
+  initial={{ width: 0 }}
+  animate={isInView ? { width: '116px' } : { width: 0 }}
+  transition={{ duration: 0.8, delay: 0.4 }}
+  style={{
+    height: '4px',
+    background: step.iconColor,
+    marginTop: '0.5rem',
+    borderRadius: '10px',
+    boxShadow: `0 3px 12px ${step.iconColor}, 
+                0 6px 25px rgba(0,0,0,0.15), 
+                inset 0 1px 0 rgba(255,255,255,0.6)`,
+    position: 'relative',
+    zIndex: 10,
+  }}
+/>
+          </motion.div>
+        </motion.div>
+      </div>
+    </div>
+  );
+};
+
+export default function TutorialPage() {
+  const [activeImageIndex, setActiveImageIndex] = useState<{ [key: number]: number }>({});
+  const [isMobile, setIsMobile] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
+  const [showTopButton, setShowTopButton] = useState(false);
+  const [showBottomButton, setShowBottomButton] = useState(true);
+
+  useEffect(() => {
+    const link = document.createElement('link');
+    link.href =
+      'https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800;900&family=Inter:wght@400;500;600&display=swap';
+    link.rel = 'stylesheet';
+    document.head.appendChild(link);
+
+    // Add shimmer animation
+    const style = document.createElement('style');
+    style.innerHTML = `
+      @keyframes shimmer {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
+      }
+      
+      * {
+        box-sizing: border-box;
+      }
+      
+      html, body {
+        overflow-x: hidden;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      
+      body {
+        overflow-y: auto;
+      }
+    `;
+    document.head.appendChild(style);
+
+    return () => {
+      document.head.removeChild(link);
+      document.head.removeChild(style);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+      setIsTablet(window.innerWidth >= 768 && window.innerWidth < 1024);
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      const scrollHeight = document.documentElement.scrollHeight;
+      const clientHeight = document.documentElement.clientHeight;
+
+      setShowTopButton(scrollTop > 300);
+      setShowBottomButton(scrollTop < scrollHeight - clientHeight - 300);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const scrollToBottom = () => {
+    window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' });
+  };
+
+  const totalSteps = tutorialSections.reduce((acc, section) => acc + section.steps.length, 0);
+
+  return (
+    <div
+      style={{
+        minHeight: '100vh',
+        background: 'linear-gradient(180deg, #e0f7fa 0%, #ffffff 40%, #ffffff 100%)',
+        position: 'relative',
+        fontFamily: '"Inter", sans-serif',
+        width: '100%',
+      }}
+    >
+      {/* Floating Navigation Buttons */}
+      {!isMobile && (
+        <FloatingNavButtons
+          onScrollToTop={scrollToTop}
+          onScrollToBottom={scrollToBottom}
+          showTop={showTopButton}
+          showBottom={showBottomButton}
+        />
+      )}
+
+      {/* Background */}
+      <div style={{ position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none' }}>
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(135deg, rgba(224,247,250,0.3) 0%, rgba(255,255,255,0) 50%)',
+            opacity: 0.6,
+          }}
+        />
+      </div>
+
+      <div style={{ position: 'relative', zIndex: 10, width: '100%' }}>
+        {/* Hero Section */}
+        <section
+          style={{
+            padding: isMobile ? '2rem 1rem' : isTablet ? '2.5rem 1.5rem' : '3rem 1.5rem',
+            minHeight: isMobile ? 'auto' : '500px',
+            display: 'flex',
+            alignItems: 'center',
+            background: 'linear-gradient(135deg, #ecfeff 0%, #ffffff 50%, #ecfeff 100%)',
+          }}
+        >
+          <div
+            style={{
+              maxWidth: '1280px',
+              margin: '0 auto',
+              width: '100%',
+              padding: isMobile ? '0 0.5rem' : '0 1.5rem',
+            }}
+          >
+            <div
+              style={{
+                display: isMobile ? 'flex' : 'grid',
+                flexDirection: isMobile ? 'column' : undefined,
+                gridTemplateColumns: isMobile ? undefined : isTablet ? '1fr' : '1.1fr 0.9fr',
+                gap: isMobile ? '2rem' : isTablet ? '2.5rem' : '3rem',
+                alignItems: isMobile ? "start" : "Center",
+              }}
+            >
+              {/* Logo - appears first on mobile */}
+              {/*{isMobile && (
+                <motion.div
+                  initial={{ opacity: 0, x: -40 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.7, delay: 0.05 }}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'start',
+                    justifyContent: 'flex-start',
+                    marginBottom: '1rem',
+                    
+                  }}
+                >
+                  <img
+                    src={logoImage}
+                    alt="WorkEye Logo"
+                    style={{
+                      width: '6rem',
+                      height: 'auto',
+                      objectFit: 'contain',
+                    }}
+                  />
+                </motion.div>
+              )}*/}
+
+              {/* Video - appears second on mobile */}
+              {isMobile && (
+                <motion.div
+                  style={{ 
+                    width: '100%', 
+                    display: 'flex', 
+                    justifyContent: 'center', 
+                    marginTop: '1.25rem',
+                  }}
+                >
+                  <TutorialVideo />
+                </motion.div>
+              )}
+
+              {/* Text Content */}
+              <div
+                style={{
+                  maxWidth: isMobile ? '100%' : '650px',
+                  marginTop: isMobile ? '0' : '-2.5rem',
+                }}
+              >
+                <motion.h1
+                  initial={{ opacity: 0, x: -40 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
+                  style={{
+                    fontFamily: '"Poppins", sans-serif',
+                    fontSize: isMobile ? '28px' : isTablet ? '36px' : '48px',
+                    fontWeight: 700,
+                    marginTop:'1rem',
+                    marginBottom: '1rem',
+                    lineHeight: isMobile ? '38px' : isTablet ? '46px' : '58px',
+                    letterSpacing: '-0.025em',
+                  }}
+                >
+                  {!isMobile && (
+                    <motion.div
+                      initial={{ opacity: 0, x: -40 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.7, delay: 0.05 }}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'flex-start',
+                        marginLeft: '2rem',
+                        marginBottom: '1.5rem',
+                      }}
+                    >
+                  
+                    </motion.div>
+                  )}
+
+                  <span style={{ color: 'rgb(6, 182, 212)', fontWeight: 900 }}>Explore Tally Connect</span>{' '}
+                  <span style={{ color: '#0F172A' }}>with Detailed Step-by-Step Tutorials</span>
+                </motion.h1>
+
+                <motion.p
+                  initial={{ opacity: 0, x: -40 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.7, delay: 0.2 }}
+                  style={{
+                    fontFamily: '"Inter", sans-serif',
+                    fontSize: isMobile ? '14px' : '16px',
+                    fontWeight: 400,
+                    color: '#475569',
+                    marginTop: '-0.75rem',
+                    marginBottom: '1.5rem',
+                    lineHeight: isMobile ? '22px' : '26px',
+                  }}
+                >
+                  Learn how to streamline meetings, boost collaboration, and scale faster with comprehensive tutorials
+                  covering setup, configuration, and advanced features.
+                </motion.p>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
                   {[
                     'Quick start guides for instant setup',
                     'Advanced feature walkthroughs',
                     'How it works steps for smooth onboarding',
-                  ].map((feature) => (
-                    <div key={feature} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                      <CheckCircle style={{ width: '1.5rem', height: '1.5rem', color: 'rgb(6, 182, 212)', flexShrink: 0 }} />
-                      <span style={{ fontSize: '1.1rem', color: 'rgb(55, 65, 81)' }}>{feature}</span>
-                    </div>
+                  ].map((feature, idx) => (
+                    <motion.div
+                      key={feature}
+                      initial={{ opacity: 0, x: -40 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.7, delay: 0.3 + idx * 0.1 }}
+                      style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}
+                    >
+                      <div
+                        style={{
+                          width: isMobile ? '1.75rem' : '2.25rem',
+                          height: isMobile ? '1.75rem' : '2.25rem',
+                          borderRadius: '0.5rem',
+                          background: 'rgba(6, 182, 212, 0.15)',
+                          border: '2px solid rgb(6, 182, 212)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          flexShrink: 0,
+                        }}
+                      >
+                        <CheckCircle
+                          style={{
+                            width: isMobile ? '1rem' : '1.25rem',
+                            height: isMobile ? '1rem' : '1.25rem',
+                            color: 'rgb(6, 182, 212)',
+                          }}
+                        />
+                      </div>
+                      <span
+                        style={{
+                          fontFamily: "'Inter', sans-serif",
+                          fontSize: isMobile ? '14px' : '16px',
+                          fontWeight: 500,
+                          color: '#475569',
+                          lineHeight: isMobile ? '22px' : '26px',
+                        }}
+                      >
+                        {feature}
+                      </span>
+                    </motion.div>
                   ))}
                 </div>
               </div>
 
-              {/* RIGHT: Video Card */}
-<motion.div
-  style={{
-    width: '100%',
-    display: 'flex',
-    justifyContent: 'center'
-  }}
-  animate={{ y: [0, -14, 0] }}
-  transition={{
-    duration: 4,
-    repeat: Infinity,
-    ease: 'easeInOut',
-  }}
->
-  <div
-    style={{
-      background: 'white',
-      borderRadius: '1.75rem',
-      boxShadow: '0 30px 60px -15px rgba(0, 0, 0, 0.25)',
-      overflow: 'hidden',
-      border: '1px solid rgb(243, 244, 246)',
-      width: '100%',
-      maxWidth: '640px', // 🔥 INCREASED SIZE
-    }}
-  >
-    {/* VIDEO PREVIEW */}
-    <div
-      style={{
-        position: 'relative',
-        height: '300px', // 🔥 TALLER VIDEO AREA
-        background:
-          'linear-gradient(to bottom right, rgb(219, 234, 254), rgb(207, 250, 254))',
-      }}
-    >
-      <div
-        style={{
-          position: 'absolute',
-          inset: 0,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <div style={{ textAlign: 'center' }}>
-          <button
-            style={{
-              width: '5.5rem',
-              height: '5.5rem',
-              background: 'rgb(6, 182, 212)',
-              borderRadius: '50%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.35)',
-              border: 'none',
-              cursor: 'pointer',
-              margin: '0 auto 1.75rem',
-              transition: 'background 0.3s',
-            }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.background = 'rgb(8, 145, 178)')
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.background = 'rgb(6, 182, 212)')
-            }
-          >
-            <Play
-              style={{
-                width: '2.75rem',
-                height: '2.75rem',
-                color: 'white',
-                marginLeft: '0.25rem',
-              }}
-              fill="white"
-            />
-          </button>
-
-          <p
-            style={{
-              marginTop: '1.25rem',
-              color: 'rgb(55, 65, 81)',
-              fontWeight: 600,
-              fontSize: '1.15rem',
-            }}
-          >
-            Getting Started with Tally Connect
-          </p>
-          <p
-            style={{
-              fontSize: '0.9rem',
-              color: 'rgb(107, 114, 128)',
-              marginTop: '0.25rem',
-            }}
-          >
-            Duration: 5:32
-          </p>
-        </div>
-      </div>
-    </div>
-
-    {/* VIDEO INFO */}
-    <div style={{ padding: '2.25rem' }}>
-      <h3
-        style={{
-          fontSize: '1.5rem',
-          color: 'rgb(30, 41, 59)',
-          marginBottom: '0.75rem',
-          fontWeight: 700,
-        }}
-      >
-        Welcome to Tally Connect Tutorial
-      </h3>
-
-      <p
-        style={{
-          color: 'rgb(75, 85, 99)',
-          marginBottom: '1.75rem',
-          lineHeight: '1.65',
-        }}
-      >
-        Learn how to set up your account, configure tracking parameters, and
-        start monitoring your assets in just a few minutes.
-      </p>
-
-      <button
-        style={{
-          width: '100%',
-          padding: '0.85rem 1rem',
-          background: 'rgb(30, 41, 59)',
-          color: 'white',
-          borderRadius: '0.75rem',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: '0.5rem',
-          boxShadow: '0 12px 18px -6px rgba(0, 0, 0, 0.15)',
-          border: 'none',
-          cursor: 'pointer',
-          fontWeight: 600,
-          transition: 'all 0.3s',
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.background = 'rgb(15, 23, 42)';
-          e.currentTarget.style.transform = 'translateY(-2px)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.background = 'rgb(30, 41, 59)';
-          e.currentTarget.style.transform = 'translateY(0)';
-        }}
-      >
-        Watch Full Tutorial Series
-        <ExternalLink style={{ width: '1.25rem', height: '1.25rem' }} />
-      </button>
-    </div>
-  </div>
-</motion.div>
- </div>
+              {/* Video for desktop/tablet */}
+              {!isMobile && (
+                <motion.div
+                  style={{ 
+                    width: '100%', 
+                    display: 'flex', 
+                    justifyContent: 'center', 
+                    marginTop: '4rem',
+                  }}
+                  animate={{ y: [0, -12, 0] }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                  }}
+                >
+                  <TutorialVideo />
+                </motion.div>
+              )}
+            </div>
           </div>
         </section>
+
         {/* Tutorial Section Header */}
-<section
-  style={{
-    padding: '3rem 1rem 2.5rem',
-    background: 'linear-gradient(to bottom, rgba(255,255,255,0), #f8fafc)',
-  }}
->
-  <div
-    style={{
-      maxWidth: '1100px',
-      margin: '0 auto',
-      textAlign: 'center',
-    }}
-  >
-    <h2
-      style={{
-        fontSize: '2.4rem',
-        fontWeight: 800,
-        color: '#0f172a',
-        marginBottom: '0.75rem',
-      }}
-    >
-      Complete Step-by-Step Tutorial
-    </h2>
-
-    <p
-      style={{
-        fontSize: '1rem',
-        color: '#475569',
-        maxWidth: '720px',
-        margin: '0 auto',
-        lineHeight: 1.6,
-      }}
-    >
-      Master Tally Connect with our comprehensive guide covering every feature
-      from sign-up to advanced functionality
-    </p>
-  </div>
-</section>
-<section style={{ padding: '3rem 1rem' }}>
-  <div style={{ maxWidth: '90rem', margin: '0 auto' }}>
-    {tutorialSections.map((section) => (
-      <div key={section.sectionId} style={{ marginBottom: '4rem' }}>
-        <h3 style={{ fontSize: '1.9rem', fontWeight: 800, color: '#1e293b' }}>
-          {section.sectionTitle}
-        </h3>
-        <p style={{ color: '#475569', marginBottom: '2.5rem' }}>
-          {section.sectionDescription}
-        </p>
-
-        <div
+        <section
           style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(640px, 1fr))',
-            gap: '2.5rem',
+            padding: isMobile ? '2.5rem 1rem 1.5rem' : '3rem 1.5rem 2rem',
+            background: 'linear-gradient(to bottom, rgba(255,255,255,0), #f8fafc)',
           }}
         >
-          {section.steps.map((step) => {
-            const Icon = step.icon;
-            const isHovered = hoveredCard === step.number;
+          <div
+            style={{
+              maxWidth: '1280px',
+              margin: '0 auto',
+              textAlign: 'center',
+              padding: isMobile ? '0 0.5rem' : '0 1.5rem',
+            }}
+          >
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              viewport={{ once: true }}
+              style={{
+                fontFamily: '"Poppins", sans-serif',
+                fontSize: isMobile ? '28px' : isTablet ? '34px' : '40px',
+                fontWeight: 700,
+                color: 'rgb(20, 47, 83)',
+                marginBottom: '0.75rem',
+                lineHeight: isMobile ? '36px' : isTablet ? '42px' : '48px',
+              }}
+            >
+              Complete Step-by-Step Guide
+            </motion.h2>
+
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              viewport={{ once: true }}
+              style={{
+                fontFamily: '"Inter", sans-serif',
+                fontSize: isMobile ? '15px' : '17px',
+                color: '#475569',
+               // maxWidth: '720px',
+                margin: '0 auto',
+                lineHeight: isMobile ? '23px' : '26px',
+                fontWeight: 400,
+              }}
+            >
+              Master Tally Connect with our comprehensive guide covering every feature from sign-up to advanced functionality
+            </motion.p>
+            <motion.div
+  initial={{ opacity: 0, y: 16 }}
+  whileInView={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.5, delay: 0.35 }}
+  viewport={{ once: true }}
+  style={{
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '0.75rem',
+    padding: isMobile ? '0.65rem 1rem' : '0.75rem 1.25rem',
+    margin: '1.25rem auto 0',
+    maxWidth: 'fit-content',
+
+    // BOX STYLES
+    background:
+      'linear-gradient(135deg, rgba(6,182,212,0.12), rgba(59,130,246,0.12))',
+    border: '1.5px solid rgba(6,182,212,0.35)',
+    borderRadius: '999px',
+    backdropFilter: 'blur(14px)',
+    WebkitBackdropFilter: 'blur(14px)',
+    boxShadow:
+      '0 6px 20px rgba(6,182,212,0.18), inset 0 1px 0 rgba(255,255,255,0.6)',
+  }}
+>
+<motion.div 
+                animate={{ 
+                  scale: [1, 1.05, 1],
+                  rotate: [0, 5, -5, 0]
+                }}
+                transition={{ 
+                  duration: 3,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+                style={{
+                  position: 'relative',
+                  zIndex: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: isMobile ? '2.25rem' : '2.5rem',
+                  height: isMobile ? '2.25rem' : '2.5rem',
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.4), rgba(6, 182, 212, 0.25))',
+                  backdropFilter: 'blur(15px)',
+                  WebkitBackdropFilter: 'blur(15px)',
+                  border: '1.5px solid rgba(6, 182, 212, 0.5)',
+                  boxShadow: '0 4px 12px rgba(6, 182, 212, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 0 20px rgba(6, 182, 212, 0.2)',
+                }}
+              >
+                {/* Icon glow effect */}
+  <div
+  style={{
+    position: 'absolute',
+    inset: '-4px',
+    borderRadius: '50%',
+    background: 'radial-gradient(circle, rgba(6, 182, 212, 0.4), transparent 70%)',
+    filter: 'blur(6px)',
+    animation: 'pulse 2s ease-in-out infinite',
+  }}
+></div>
+<Info size={isMobile ? 18 : 20} color="#06B6D4" strokeWidth={2.5} style={{ position: 'relative', zIndex: 1 }} />
+              </motion.div>
+              <span
+                style={{
+                  fontFamily: '"Inter", sans-serif',
+                  fontSize: isMobile ? '0.875rem' : isTablet ? '0.9375rem' : '1rem',
+
+                  color: '#0e7490',
+                  fontWeight: 600,
+                  position: 'relative',
+                  zIndex: 1,
+                  textShadow: '0 1px 3px rgba(255,255,255,0.9), 0 0 10px rgba(255,255,255,0.5)',
+                  letterSpacing: '-0.01em',
+                }}
+              >
+                {isMobile ? 'Tap cards for details' : 'Hover over cards to highlight the steps'}
+              </span>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Scrolling Story Steps */}
+        <section
+          style={{
+           background: '#f0fdff',
+
+            position: 'relative',
+          }}
+        >
+          {tutorialSections.map((section, sectionIndex) => {
+            const sectionStepStart = tutorialSections
+              .slice(0, sectionIndex)
+              .reduce((acc, s) => acc + s.steps.length, 0);
 
             return (
               <div
-                key={step.number}
-                onMouseEnter={() => setHoveredCard(step.number)}
-                onMouseLeave={() => setHoveredCard(null)}
+                key={section.sectionId}
                 style={{
                   position: 'relative',
-                  borderRadius: '1.25rem',
-                  overflow: 'hidden',
-                  background: 'white',
-                  boxShadow: '0 25px 50px rgba(0,0,0,0.12)',
-                  transition: 'transform 0.3s',
-                  transform: isHovered ? 'translateY(-6px)' : 'none',
+                  paddingTop: sectionIndex === 0 ? '2rem' : '4rem',
+                  paddingBottom: '2rem',
                 }}
               >
-                {/* ✅ IMAGE FIX — FULLY READABLE */}
-                <img
-  src={step.image}
-  alt={step.title}
-  style={{
-    width: '100%',
-    height: '100%',
-    minHeight: '520px',        
-    maxHeight: '720px',        
-    objectFit: 'contain',      
-    background: '#ffffff',    
-    padding: '2rem',           
-    display: 'block',
-    imageRendering: 'auto',    
-    transition: 'filter 0.25s ease',
-  }}
-/>
-
-
-                {/* ✅ HOVER OVERLAY (UNCHANGED STYLE) */}
-                {isHovered && (
-                  <div
+                {/* Section Header */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                  viewport={{ once: true }}
+                  style={{
+                    padding: isMobile ? '2rem 1rem 1rem' : '2.5rem 2rem 1.5rem',
+                    textAlign: 'center',
+                    maxWidth: '900px',
+                    margin: '0 auto',
+                    position: 'relative',
+                  }}
+                >
+                  <motion.div
+                    animate={{
+                      scale: [1, 1.2, 1],
+                      opacity: [0.3, 0.5, 0.3],
+                    }}
+                    transition={{ duration: 4, repeat: Infinity }}
                     style={{
                       position: 'absolute',
-                      inset: 0,
-                      background: 'rgba(0,0,0,0.85)',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'center',
-                      padding: '2.5rem',
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)',
+                      width: isMobile ? '250px' : '400px',
+                      height: isMobile ? '250px' : '400px',
+                      background: `radial-gradient(circle, ${section.steps[0].iconColor}12, transparent 70%)`,
+                      borderRadius: '50%',
+                      filter: 'blur(50px)',
+                      zIndex: 0,
+                    }}
+                  />
+
+                  <h2
+                    style={{
+                      fontFamily: '"Poppins", sans-serif',
+                      fontSize: isMobile ? '24px' : isTablet ? '28px' : '32px',
+                      fontWeight: 700,
+                      color: 'rgb(20, 47, 83)',
+                      marginBottom: '0.5rem',
+                      position: 'relative',
+                      zIndex: 1,
+                      background: 'linear-gradient(135deg, rgb(20, 47, 83), rgb(71, 85, 105))',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      backgroundClip: 'text',
                     }}
                   >
-                    <div
-                      style={{
-                        width: '3.5rem',
-                        height: '3.5rem',
-                        background: step.iconColor,
-                        borderRadius: '0.75rem',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        marginBottom: '1rem',
-                      }}
-                    >
-                      <Icon color="white" size={28} />
-                    </div>
+                    {section.sectionTitle}
+                  </h2>
+                  <p
+                    style={{
+                      fontFamily: '"Inter", sans-serif',
+                      color: '#64748b',
+                      lineHeight: '1.6',
+                      fontSize: isMobile ? '14px' : '16px',
+                      position: 'relative',
+                      zIndex: 1,
+                    }}
+                  >
+                    {section.sectionDescription}
+                  </p>
+                </motion.div>
 
-                    <h4
-                      style={{
-                        fontSize: '1.5rem',
-                        fontWeight: 700,
-                        color: 'white',
-                        marginBottom: '0.75rem',
-                      }}
-                    >
-                      {step.title}
-                    </h4>
-
-                    <p
-                      style={{
-                        fontSize: '1rem',
-                        color: 'rgba(255,255,255,0.92)',
-                        lineHeight: '1.6',
-                      }}
-                    >
-                      {step.description}
-                    </p>
-                  </div>
-                )}
+                {/* Steps */}
+                {section.steps.map((step, stepIndex) => (
+                  <ScrollingStoryStep
+                    key={step.number}
+                    step={step}
+                    isMobile={isMobile}
+                    isTablet={isTablet}
+                    activeImageIndex={activeImageIndex}
+                    stepIndex={sectionStepStart + stepIndex}
+                    totalSteps={totalSteps}
+                  />
+                ))}
               </div>
             );
           })}
+        </section>
+
+        {/* CTA SECTION */}
+              <div
+          style={{
+            padding: isMobile ? '3rem 1.25rem 4rem' : isTablet ? '4rem 2.5rem 5rem' : '5rem 3rem 6rem',
+            textAlign: 'center',
+            background: 'linear-gradient(to bottom, #f0fbff, #f8fafc)',
+
+          }}
+        >
+          <motion.button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              window.location.href = 'https://tally-connect-yu2q.onrender.com';
+            }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.98 }}
+            style={{
+              padding: isMobile ? '1rem 2rem' : isTablet ? '1.125rem 3rem' : '1.25rem 3.5rem',
+              background: 'linear-gradient(135deg, rgb(30, 41, 59), rgb(15, 23, 42))',
+              color: 'white',
+              borderRadius: '1rem',
+              border: 'none',
+              fontSize: isMobile ? '1rem' : '1.125rem',
+              fontWeight: 700,
+              lineHeight: 1.3,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem',
+              boxShadow: '0 12px 30px rgba(0,0,0,0.25)',
+              transition: 'all 0.3s',
+              whiteSpace: 'nowrap',
+              width: isMobile ? '100%' : 'auto',
+              justifyContent: 'center',
+              position: 'relative',
+              overflow: 'hidden',
+              margin: '0 auto',
+              zIndex: 100,
+            }}
+          >
+            <motion.div
+              animate={{
+                x: ['-100%', '100%'],
+              }}
+              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+              style={{
+                position: 'absolute',
+                inset: 0,
+                background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent)',
+              }}
+            />
+            <span style={{ position: 'relative', zIndex: 1 }}>Go to Dashboard</span>
+            <ArrowRight style={{ width: isMobile ? '1.4rem' : '1.6rem', height: isMobile ? '1.4rem' : '1.6rem', position: 'relative', zIndex: 1 }} />
+          </motion.button>
         </div>
+
+        <Footer />
       </div>
-    ))}
-  </div>
-</section>
-           
-{/* CTA SECTION */}
-<div
-  style={{
-    display: 'flex',
-    justifyContent: 'center',
-    marginTop: '1.25rem',
-    marginBottom: '2.5rem',
-  }}
->
-  <button
-    onClick={() =>
-      (window.location.href =
-        'https://tally-connect-yu2q.onrender.com')
-    }
-    style={{
-      padding: '1.25rem 3.5rem',   
-      background: 'rgb(30, 41, 59)',
-      color: 'white',
-      borderRadius: '1rem',        
-      border: 'none',
-      fontSize: '1.125rem',
-      fontWeight: 700,
-      lineHeight: 1.3,             
-      cursor: 'pointer',
-      display: 'flex',
-      alignItems: 'center',
-      gap: '0.75rem',
-      boxShadow: '0 12px 30px rgba(0,0,0,0.25)',
-      transition: 'all 0.3s',
-      whiteSpace: 'nowrap',
-    }}
-    onMouseEnter={(e) => {
-      e.currentTarget.style.background = 'rgb(15, 23, 42)';
-      e.currentTarget.style.transform = 'scale(1.04)';
-    }}
-    onMouseLeave={(e) => {
-      e.currentTarget.style.background = 'rgb(30, 41, 59)';
-      e.currentTarget.style.transform = 'scale(1)';
-    }}
-  >
-    Go to Dashboard
-    <ArrowRight style={{ width: '1.6rem', height: '1.6rem' }} />
-  </button>
-</div>
-<Footer/>
-</div>
-
-
-      <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-      `}</style>
     </div>
   );
 }
+
