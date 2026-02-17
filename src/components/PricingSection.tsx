@@ -8,6 +8,7 @@ import {
 } from "./ui/card";
 import { Check, Zap, Crown, Star, Sparkles } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
+import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 interface PricingSectionProps {
@@ -54,6 +55,7 @@ export function PricingSection({ onPlanSelect }: PricingSectionProps) {
     useState<BillingCycle>("monthly");
   const [plans, setPlans] = useState<Plan[]>([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   const getPrice = (plan: Plan) => {
     if (plan.isFree) return 0;
@@ -80,8 +82,7 @@ export function PricingSection({ onPlanSelect }: PricingSectionProps) {
 
   const handlePlanClick = (plan: Plan) => {
     if (plan.isEnterprise) {
-      // Open contact sales link in new tab or handle as needed
-      window.open("/contact", "_blank");
+      navigate("/contact")
     } else {
       onPlanSelect(plan.licenseType, billingCycle);
     }
