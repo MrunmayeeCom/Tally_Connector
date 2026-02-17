@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
 import { useState } from 'react';
+import { useNavigate } from "react-router-dom";
 import { ChevronDown } from 'lucide-react';
 
 interface FAQItem {
@@ -9,6 +10,7 @@ interface FAQItem {
 
 export function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const navigate = useNavigate();
 
   const faqs: FAQItem[] = [
     {
@@ -125,14 +127,14 @@ export function FAQ() {
           viewport={{ once: true }}
           className="text-center mt-12"
         >
-          <p className="text-[#5A6C7D] mb-4">Still have questions?</p>
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="px-8 py-3 bg-[#0066CC] text-white rounded-lg hover:bg-[#004C99] transition-all shadow-md hover:shadow-lg font-medium"
-          >
-            Contact Support
-          </motion.button>
+          <motion.button 
+                onClick={() => navigate('/contact')}
+                whileHover={{ scale: 1.05, boxShadow: '0 10px 25px rgba(0, 102, 204, 0.3)' }}
+                whileTap={{ scale: 0.95 }}
+                className="px-8 py-4 bg-[#0066CC] text-white rounded-lg hover:bg-[#004C99] transition-all shadow-md hover:shadow-lg font-medium"
+              >
+                Contact Support
+              </motion.button>
         </motion.div>
       </div>
     </section>

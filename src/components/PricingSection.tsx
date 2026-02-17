@@ -81,7 +81,7 @@ export function PricingSection({ onPlanSelect }: PricingSectionProps) {
   const handlePlanClick = (plan: Plan) => {
     if (plan.isEnterprise) {
       // Open contact sales link in new tab or handle as needed
-      window.open("/contact-sales", "_blank");
+      window.open("/contact", "_blank");
     } else {
       onPlanSelect(plan.licenseType, billingCycle);
     }

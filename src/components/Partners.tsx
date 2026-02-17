@@ -3,36 +3,36 @@ import { Link } from 'react-router-dom';
 import { Award, Users, TrendingUp, Target, CheckCircle, Globe } from 'lucide-react';
 
 export function Partners() {
-  const partnerCards = [
-    {
-      name: 'IZAAP Technologies Private Limited',
-      badge: 'GOLD',
-      location: 'CHENNAI, IN',
-      description: 'An award-winning Tally Connect Gold Partner with over 10 years of expertise in consultation, customization, API integration, mobile apps integration, to enhance your digital experience.',
-      icons: ['✓', '👥', '🏆'],
-    },
-    {
-      name: 'Corporate Intellect Solutions',
-      badge: 'GOLD',
-      location: 'DELHI, MUMBAI, BANGALORE, GUJRAT, HYDERABAD, IN',
-      description: 'CIS is a proficient IT Consulting empowering organizations with expert guidance and customized Tally Connect solutions, driving efficient digital transformations to achieve their business goals',
-      icons: ['✓', '👥', '🏆'],
-    },
-    {
-      name: 'Rajlaxmi Solutions Private Limited',
-      badge: 'GOLD',
-      location: 'MUMBAI, DELHI, BANGALORE, CHENNAI, HYDERABAD, KOLKATTA, IN',
-      description: 'Expert Tally Connect partner providing comprehensive business solutions and training services across multiple cities in India.',
-      icons: ['✓', '👥', '🏆'],
-    },
-    {
-      name: 'All CAD Services Private Limited',
-      badge: 'GOLD',
-      location: 'JAIPUR, CHENNAI, DUBAI, SHARJAH, ABU DHABI, IN, DUBAI, ABU DHABI',
-      description: 'Global Tally Connect solutions provider with presence in India and UAE, offering innovative business management services.',
-      icons: ['✓', '👥', '🏆'],
-    },
-  ];
+  // const partnerCards = [
+  //   {
+  //     name: 'IZAAP Technologies Private Limited',
+  //     badge: 'GOLD',
+  //     location: 'CHENNAI, IN',
+  //     description: 'An award-winning Tally Connect Gold Partner with over 10 years of expertise in consultation, customization, API integration, mobile apps integration, to enhance your digital experience.',
+  //     icons: ['✓', '👥', '🏆'],
+  //   },
+  //   {
+  //     name: 'Corporate Intellect Solutions',
+  //     badge: 'GOLD',
+  //     location: 'DELHI, MUMBAI, BANGALORE, GUJRAT, HYDERABAD, IN',
+  //     description: 'CIS is a proficient IT Consulting empowering organizations with expert guidance and customized Tally Connect solutions, driving efficient digital transformations to achieve their business goals',
+  //     icons: ['✓', '👥', '🏆'],
+  //   },
+  //   {
+  //     name: 'Rajlaxmi Solutions Private Limited',
+  //     badge: 'GOLD',
+  //     location: 'MUMBAI, DELHI, BANGALORE, CHENNAI, HYDERABAD, KOLKATTA, IN',
+  //     description: 'Expert Tally Connect partner providing comprehensive business solutions and training services across multiple cities in India.',
+  //     icons: ['✓', '👥', '🏆'],
+  //   },
+  //   {
+  //     name: 'All CAD Services Private Limited',
+  //     badge: 'GOLD',
+  //     location: 'JAIPUR, CHENNAI, DUBAI, SHARJAH, ABU DHABI, IN, DUBAI, ABU DHABI',
+  //     description: 'Global Tally Connect solutions provider with presence in India and UAE, offering innovative business management services.',
+  //     icons: ['✓', '👥', '🏆'],
+  //   },
+  // ];
 
   const benefits = [
     {
@@ -118,7 +118,7 @@ export function Partners() {
             </p>
           </motion.div>
 
-          {/* Partner Cards Grid */}
+          {/* Partner Cards Grid
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
             {partnerCards.map((partner, index) => (
               <motion.div
@@ -151,7 +151,7 @@ export function Partners() {
                 </p>
               </motion.div>
             ))}
-          </div>
+          </div> */}
 
           {/* Benefits Section */}
           <motion.div
