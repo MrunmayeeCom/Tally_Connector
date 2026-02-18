@@ -50,8 +50,14 @@ export function CheckoutPage({
   const [lmsPlan, setLmsPlan] = useState<{
     licenseId: string;
     planName: string;   
-    pricePerUser: number; // Price per user per month
-    includedUsers: number; // Number of users included in the plan
+    pricePerUser: number;
+    includedUsers: number;
+    discountConfig: {
+      monthly: number;
+      quarterly: number;
+      "half-yearly": number;
+      yearly: number;
+    };
   } | null>(null);
 
   const [loading, setLoading] = useState(true);
@@ -74,12 +80,10 @@ export function CheckoutPage({
 
   // Calculate discount amount
   const getDiscount = () => {
+    if (!lmsPlan) return 0;
     const subtotal = getSubtotal();
-    
-    if (billingCycle === "quarterly") return subtotal * 0.05; // 5% discount
-    if (billingCycle === "half-yearly") return subtotal * 0.10; // 10% discount
-    if (billingCycle === "yearly") return subtotal * 0.20; // 20% discount
-    return 0;
+    const pct = lmsPlan.discountConfig?.[billingCycle] ?? 0;
+    return subtotal * (pct / 100);
   };
 
   // Calculate price after discount
@@ -217,12 +221,7 @@ export function CheckoutPage({
   };
 
   const getSavingsPercent = () => {
-    switch (billingCycle) {
-      case "monthly": return 0;
-      case "quarterly": return 5;
-      case "half-yearly": return 10;
-      case "yearly": return 20;
-    }
+    return lmsPlan?.discountConfig?.[billingCycle] ?? 0;
   };
 
   const getBillingPeriod = () => {
@@ -390,8 +389,14 @@ export function CheckoutPage({
         setLmsPlan({
           licenseId: matched._id,
           planName: matched.licenseType.name, 
-          pricePerUser: matched.licenseType.price.amount, // Price per user per month
-          includedUsers: userCount, // Number of users in the plan
+          pricePerUser: matched.licenseType.price.amount,
+          includedUsers: userCount,
+          discountConfig: matched.licenseType.discountConfig || {
+            monthly: 0,
+            quarterly: 5,
+            "half-yearly": 10,
+            yearly: 20,
+          },
         });
       } catch (err) {
         console.error("Failed to load checkout plan", err);
@@ -585,21 +590,23 @@ export function CheckoutPage({
                   <p className="text-sm text-muted-foreground mb-3">Billing Cycle</p>
                   <Tabs value={billingCycle} onValueChange={(value) => setBillingCycle(value as BillingCycle)}>
                     <TabsList className="w-full grid-cols-4">
-                      <TabsTrigger value="monthly" className="text-xs">
-                        Monthly
-                      </TabsTrigger>
-                      <TabsTrigger value="quarterly" className="text-xs">
-                        Quarterly
-                        <span className="ml-1 text-[10px] text-green-600 dark:text-green-400">-5%</span>
-                      </TabsTrigger>
-                      <TabsTrigger value="half-yearly" className="text-xs">
-                        Half-Yearly
-                        <span className="ml-1 text-[10px] text-green-600 dark:text-green-400">-10%</span>
-                      </TabsTrigger>
-                      <TabsTrigger value="yearly" className="text-xs">
-                        Yearly
-                        <span className="ml-1 text-[10px] text-green-600 dark:text-green-400">-20%</span>
-                      </TabsTrigger>
+                      {(["monthly", "quarterly", "half-yearly", "yearly"] as BillingCycle[]).map((cycle) => {
+                        const pct = lmsPlan?.discountConfig?.[cycle] ?? 0;
+                        const labels: Record<string, string> = {
+                          monthly: "Monthly",
+                          quarterly: "Quarterly",
+                          "half-yearly": "Half-Yearly",
+                          yearly: "Yearly",
+                        };
+                        return (
+                          <TabsTrigger key={cycle} value={cycle} className="text-xs">
+                            {labels[cycle]}
+                            {pct > 0 && (
+                              <span className="ml-1 text-[10px] text-green-600 dark:text-green-400">-{pct}%</span>
+                            )}
+                          </TabsTrigger>
+                        );
+                      })}
                     </TabsList>
                   </Tabs>
                 </div>

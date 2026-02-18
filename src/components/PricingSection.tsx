@@ -34,6 +34,12 @@ interface Plan {
   isFree: boolean;
   isEnterprise: boolean;
   icon: any;
+  discountConfig: {
+    monthly: number;
+    quarterly: number;
+    "half-yearly": number;
+    yearly: number;
+  };
 }
 
 const PLAN_ORDER: Record<string, number> = {
@@ -59,11 +65,11 @@ export function PricingSection({ onPlanSelect }: PricingSectionProps) {
 
   const getPrice = (plan: Plan) => {
     if (plan.isFree) return 0;
-
-    if (billingCycle === "monthly") return plan.price;
-    if (billingCycle === "quarterly") return (plan.price * 3 * 0.95); // 5% discount
-    if (billingCycle === "half-yearly") return (plan.price * 6 * 0.90); // 10% discount
-    return plan.price * 12 * 0.8;
+    const months: Record<BillingCycle, number> = {
+      monthly: 1, quarterly: 3, "half-yearly": 6, yearly: 12,
+    };
+    const discountPct = plan.discountConfig?.[billingCycle] ?? 0;
+    return plan.price * months[billingCycle] * (1 - discountPct / 100);
   };
 
   const getBillingText = () => {
@@ -74,10 +80,9 @@ export function PricingSection({ onPlanSelect }: PricingSectionProps) {
   };
 
   const getDiscountText = () => {
-    if (billingCycle === "quarterly") return "Save 5%";
-    if (billingCycle === "half-yearly") return "Save 10%";
-    if (billingCycle === "yearly") return "Save 20%";
-    return "";
+    const refPlan = plans.find(p => !p.isFree && !p.isEnterprise);
+    const pct = refPlan?.discountConfig?.[billingCycle] ?? 0;
+    return pct > 0 ? `Save ${pct}%` : "";
   };
 
   const handlePlanClick = (plan: Plan) => {
@@ -121,6 +126,12 @@ export function PricingSection({ onPlanSelect }: PricingSectionProps) {
               isFree: (lt.price?.amount ?? 0) === 0,
               isEnterprise: lt.name.toLowerCase() === "enterprise",
               icon: meta.icon || Star,
+              discountConfig: lt.discountConfig || {
+                monthly: 0,
+                quarterly: 5,
+                "half-yearly": 10,
+                yearly: 20,
+              },
             };
           })
           .filter(Boolean);
@@ -159,21 +170,24 @@ export function PricingSection({ onPlanSelect }: PricingSectionProps) {
             className="w-fit mx-auto"
           >
             <TabsList className="inline-flex h-auto p-1">
-              <TabsTrigger value="monthly" className="px-4 py-2">
-                Monthly
-              </TabsTrigger>
-              <TabsTrigger value="quarterly" className="px-4 py-2">
-                Quarterly{" "}
-                <span className="ml-1 text-xs text-emerald-600 font-medium">-5%</span>
-              </TabsTrigger>
-              <TabsTrigger value="half-yearly" className="px-4 py-2">
-                Half-Yearly{" "}
-                <span className="ml-1 text-xs text-emerald-600 font-medium">-10%</span>
-              </TabsTrigger>
-              <TabsTrigger value="yearly" className="px-4 py-2">
-                Yearly{" "}
-                <span className="ml-1 text-xs text-emerald-600 font-medium">-20%</span>
-              </TabsTrigger>
+              {(["monthly", "quarterly", "half-yearly", "yearly"] as BillingCycle[]).map((cycle) => {
+                const refPlan = plans.find(p => !p.isFree && !p.isEnterprise);
+                const pct = refPlan?.discountConfig?.[cycle] ?? 0;
+                const labels: Record<string, string> = {
+                  monthly: "Monthly",
+                  quarterly: "Quarterly",
+                  "half-yearly": "Half-Yearly",
+                  yearly: "Yearly",
+                };
+                return (
+                  <TabsTrigger key={cycle} value={cycle} className="px-4 py-2">
+                    {labels[cycle]}{" "}
+                    {pct > 0 && (
+                      <span className="ml-1 text-xs text-emerald-600 font-medium">-{pct}%</span>
+                    )}
+                  </TabsTrigger>
+                );
+              })}
             </TabsList>
           </Tabs>
         </div>
