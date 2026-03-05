@@ -1,7 +1,12 @@
 import { motion } from "framer-motion";
 import { TrendingUp, Zap, Shield, RefreshCw } from "lucide-react";
 
-export function FeaturesSection() {
+// Added onKnowMore prop
+interface FeaturesSectionProps {
+  onKnowMore?: () => void;
+}
+
+export function FeaturesSection({ onKnowMore }: FeaturesSectionProps) {
   const features = [
     {
       icon: TrendingUp,
@@ -136,7 +141,9 @@ export function FeaturesSection() {
           <p className="text-gray-600 mb-6">
             Discover how Tally Connect can transform your business
           </p>
+          {/* Added onClick={onKnowMore} */}
           <motion.button
+            onClick={onKnowMore}
             whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.95 }}
             className="px-8 py-4 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-xl font-semibold shadow-xl hover:shadow-2xl transition-all"

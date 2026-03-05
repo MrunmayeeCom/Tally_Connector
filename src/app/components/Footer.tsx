@@ -83,7 +83,7 @@ export function Footer() {
         {/* Bottom Bar */}
         <div className="border-t border-gray-700 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-gray-400 text-sm">
-            © 2026 Tally Connect. All rights reserved.
+            © 2026 Tally Connect. All rights reserved. Powered by Averlon.
           </p>
           <div className="flex items-center gap-4">
             {socialLinks.map((social, index) => (

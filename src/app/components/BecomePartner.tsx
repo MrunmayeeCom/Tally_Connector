@@ -1,8 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { TrendingUp, GraduationCap, Award, Briefcase, Target, Zap } from "lucide-react";
 
 export default function BecomePartner() {
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const [activeTier, setActiveTier] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"become" | "directory">("become");
@@ -47,73 +51,53 @@ export default function BecomePartner() {
 ];
 
   return (
-    <div className="relative min-h-screen font-[Inter] overflow-hidden">
+  <div className="relative min-h-screen font-[Inter] overflow-hidden">
   
     {/* Gradient Background */}
     <div className="absolute inset-0 bg-gradient-to-br from-[#0f172a] via-[#1e1b4b] to-[#831843]"></div>
 
     {/* Content */}
-    <div className="relative z-10 pt-32 pb-20">
+    <div className="relative z-10 pt-24 pb-20">
 
     {/* HERO SECTION */}
-    <div className="text-center px-6 mb-20">
+    <div className="text-center px-6 mb-6 flex justify-center">
 
-      <h1 className="text-4xl md:text-5xl font-bold italic text-white">
-        Become a Tally Connect Partner
-      </h1>
+      <div className="rounded-3xl px-14 py-10 max-w-6xl">
 
-      <p className="mt-6 text-lg text-gray-300 max-w-2xl mx-auto">
-        Join our network of trusted partners and grow your business with Tally Connect
-      </p>
+          <h2 className="text-5xl md:text-6xl font-extrabold italic text-gray-200 tracking-wide">
+            Become a Tally Connect Partner
+          </h2>
 
-          <div className="mt-10 flex justify-center gap-6 flex-wrap">
+          <p className="mt-6 text-lg text-gray-300 max-w-2xl mx-auto leading-relaxed">
+            Join our network of trusted partners and grow your business with Tally Connect
+          </p>
 
-      <button
-        onClick={() => setActiveTab("become")}
-        className={`px-8 py-4 rounded-2xl backdrop-blur-xl border transition ${
-          activeTab === "become"
-            ? "bg-white/20 border-white/30 text-white shadow-xl"
-            : "bg-white/10 border-white/20 text-gray-300 hover:bg-white/20 hover:text-white"
-        }`}
-      >
-        Become a Partner
-      </button>
-
-      <button
-        onClick={() => setActiveTab("directory")}
-        className={`px-8 py-4 rounded-2xl backdrop-blur-xl border transition ${
-          activeTab === "directory"
-            ? "bg-white/20 border-white/30 text-white shadow-xl"
-            : "bg-white/10 border-white/20 text-gray-300 hover:bg-white/20 hover:text-white"
-        }`}
-      >
-        Partner Directory
-      </button>
-
-    </div>
+        </div>
+        </div>
+        <div className="mt-6 mb-4 flex justify-center gap-6 flex-wrap">
     </div>
 
-  <div className="max-w-7xl mx-auto px-6 space-y-10">
+  <div className="max-w-6xl mx-auto px-6 space-y-10">
       {activeTab === "become" && (
 
     <div className="max-w-7xl mx-auto space-y-10">
 
       {/* PARTNER ADVANTAGES - GLASS STYLE */}
-      <div className="text-center mb-15">
+      <div className="text-center mb-12">
 
       <div className="bg-white/10 backdrop-blur-xl border border-white/20 
-                      rounded-3xl px-10 py-8 shadow-2xl">
+                      rounded-2xl px-8 py-6 shadow-xl max-w-6xl mx-auto">
 
       <h2 className="text-3xl font-semibold text-teal-300 mb-10">
         Partner Advantages
       </h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
       {benefits.map((item, index) => (
         <motion.div
         key={index}
         whileHover={{ scale: 1.05 }}
-        className="bg-white/10 p-6 rounded-2xl border border-white/20 text-center backdrop-blur-md">
+        className="bg-white/10 p-4 rounded-xl border border-white/20 text-center backdrop-blur-md">
       <item.icon className="w-8 h-8 mx-auto mb-3 text-teal-300" />
 
       <h4 className="text-sm font-semibold text-white">
@@ -130,11 +114,11 @@ export default function BecomePartner() {
 </div>
 
       {/* TIERS + FORM SECTION */}
-      <div className="grid lg:grid-cols-2 gap-16">
+      <div className="grid md:grid-cols-[0.95fr_1.05fr] gap-8 items-start">
 
         {/* LEFT - INTERACTIVE TIERS */}
       <div>
-      <div className="text-center mb-10">
+      <div className="text-center mb-6">
       <h2 className="text-3xl md:text-4xl font-semibold">
       <span className="bg-gradient-to-r from-yellow-400 via-amber-300 to-yellow-500 bg-clip-text text-transparent">
       Partnership Tiers
@@ -148,96 +132,95 @@ export default function BecomePartner() {
       </p>
 </div>
 
-      <div className="space-y-6">
+      <div className="space-y-4 max-w-xl mx-auto">
 
       {/* GOLD */}
-      <div
-      onClick={() => 
-      setActiveTier(activeTier === "gold" ? null : "gold")
-      }
-      className="cursor-pointer bg-gradient-to-r from-yellow-400 to-yellow-600 
-                 p-5 rounded-2xl text-white shadow-lg">
-      <h3 className="font-bold text-lg">Gold Partner</h3>
-    </div>
+      <div className="bg-gradient-to-r from-yellow-400 to-yellow-600 
+                rounded-2xl text-white flex overflow-hidden shadow-lg">
 
-    {activeTier === "gold" && (
-      <div className="bg-white/10 p-8 rounded-2xl border border-white/20 text-white">
-        <h4 className="font-semibold mb-3">Requirements:</h4>
-        <ul className="text-sm space-y-2 mb-4">
-          <li>✔ Expert certification</li>
-          <li>✔ 30+ implementations</li>
-          <li>✔ Premium revenue target</li>
-        </ul>
+        {/* ICON */}
+        <div className="w-[35%] flex flex-col items-center justify-center bg-black/10 gap-3">
+          <Award className="w-12 h-12 text-white" />
+          <h3 className="font-bold text-lg">Gold Partner</h3>
+        </div>
 
-        <h4 className="font-semibold mb-3">Benefits:</h4>
-        <ul className="text-sm space-y-2">
-          <li>✔ All Silver benefits</li>
-          <li>✔ Dedicated success manager</li>
-          <li>✔ Featured listing</li>
-        </ul>
+        {/* DETAILS */}
+        <div className="w-[65%] p-5">
+
+          <h4 className="text-sm font-semibold mb-2">Requirements:</h4>
+          <ul className="text-xs space-y-1 mb-3">
+            <li>✔ Expert certification</li>
+            <li>✔ 30+ implementations</li>
+            <li>✔ Premium revenue target</li>
+          </ul>
+
+          <h4 className="text-sm font-semibold mb-2">Benefits:</h4>
+          <ul className="text-xs space-y-1">
+            <li>✔ All Silver benefits</li>
+            <li>✔ Dedicated success manager</li>
+            <li>✔ Featured listing</li>
+          </ul>
+        </div>
+        </div>
+
+      {/* SILVER */}
+      <div className="bg-gradient-to-r from-gray-300 to-gray-400 
+                rounded-2xl text-white flex overflow-hidden shadow-lg">
+
+        <div className="w-[35%] flex flex-col items-center justify-center bg-black/10 gap-3">
+          <Target className="w-12 h-12 text-white" />
+          <h3 className="font-bold text-lg">Silver Partner</h3>
+        </div>
+
+        <div className="w-[65%] p-5">
+
+          <h4 className="text-sm font-semibold mb-2">Requirements:</h4>
+          <ul className="text-xs space-y-1 mb-3">
+            <li>✔ Advanced certification</li>
+            <li>✔ 15+ implementations</li>
+            <li>✔ Higher revenue target</li>
+          </ul>
+
+          <h4 className="text-sm font-semibold mb-2">Benefits:</h4>
+          <ul className="text-xs space-y-1">
+            <li>✔ All Bronze benefits</li>
+            <li>✔ Priority support</li>
+            <li>✔ Co-marketing opportunities</li>
+          </ul>
+        </div>
+
       </div>
-    )}
 
-    {/* SILVER */}
-    <div
-      onClick={() => 
-      setActiveTier(activeTier === "silver" ? null : "silver")
-      }
-      className="cursor-pointer bg-gradient-to-r from-gray-300 to-gray-400 
-                 p-5 rounded-2xl text-white shadow-lg"
-    >
-      <h3 className="font-bold text-lg">Silver Partner</h3>
-    </div>
 
-    {activeTier === "silver" && (
-      <div className="bg-white/10 p-8 rounded-2xl border border-white/20 text-white">
-        <h4 className="font-semibold mb-3">Requirements:</h4>
-        <ul className="text-sm space-y-2 mb-4">
-          <li>✔ Advanced certification</li>
-          <li>✔ 15+ implementations</li>
-          <li>✔ Higher revenue target</li>
-        </ul>
+      {/* BRONZE */}
+      <div className="bg-gradient-to-r from-orange-400 to-orange-600 
+                rounded-2xl text-white flex overflow-hidden shadow-lg">
 
-        <h4 className="font-semibold mb-3">Benefits:</h4>
-        <ul className="text-sm space-y-2">
-          <li>✔ All Bronze benefits</li>
-          <li>✔ Priority support</li>
-          <li>✔ Co-marketing opportunities</li>
-        </ul>
+        <div className="w-[35%] flex flex-col items-center justify-center bg-black/10 gap-3">
+          <Briefcase className="w-12 h-12 text-white" />
+          <h3 className="font-bold text-lg">Bronze Partner</h3>
+        </div>
+
+        <div className="w-[65%] p-5">
+
+          <h4 className="text-sm font-semibold mb-2">Requirements:</h4>
+          <ul className="text-xs space-y-1 mb-3">
+            <li>✔ Basic certification</li>
+            <li>✔ 5+ implementations</li>
+            <li>✔ Annual revenue target</li>
+          </ul>
+
+          <h4 className="text-sm font-semibold mb-2">Benefits:</h4>
+          <ul className="text-xs space-y-1">
+            <li>✔ Partner badge</li>
+            <li>✔ Marketing materials</li>
+            <li>✔ Technical support</li>
+          </ul>
+        </div>
+
       </div>
-    )}
-
-    {/* BRONZE */}
-    <div
-      onClick={() => 
-      setActiveTier(activeTier === "bronze" ? null : "bronze")
-      }
-      className="cursor-pointer bg-gradient-to-r from-orange-400 to-orange-600 
-                 p-5 rounded-2xl text-white shadow-lg"
-    >
-      <h3 className="font-bold text-lg">Bronze Partner</h3>
-    </div>
-
-    {activeTier === "bronze" && (
-      <div className="bg-white/10 p-8 rounded-2xl border border-white/20 text-white">
-        <h4 className="font-semibold mb-3">Requirements:</h4>
-        <ul className="text-sm space-y-2 mb-4">
-          <li>✔ Basic certification</li>
-          <li>✔ 5+ implementations</li>
-          <li>✔ Annual revenue target</li>
-        </ul>
-
-        <h4 className="font-semibold mb-3">Benefits:</h4>
-        <ul className="text-sm space-y-2">
-          <li>✔ Partner badge</li>
-          <li>✔ Marketing materials</li>
-          <li>✔ Technical support</li>
-        </ul>
       </div>
-    )}
-
-  </div>
-</div>
+      </div>
 
         {/* RIGHT - FORM */}
         <div className="bg-white text-black rounded-3xl p-10 shadow-2xl">
@@ -322,6 +305,7 @@ export default function BecomePartner() {
       </div>
       </div>
     </div>
+
       )}
       {activeTab === "directory" && (
 
@@ -384,7 +368,7 @@ export default function BecomePartner() {
       </div>
 )}
     </div>
-  </div>
-  </div>
+    </div>
+    </div>
   );
 }

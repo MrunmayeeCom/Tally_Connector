@@ -1,136 +1,142 @@
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Check, Star } from "lucide-react";
+import { Check, Star, Zap, Crown, Sparkles } from "lucide-react";
 
-export function PricingSection() {
-  const pricingPlans = [
-    {
-      name: "Starter",
-      description: "Best for Starter users",
-      price: "Free",
-      period: "",
-      buttonText: "Get Started Free",
-      features: [
-        "Includes 2 users",
-        "Up to 2 Tally companies",
-        "Auto sync in 180",
-        "Interactive financial dashboard",
-        "Monthly financial summary",
-        "Last sync time visible",
-        "Agent based integration",
-        "Custom field extraction",
-        "Voucher level access",
-        "Manage your Settings",
-        "Voucher explorer",
-        "Voucher additional view",
-      ],
-      color: "from-gray-600 to-gray-700",
-      popular: false,
-    },
-    {
-      name: "Professional",
-      description: "Best for Professional users",
-      price: "₹199",
-      period: "/user/month",
-      buttonText: "Buy Now",
-      features: [
-        "Includes 5 users",
-        "Up to 5 Tally companies",
-        "Auto sync in 60",
-        "Interactive financial dashboard",
-        "Monthly financial summary",
-        "Agent based integration",
-        "Last sync time visible",
-        "Auto select mode & user",
-        "Custom field extraction",
-        "Tally ledger list access",
-        "Ledger level access",
-        "Voucher level access",
-        "Order level access",
-        "Inventory level access",
-      ],
-      color: "from-cyan-500 to-blue-600",
-      popular: true,
-    },
-    {
-      name: "Business",
-      description: "Best for Business users",
-      price: "₹399",
-      period: "/user/month",
-      buttonText: "Buy Now",
-      features: [
-        "Includes 10 users",
-        "Up to 10 Tally companies",
-        "Auto sync in 30",
-        "Interactive financial dashboard",
-        "Monthly financial summary",
-        "Last sync time visible",
-        "Custom field extraction",
-        "Auto select phone & email",
-        "Tally ledger list access",
-        "Voucher explorer",
-        "Voucher additional view",
-        "Basic reports",
-        "Advanced financial reports",
-        "CSV export",
-        "PDF export",
-        "User details visible",
-        "User creation & deletion",
-        "Full admin control",
-        "Multi company view",
-        "Company wise user assignment",
-        "Role based access",
-        "Row level access",
-        "Manage your Settings",
-        "Ledger level access",
-        "Voucher level access",
-      ],
-      color: "from-blue-600 to-indigo-600",
-      popular: false,
-    },
-    {
-      name: "Enterprise",
-      description: "Best for Enterprise users",
-      price: "₹599",
-      period: "/user/month",
-      buttonText: "Contact Sales",
-      features: [
-        "Includes 15 users",
-        "Up to 25 Tally companies",
-        "Auto sync in 1",
-        "Interactive financial dashboard",
-        "Monthly financial summary",
-        "Last sync time visible",
-        "Custom field extraction",
-        "Auto select phone & email",
-        "Tally ledger list access",
-        "Voucher explorer",
-        "Voucher additional view",
-        "Basic reports",
-        "Advanced financial reports",
-        "CSV export",
-        "PDF export",
-        "User details visible",
-        "User creation & deletion",
-        "Multi company view",
-        "Row level access",
-        "Manage your Settings",
-        "Ledger level access",
-        "Voucher level access",
-        "Order level access",
-        "Inventory level access",
-        "Email credentials",
-        "Permission revoke/assign",
-        "Login tracking",
-        "Permission monitoring",
-        "Access verification",
-        "Audit logs",
-      ],
-      color: "from-purple-600 to-pink-600",
-      popular: false,
-    },
-  ];
+interface PricingSectionProps {
+  onPlanSelect: (
+    plan: string,
+    billingCycle: "monthly" | "quarterly" | "half-yearly" | "yearly"
+  ) => void;
+  onContactSales?: () => void;
+  onBuyNow?: (
+    plan: string,
+    billingCycle: "monthly" | "quarterly" | "half-yearly" | "yearly"
+  ) => void;
+}
 
-  const tabs = ["Monthly", "Quarterly", "Half Yearly", "Yearly"];
+type BillingCycle = "monthly" | "quarterly" | "half-yearly" | "yearly";
+
+interface Plan {
+  licenseType: string;
+  name: string;
+  description: string;
+  price: number;
+  billingPeriod: "monthly" | "quarterly" | "half-yearly" | "yearly";
+  features: { featureSlug: string; uiLabel: string }[];
+  popular: boolean;
+  isFree: boolean;
+  isEnterprise: boolean;
+  icon: any;
+  color: string;
+}
+
+const PLAN_ORDER: Record<string, number> = {
+  starter: 1, professional: 2, business: 3, enterprise: 4,
+};
+
+const PLAN_UI_META: Record<string, { icon: any; popular?: boolean; color: string }> = {
+  starter:      { icon: Star,     color: "from-gray-600 to-gray-700" },
+  professional: { icon: Zap,      color: "from-cyan-500 to-blue-600", popular: true },
+  business:     { icon: Sparkles, color: "from-blue-600 to-indigo-600" },
+  enterprise:   { icon: Crown,    color: "from-purple-600 to-pink-600" },
+};
+
+const BILLING_TABS: { label: string; value: BillingCycle; discount: string }[] = [
+  { label: "Monthly",     value: "monthly",     discount: "" },
+  { label: "Quarterly",   value: "quarterly",   discount: "-5%" },
+  { label: "Half Yearly", value: "half-yearly", discount: "-10%" },
+  { label: "Yearly",      value: "yearly",      discount: "-20%" },
+];
+
+export function PricingSection({ onPlanSelect, onContactSales, onBuyNow }: PricingSectionProps) {
+  const [billingCycle, setBillingCycle] = useState<BillingCycle>("monthly");
+  const [plans, setPlans] = useState<Plan[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const getPrice = (plan: Plan) => {
+    if (plan.isFree) return 0;
+    if (billingCycle === "monthly")     return plan.price;
+    if (billingCycle === "quarterly")   return plan.price * 3 * 0.95;
+    if (billingCycle === "half-yearly") return plan.price * 6 * 0.90;
+    return plan.price * 12 * 0.8;
+  };
+
+  const getBillingText = () => {
+    if (billingCycle === "monthly")     return "/user/month";
+    if (billingCycle === "quarterly")   return "/user/quarter";
+    if (billingCycle === "half-yearly") return "/user/6 months";
+    return "/year";
+  };
+
+  const getDiscountText = () => {
+    if (billingCycle === "quarterly")   return "Save 5%";
+    if (billingCycle === "half-yearly") return "Save 10%";
+    if (billingCycle === "yearly")      return "Save 20%";
+    return "";
+  };
+
+  const handlePlanClick = (plan: Plan) => {
+    if (plan.isEnterprise) {
+      onContactSales?.();
+    } else {
+      // Check if user is logged in
+      const user = localStorage.getItem("user");
+      if (user && onBuyNow) {
+        // Logged in → go to checkout
+        onBuyNow(plan.licenseType, billingCycle);
+      } else {
+        // Not logged in → open login modal
+        onPlanSelect(plan.licenseType, billingCycle);
+      }
+    }
+  };
+
+  useEffect(() => {
+    const loadPlans = async () => {
+      try {
+        const res = await fetch(
+          "https://lisence-system.onrender.com/api/license/public/licenses-by-product/695902cfc240b17f16c3d716",
+          { headers: { "x-api-key": "my-secret-key-123" } }
+        );
+        const data = await res.json();
+        const licenses = data.licenses || data.data || data || [];
+
+        const mapped: Plan[] = licenses
+          .map((lic: any) => {
+            const lt = lic.licenseTypeId || lic.licenseType;
+            if (!lt) return null;
+            const key = lt.name?.toLowerCase();
+            const meta = PLAN_UI_META[key] || {};
+            return {
+              licenseType: lt._id,
+              name: lt.name,
+              description: lt.description ?? `Best for ${lt.name} users`,
+              price: lt.price?.amount ?? 0,
+              billingPeriod: lt.price?.billingPeriod ?? "monthly",
+              features: lt.features ?? [],
+              popular: meta.popular ?? false,
+              isFree: (lt.price?.amount ?? 0) === 0,
+              isEnterprise: lt.name.toLowerCase() === "enterprise",
+              icon: meta.icon || Star,
+              color: meta.color || "from-gray-600 to-gray-700",
+            };
+          })
+          .filter(Boolean);
+
+        mapped.sort(
+          (a, b) =>
+            (PLAN_ORDER[a.name.toLowerCase()] ?? 99) -
+            (PLAN_ORDER[b.name.toLowerCase()] ?? 99)
+        );
+        setPlans(mapped);
+      } catch (err) {
+        console.error("Failed to load Tally Connector plans", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadPlans();
+  }, []);
 
   return (
     <section id="pricing" className="py-24 bg-gradient-to-br from-gray-50 to-blue-50/30">
@@ -144,24 +150,25 @@ export function PricingSection() {
         >
           <h2 className="text-5xl font-bold mb-8 text-gray-900 italic">Pricing</h2>
           <div className="flex items-center justify-center gap-2 flex-wrap">
-            {tabs.map((tab, index) => (
+            {BILLING_TABS.map((tab, index) => (
               <motion.button
-                key={tab}
+                key={tab.value}
                 initial={{ opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
                 whileHover={{ scale: 1.05 }}
+                onClick={() => setBillingCycle(tab.value)}
                 className={`px-6 py-2 rounded-lg font-medium text-sm transition-all ${
-                  tab === "Monthly"
+                  billingCycle === tab.value
                     ? "bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg"
                     : "bg-white text-gray-700 hover:bg-gray-100"
                 }`}
               >
-                {tab}
-                {tab !== "Monthly" && (
+                {tab.label}
+                {tab.discount && (
                   <span className="ml-2 text-xs text-green-600 font-semibold">
-                    -{index * 5}%
+                    {tab.discount}
                   </span>
                 )}
               </motion.button>
@@ -169,10 +176,12 @@ export function PricingSection() {
           </div>
         </motion.div>
 
+        {loading && <p className="text-center text-gray-500 mb-8">Loading plans...</p>}
+
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {pricingPlans.map((plan, index) => (
+          {plans.map((plan, index) => (
             <motion.div
-              key={plan.name}
+              key={plan.licenseType}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -192,48 +201,47 @@ export function PricingSection() {
               )}
 
               <div className="mb-6">
-                <div
-                  className={`inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-gradient-to-r ${plan.color} text-white text-sm font-semibold mb-3`}
-                >
+                <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-gradient-to-r ${plan.color} text-white text-sm font-semibold mb-3`}>
                   {plan.name}
                 </div>
                 <p className="text-gray-600 text-sm mb-4">{plan.description}</p>
                 <div className="flex items-baseline gap-1">
-                  <span
-                    className={`text-4xl font-bold bg-gradient-to-r ${plan.color} bg-clip-text text-transparent`}
-                  >
-                    {plan.price}
+                  <span className={`text-4xl font-bold bg-gradient-to-r ${plan.color} bg-clip-text text-transparent`}>
+                    {plan.isFree ? "Free" : `₹${getPrice(plan).toLocaleString()}`}
                   </span>
-                  <span className="text-gray-600 text-sm">{plan.period}</span>
+                  {!plan.isFree && (
+                    <span className="text-gray-600 text-sm">{getBillingText()}</span>
+                  )}
                 </div>
+                {!plan.isFree && !plan.isEnterprise && getDiscountText() && (
+                  <p className="text-xs text-green-600 mt-1">{getDiscountText()}</p>
+                )}
               </div>
 
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                onClick={() => handlePlanClick(plan)}
                 className={`w-full py-3 rounded-xl font-semibold mb-6 transition-all ${
                   plan.popular
                     ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg hover:shadow-xl"
                     : "bg-gray-100 text-gray-900 hover:bg-gray-200"
                 }`}
               >
-                {plan.buttonText}
+                {plan.isFree
+                  ? "Get Started Free"
+                  : plan.isEnterprise
+                  ? "Contact Sales"
+                  : "Buy Now"}
               </motion.button>
 
               <div className="space-y-3">
-                <p className="font-semibold text-gray-900 text-sm mb-3">
-                  Includes:
-                </p>
+                <p className="font-semibold text-gray-900 text-sm mb-3">Includes:</p>
                 <div className="max-h-64 overflow-y-auto pr-2 space-y-2.5">
                   {plan.features.map((feature) => (
-                    <div
-                      key={feature}
-                      className="flex items-start gap-2 text-sm text-gray-700"
-                    >
-                      <Check
-                        className={`w-4 h-4 mt-0.5 flex-shrink-0 bg-gradient-to-r ${plan.color} text-white rounded-full p-0.5`}
-                      />
-                      <span>{feature}</span>
+                    <div key={feature.featureSlug} className="flex items-start gap-2 text-sm text-gray-700">
+                      <Check className={`w-4 h-4 mt-0.5 flex-shrink-0 bg-gradient-to-r ${plan.color} text-white rounded-full p-0.5`} />
+                      <span>{feature.uiLabel}</span>
                     </div>
                   ))}
                 </div>
@@ -245,3 +253,5 @@ export function PricingSection() {
     </section>
   );
 }
+
+export default PricingSection;

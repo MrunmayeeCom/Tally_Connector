@@ -18,32 +18,19 @@ export function HeroSection({ goToDemo }: { goToDemo: () => void }) {
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
         <motion.div
-          animate={{
-            scale: [1, 1.2, 1],
-            rotate: [0, 90, 0],
-          }}
-          transition={{
-            duration: 20,
-            repeat: Infinity,
-            ease: "linear",
-          }}
+          animate={{ scale: [1, 1.2, 1], rotate: [0, 90, 0] }}
+          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
           className="absolute -top-40 -right-40 w-96 h-96 bg-gradient-to-br from-cyan-400/20 to-blue-500/20 rounded-full blur-3xl"
         />
         <motion.div
-          animate={{
-            scale: [1, 1.3, 1],
-            rotate: [0, -90, 0],
-          }}
-          transition={{
-            duration: 25,
-            repeat: Infinity,
-            ease: "linear",
-          }}
+          animate={{ scale: [1, 1.3, 1], rotate: [0, -90, 0] }}
+          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
           className="absolute -bottom-40 -left-40 w-96 h-96 bg-gradient-to-br from-purple-400/20 to-pink-500/20 rounded-full blur-3xl"
         />
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-32 relative z-10">
+      {/* py-32 → py-24 to reduce top/bottom spacing and pull content up */}
+      <div className="max-w-7xl mx-auto px-6 py-24 relative z-10">
         {/* Top Banner */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -67,9 +54,7 @@ export function HeroSection({ goToDemo }: { goToDemo: () => void }) {
           className="text-center mb-8"
         >
           <h1 className="text-6xl md:text-7xl font-bold mb-6 leading-tight">
-            <span className="text-cyan-300 italic">
-              Smarter
-            </span>{" "}
+            <span className="text-cyan-300 italic">Smarter</span>{" "}
             <span className="text-white">Tally Solutions</span>
             <br />
             <span className="text-white">for Growing Businesses</span>
@@ -98,7 +83,7 @@ export function HeroSection({ goToDemo }: { goToDemo: () => void }) {
             whileTap={{ scale: 0.95 }}
             className="px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-xl font-semibold shadow-xl hover:shadow-2xl transition-all flex items-center gap-2 group"
           >
-          Get a Demo
+            Get a Demo
           </motion.button>
           <motion.button
             whileHover={{ scale: 1.05, y: -2 }}
@@ -117,24 +102,9 @@ export function HeroSection({ goToDemo }: { goToDemo: () => void }) {
           className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto"
         >
           {[
-            {
-              icon: Clock,
-              value: "99.9%",
-              label: "Uptime",
-              color: "from-cyan-400 to-blue-500",
-            },
-            {
-              icon: Zap,
-              value: "2 min",
-              label: "Auto Sync",
-              color: "from-purple-400 to-pink-500",
-            },
-            {
-              icon: HeadphonesIcon,
-              value: "24/7",
-              label: "Support",
-              color: "from-orange-400 to-red-500",
-            },
+            { icon: Clock, value: "99.9%", label: "Uptime", color: "from-cyan-400 to-blue-500" },
+            { icon: Zap, value: "2 min", label: "Auto Sync", color: "from-purple-400 to-pink-500" },
+            { icon: HeadphonesIcon, value: "24/7", label: "Support", color: "from-orange-400 to-red-500" },
           ].map((stat, index) => (
             <motion.div
               key={stat.label}
@@ -144,14 +114,10 @@ export function HeroSection({ goToDemo }: { goToDemo: () => void }) {
               whileHover={{ y: -5, scale: 1.05 }}
               className="bg-white/10 backdrop-blur-md rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all border border-white/20"
             >
-              <div
-                className={`w-12 h-12 rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center mb-4`}
-              >
+              <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center mb-4`}>
                 <stat.icon className="w-6 h-6 text-white" />
               </div>
-              <div
-                className={`text-4xl font-bold mb-2 bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}
-              >
+              <div className={`text-4xl font-bold mb-2 bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}>
                 {stat.value}
               </div>
               <div className="text-white/90 font-medium">{stat.label}</div>
