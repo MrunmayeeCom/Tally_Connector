@@ -150,7 +150,7 @@ export function PaymentSuccess() {
               <Button
                 variant="outline"
                 className="w-full"
-                onClick={() => window.open("/tally-agent.exe", "_blank")}
+                onClick={() => window.open("/DownloadAgent.zip", "_blank")}
               >
                 <Download className="h-4 w-4 mr-2" />
                 Download Tally Agent
