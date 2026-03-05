@@ -1,4 +1,4 @@
-import { Menu, X, ChevronDown, User, LogOut, LayoutDashboard } from 'lucide-react';
+import { Menu, X, ChevronDown, User, LogOut, LayoutDashboard, Download } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
@@ -164,6 +164,17 @@ export function Navbar({ scrolled, onLoginClick }: NavbarProps) {
     setMobileMenuOpen(false);
   };
 
+  const handleDownloadAgent = () => {
+    const link = document.createElement("a");
+    link.href = "/DownloadAgent.zip";
+    link.download = "DownloadAgent.zip";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setDropdownOpen(false);
+    setMobileMenuOpen(false);
+  };
+
   const getLoginButtonText = () => {
     if (hasActiveLicense) {
       return "Dashboard";
@@ -301,6 +312,14 @@ export function Navbar({ scrolled, onLoginClick }: NavbarProps) {
                                 <span className="font-medium">Dashboard</span>
                               </button>
 
+                              <button
+                                onClick={handleDownloadAgent}
+                                className="w-full flex items-center gap-3 px-4 py-3 text-[#002855] hover:bg-gray-50 rounded-lg transition-colors text-left"
+                              >
+                                <Download size={20} className="flex-shrink-0" />
+                                <span className="font-medium">Download Agent</span>
+                              </button>
+
                               <div className="my-2 border-t border-gray-100"></div>
                             </>
                           )}
@@ -387,13 +406,23 @@ export function Navbar({ scrolled, onLoginClick }: NavbarProps) {
 
                   {/* Only show Dashboard button in mobile if user has active license */}
                   {hasActiveLicense && (
-                    <button
-                      onClick={handleDashboardClick}
-                      className="w-full flex items-center justify-center gap-2 px-6 py-2 text-[#002855] border border-[#0066CC] rounded-lg hover:bg-gray-50 transition-all font-medium"
-                    >
-                      <LayoutDashboard size={18} />
-                      Dashboard
-                    </button>
+                    <>
+                      <button
+                        onClick={handleDashboardClick}
+                        className="w-full flex items-center justify-center gap-2 px-6 py-2 text-[#002855] border border-[#0066CC] rounded-lg hover:bg-gray-50 transition-all font-medium"
+                      >
+                        <LayoutDashboard size={18} />
+                        Dashboard
+                      </button>
+
+                      <button
+                        onClick={handleDownloadAgent}
+                        className="w-full flex items-center justify-center gap-2 px-6 py-2 text-[#002855] border border-[#0066CC] rounded-lg hover:bg-gray-50 transition-all font-medium"
+                      >
+                        <Download size={18} />
+                        Download Agent
+                      </button>
+                    </>
                   )}
 
                   <button
