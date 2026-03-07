@@ -130,8 +130,8 @@ export function ContactSupportPage({ onBack }: ContactSupportPageProps) {
                   <Mail className="h-5 w-5 text-[#003366] mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="text-sm font-medium text-gray-900">Email</p>
-                    <a href="mailto:support@tally.com" className="text-sm text-gray-600 hover:text-[#003366] transition-colors">
-                      support@tally.com
+                    <a href="mailto:info@averlonworld.com" className="text-sm text-gray-600 hover:text-[#003366] transition-colors">
+                      info@averlonworld.com
                     </a>
                   </div>
                 </div>
@@ -139,8 +139,8 @@ export function ContactSupportPage({ onBack }: ContactSupportPageProps) {
                   <Phone className="h-5 w-5 text-[#003366] mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="text-sm font-medium text-gray-900">Phone</p>
-                    <a href="tel:+18001234567" className="text-sm text-gray-600 hover:text-[#003366] transition-colors">
-                      +1 (800) 123-4567
+                    <a href="tel:+919892440788" className="text-sm text-gray-600 hover:text-[#003366] transition-colors">
+                      +91 98924 40788
                     </a>
                   </div>
                 </div>
@@ -167,8 +167,8 @@ export function ContactSupportPage({ onBack }: ContactSupportPageProps) {
                   <Mail className="h-5 w-5 text-[#003366] mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="text-sm font-medium text-gray-900">Email</p>
-                    <a href="mailto:sales@tally.com" className="text-sm text-gray-600 hover:text-[#003366] transition-colors">
-                      sales@tally.com
+                    <a href="mailto:info@averlonworld.com" className="text-sm text-gray-600 hover:text-[#003366] transition-colors">
+                      info@averlonworld.com
                     </a>
                   </div>
                 </div>
@@ -176,8 +176,8 @@ export function ContactSupportPage({ onBack }: ContactSupportPageProps) {
                   <Phone className="h-5 w-5 text-[#003366] mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="text-sm font-medium text-gray-900">Phone</p>
-                    <a href="tel:+18001234568" className="text-sm text-gray-600 hover:text-[#003366] transition-colors">
-                      +1 (800) 123-4568
+                    <a href="tel:+919892440788" className="text-sm text-gray-600 hover:text-[#003366] transition-colors">
+                      +91 9892440788
                     </a>
                   </div>
                 </div>

@@ -166,8 +166,8 @@ export function Navbar({ scrolled, onLoginClick }: NavbarProps) {
 
   const handleDownloadAgent = () => {
     const link = document.createElement("a");
-    link.href = "/DownloadAgent.zip";
-    link.download = "DownloadAgent.zip";
+    link.href = "/AgentDownload.zip";
+    link.download = "AgentDownload.zip";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
