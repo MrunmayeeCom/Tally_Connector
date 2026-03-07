@@ -201,13 +201,9 @@ export function ContactSupportPage({ onBack }: ContactSupportPageProps) {
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-gray-600 leading-relaxed">
-                  Tally Headquarters
-
-                  123 Business Ave
-
-                  San Francisco, CA 94105
-
-                  United States
+                  5th Floor, Lodha Supremus - II, Phase - II, Unit No, A. 533,<br /> 
+                  Road No. 22, Wagle Industrial Estate,<br /> 
+                  Thane West, Maharashtra 400604
                 </p>
               </CardContent>
             </Card>
