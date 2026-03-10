@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { TrendingUp, GraduationCap, Award, Briefcase, Target, Zap } from "lucide-react";
+import ApplicationForm from './ApplicationForm';
 
-export default function BecomePartner() {
+export default function BecomePartner({ onGoToDirectory }: { onGoToDirectory?: () => void }) {
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -10,6 +11,11 @@ export default function BecomePartner() {
 
   const [activeTier, setActiveTier] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"become" | "directory">("become");
+
+  const handlePartnersClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (onGoToDirectory) onGoToDirectory();
+  };
 
   const benefits = [
   {
@@ -60,9 +66,9 @@ export default function BecomePartner() {
     <div className="relative z-10 pt-24 pb-20">
 
     {/* HERO SECTION */}
-    <div className="text-center px-6 mb-6 flex justify-center">
+    <div className="text-center px-6 mb-2 flex justify-center">
 
-      <div className="rounded-3xl px-14 py-10 max-w-6xl">
+      <div className="rounded-3xl px-14 py-4 max-w-6xl">
 
           <h2 className="text-5xl md:text-6xl font-extrabold italic text-gray-200 tracking-wide">
             Become a Tally Connect Partner
@@ -77,6 +83,30 @@ export default function BecomePartner() {
         <div className="mt-6 mb-4 flex justify-center gap-6 flex-wrap">
     </div>
 
+    {/* Sticky Tabs */}
+    <div className="bg-white/10 backdrop-blur-md sticky top-16 md:top-20 z-40 border-b border-white/20 mb-6">
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="flex justify-center">
+          <button
+            onClick={() => setActiveTab("become")}
+            className={`flex-1 md:flex-none px-8 py-4 text-center font-medium border-b-4 transition-colors ${
+              activeTab === "become"
+                ? "bg-white/10 text-white border-white"
+                : "text-white/70 border-transparent hover:bg-white/10 hover:border-white/50"
+            }`}
+          >
+            Become a partner
+          </button>
+          <button
+            onClick={handlePartnersClick}
+            className="flex-1 md:flex-none px-8 py-4 text-center text-white/70 hover:bg-white/10 transition-colors font-medium border-b-4 border-transparent hover:border-white/50"
+          >
+            Partner directory
+          </button>
+        </div>
+      </div>
+    </div>
+
   <div className="max-w-6xl mx-auto px-6 space-y-10">
       {activeTab === "become" && (
 
@@ -88,7 +118,7 @@ export default function BecomePartner() {
       <div className="bg-white/10 backdrop-blur-xl border border-white/20 
                       rounded-2xl px-8 py-6 shadow-xl max-w-6xl mx-auto">
 
-      <h2 className="text-3xl font-semibold text-teal-300 mb-10">
+      <h2 className="text-4xl font-semibold text-teal-300 mb-10">
         Partner Advantages
       </h2>
 
@@ -97,14 +127,14 @@ export default function BecomePartner() {
         <motion.div
         key={index}
         whileHover={{ scale: 1.05 }}
-        className="bg-white/10 p-4 rounded-xl border border-white/20 text-center backdrop-blur-md">
-      <item.icon className="w-8 h-8 mx-auto mb-3 text-teal-300" />
+        className="bg-white/10 p-3 rounded-xl border border-white/20 text-center backdrop-blur-md">
+      <item.icon className="w-6 h-6 mx-auto mb-2 text-teal-300" />
 
       <h4 className="text-sm font-semibold text-white">
       {item.title}
       </h4>
 
-      <p className="mt-2 text-xs text-gray-300 leading-relaxed">
+      <p className="mt-1 text-xs text-gray-300 leading-relaxed">
       {item.description}
       </p>
       </motion.div>
@@ -223,86 +253,9 @@ export default function BecomePartner() {
       </div>
 
         {/* RIGHT - FORM */}
-        <div className="bg-white text-black rounded-3xl p-10 shadow-2xl">
-
-          <h2 className="text-2xl font-semibold mb-8 text-center">
-            Partner Application Form
-          </h2>
-
-          <form className="grid grid-cols-2 gap-4">
-
-        {/* Company Info */}
-        <input placeholder="Company Name *" className="border text-sm p-3 rounded-lg col-span-2" />
-        <input placeholder="Contact Person *" className="border text-sm p-3 rounded-lg col-span-2" />
-
-        <input type="email" placeholder="Email *" className="border text-sm p-3 rounded-lg" />
-        <input placeholder="Phone *" className="border text-sm p-3 rounded-lg" />
-
-        <input placeholder="Website" className="border text-sm p-3 rounded-lg col-span-2" />
-
-        <input placeholder="Country *" className="border text-sm p-3 rounded-lg" />
-        <input placeholder="City *" className="border text-sm p-3 rounded-lg" />
-
-        {/* NEW FIELDS */}
-
-        {/* Business Type */}
-        <select className="border text-sm p-3 rounded-lg col-span-2">
-        <option>Business Type *</option>
-        <option>Technology</option>
-        <option>Healthcare</option>
-        <option>Finance</option>
-        <option>Consulting</option>
-        <option>Reseller</option>
-        <option>Other</option>
-        </select>
-
-        {/* Years in Business */}
-        <select className="border text-sm p-3 rounded-lg">
-        <option>Years in Business *</option>
-        <option>0–1 years</option>
-        <option>1–3 years</option>
-        <option>3–5 years</option>
-        <option>5–10 years</option>
-        <option>10+ years</option>
-        </select>
-
-        {/* Employees */}
-        <select className="border text-sm p-3 rounded-lg">
-          <option>Employees *</option>
-          <option>1–10</option>
-          <option>11–50</option>
-          <option>51–200</option>
-          <option>201–500</option>
-          <option>500+</option>
-        </select>
-
-        {/* Existing Clients */}
-        <input placeholder="Existing Clients" className="border text-sm p-3 rounded-lg" />
-
-        {/* Join As */}
-        <select className="border text-sm p-3 rounded-lg">
-          <option>Join As *</option>
-          <option>Channel Partner</option>
-          <option>Distributor</option>
-        </select>
-
-        {/* Why Partner */}
-        <textarea
-          placeholder="Why do you want to become a partner? *"
-          className="border text-sm p-3 rounded-lg col-span-2 h-24"
-        />
-
-        {/* Submit Button */}
-        <button
-          type="submit"
-          className="col-span-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-xl text-sm font-medium hover:opacity-90 transition"
-        >
-          Submit Application
-        </button>
-
-    </form>
-    
-      </div>
+        <div className="rounded-3xl overflow-hidden shadow-2xl">
+          <ApplicationForm />
+        </div>
       </div>
     </div>
 

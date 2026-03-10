@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Zap, Clock, HeadphonesIcon } from "lucide-react";
-import heroImage from "../../assets/bimage1.png";
+import heroImage from "./assets1/assets/bimage1a.jpg";
 
 export function HeroSection({ goToDemo }: { goToDemo: () => void }) {
   return (
@@ -63,7 +63,7 @@ export function HeroSection({ goToDemo }: { goToDemo: () => void }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
-            className="text-xl text-white/90 max-w-3xl mx-auto leading-relaxed"
+            className="text-sm text-white/90 max-w-3xl mx-auto leading-relaxed"
           >
             Streamline operations, boost productivity, and scale faster with
             Tally Connect — trusted by SMEs and enterprises across industries.
@@ -117,7 +117,7 @@ export function HeroSection({ goToDemo }: { goToDemo: () => void }) {
               <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center mb-4`}>
                 <stat.icon className="w-6 h-6 text-white" />
               </div>
-              <div className={`text-4xl font-bold mb-2 bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}>
+              <div className={`text-3xl font-bold mb-2 bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}>
                 {stat.value}
               </div>
               <div className="text-white/90 font-medium">{stat.label}</div>

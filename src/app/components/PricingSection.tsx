@@ -79,13 +79,10 @@ export function PricingSection({ onPlanSelect, onContactSales, onBuyNow }: Prici
     if (plan.isEnterprise) {
       onContactSales?.();
     } else {
-      // Check if user is logged in
       const user = localStorage.getItem("user");
       if (user && onBuyNow) {
-        // Logged in → go to checkout
         onBuyNow(plan.licenseType, billingCycle);
       } else {
-        // Not logged in → open login modal
         onPlanSelect(plan.licenseType, billingCycle);
       }
     }
@@ -139,118 +136,128 @@ export function PricingSection({ onPlanSelect, onContactSales, onBuyNow }: Prici
   }, []);
 
   return (
-    <section id="pricing" className="py-24 bg-gradient-to-br from-gray-50 to-blue-50/30">
-      <div className="max-w-7xl mx-auto px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-12"
-        >
-          <h2 className="text-5xl font-bold mb-8 text-gray-900 italic">Pricing</h2>
-          <div className="flex items-center justify-center gap-2 flex-wrap">
-            {BILLING_TABS.map((tab, index) => (
-              <motion.button
-                key={tab.value}
-                initial={{ opacity: 0, y: 10 }}
+    <>
+      {/* Gray scrollbar styles */}
+      <style>{`
+        .gray-scrollbar::-webkit-scrollbar { width: 8px; }
+        .gray-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        .gray-scrollbar::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
+        .gray-scrollbar::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+      `}</style>
+
+      <section id="pricing" className="pt-10 pb-24 bg-gradient-to-br from-gray-50 to-blue-50/30">
+        <div className="max-w-7xl mx-auto px-10">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-5xl font-bold mb-8 text-gray-900">Pricing</h2>
+            <div className="flex items-center justify-center gap-2 flex-wrap">
+              {BILLING_TABS.map((tab, index) => (
+                <motion.button
+                  key={tab.value}
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.1 }}
+                  whileHover={{ scale: 1.05 }}
+                  onClick={() => setBillingCycle(tab.value)}
+                  className={`px-6 py-2 rounded-lg font-medium text-sm transition-all ${
+                    billingCycle === tab.value
+                      ? "bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg"
+                      : "bg-white text-gray-700 hover:bg-gray-100"
+                  }`}
+                >
+                  {tab.label}
+                  {tab.discount && (
+                    <span className={`ml-2 text-xs font-semibold ${billingCycle === tab.value ? "text-white" : "text-green-600"}`}>
+                      {tab.discount}
+                    </span>
+                  )}
+                </motion.button>
+              ))}
+            </div>
+          </motion.div>
+
+          {loading && <p className="text-center text-gray-500 mb-8">Loading plans...</p>}
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {plans.map((plan, index) => (
+              <motion.div
+                key={plan.licenseType}
+                initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                whileHover={{ scale: 1.05 }}
-                onClick={() => setBillingCycle(tab.value)}
-                className={`px-6 py-2 rounded-lg font-medium text-sm transition-all ${
-                  billingCycle === tab.value
-                    ? "bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg"
-                    : "bg-white text-gray-700 hover:bg-gray-100"
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+                whileHover={{ y: -10, scale: 1.02 }}
+                className={`relative rounded-3xl p-6 bg-white shadow-xl hover:shadow-2xl transition-all ${
+                  plan.popular ? "ring-4 ring-cyan-500" : ""
                 }`}
               >
-                {tab.label}
-                {tab.discount && (
-                  <span className="ml-2 text-xs text-green-600 font-semibold">
-                    {tab.discount}
-                  </span>
-                )}
-              </motion.button>
-            ))}
-          </div>
-        </motion.div>
-
-        {loading && <p className="text-center text-gray-500 mb-8">Loading plans...</p>}
-
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {plans.map((plan, index) => (
-            <motion.div
-              key={plan.licenseType}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              whileHover={{ y: -10, scale: 1.02 }}
-              className={`relative rounded-3xl p-6 bg-white shadow-xl hover:shadow-2xl transition-all ${
-                plan.popular ? "ring-4 ring-cyan-500" : ""
-              }`}
-            >
-              {plan.popular && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                  <div className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-4 py-1 rounded-full text-sm font-semibold flex items-center gap-1 shadow-lg">
-                    <Star className="w-4 h-4 fill-white" />
-                    Most Popular
+                {plan.popular && (
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                    <div className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-4 py-1 rounded-full text-xs font-semibold flex items-center gap-1 shadow-lg whitespace-nowrap">
+                      <Star className="w-4 h-4 fill-white" />
+                      Most Popular
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              <div className="mb-6">
-                <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-gradient-to-r ${plan.color} text-white text-sm font-semibold mb-3`}>
-                  {plan.name}
-                </div>
-                <p className="text-gray-600 text-sm mb-4">{plan.description}</p>
-                <div className="flex items-baseline gap-1">
-                  <span className={`text-4xl font-bold bg-gradient-to-r ${plan.color} bg-clip-text text-transparent`}>
-                    {plan.isFree ? "Free" : `₹${getPrice(plan).toLocaleString()}`}
-                  </span>
-                  {!plan.isFree && (
-                    <span className="text-gray-600 text-sm">{getBillingText()}</span>
+                <div className="mb-4">
+                  <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-gradient-to-r ${plan.color} text-white text-xs font-semibold mb-2`}>
+                    {plan.name}
+                  </div>
+                  <p className="text-gray-600 text-xs mb-3">{plan.description}</p>
+                  <div className="flex items-baseline gap-1">
+                    <span className={`text-2xl font-bold bg-gradient-to-r ${plan.color} bg-clip-text text-transparent`}>
+                      {plan.isFree ? "Free" : `₹${getPrice(plan).toLocaleString()}`}
+                    </span>
+                    {!plan.isFree && (
+                      <span className="text-gray-600 text-xs">{getBillingText()}</span>
+                    )}
+                  </div>
+                  {!plan.isFree && !plan.isEnterprise && getDiscountText() && (
+                    <p className="text-xs text-green-600 mt-1">{getDiscountText()}</p>
                   )}
                 </div>
-                {!plan.isFree && !plan.isEnterprise && getDiscountText() && (
-                  <p className="text-xs text-green-600 mt-1">{getDiscountText()}</p>
-                )}
-              </div>
 
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => handlePlanClick(plan)}
-                className={`w-full py-3 rounded-xl font-semibold mb-6 transition-all ${
-                  plan.popular
-                    ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg hover:shadow-xl"
-                    : "bg-gray-100 text-gray-900 hover:bg-gray-200"
-                }`}
-              >
-                {plan.isFree
-                  ? "Get Started Free"
-                  : plan.isEnterprise
-                  ? "Contact Sales"
-                  : "Buy Now"}
-              </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => handlePlanClick(plan)}
+                  className={`w-full py-2 rounded-xl font-semibold text-sm mb-4 transition-all ${
+                    plan.popular
+                      ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg hover:shadow-xl"
+                      : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                  }`}
+                >
+                  {plan.isFree
+                    ? "Get Started Free"
+                    : plan.isEnterprise
+                    ? "Contact Sales"
+                    : "Buy Now"}
+                </motion.button>
 
-              <div className="space-y-3">
-                <p className="font-semibold text-gray-900 text-sm mb-3">Includes:</p>
-                <div className="max-h-64 overflow-y-auto pr-2 space-y-2.5">
-                  {plan.features.map((feature) => (
-                    <div key={feature.featureSlug} className="flex items-start gap-2 text-sm text-gray-700">
-                      <Check className={`w-4 h-4 mt-0.5 flex-shrink-0 bg-gradient-to-r ${plan.color} text-white rounded-full p-0.5`} />
-                      <span>{feature.uiLabel}</span>
-                    </div>
-                  ))}
+                <div className="space-y-2">
+                  <p className="font-semibold text-gray-900 text-xs mb-2">Includes:</p>
+                  <div className="max-h-64 overflow-y-auto pr-2 space-y-2 gray-scrollbar">
+                    {plan.features.map((feature) => (
+                      <div key={feature.featureSlug} className="flex items-start gap-2 text-xs text-gray-700">
+                        <Check className={`w-3 h-3 mt-0.5 flex-shrink-0 bg-gradient-to-r ${plan.color} text-white rounded-full p-0.5`} />
+                        <span>{feature.uiLabel}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            ))}
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 }
 

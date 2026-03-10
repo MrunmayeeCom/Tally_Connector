@@ -149,10 +149,10 @@ export function Header({ onLoginClick, onNavigate }: HeaderProps) {
       transition={{ duration: 0.6 }}
       className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-200"
     >
-      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-        {/* Logo */}
+      <div className="max-w-7xl mx-auto px-6 py-2.5 flex items-center justify-between gap-4">
+        {/* Logo — unchanged */}
         <motion.div
-          className="flex items-center gap-2 cursor-pointer"
+          className="flex items-center gap-2 cursor-pointer w-40 flex-shrink-0"
           whileHover={{ scale: 1.05 }}
           transition={{ type: "spring", stiffness: 400 }}
           onClick={() => {
@@ -165,16 +165,16 @@ export function Header({ onLoginClick, onNavigate }: HeaderProps) {
             <div className="w-2 h-2 rounded-full bg-blue-600"></div>
             <div className="w-2 h-2 rounded-full bg-[#002855]"></div>
           </div>
-          <span className="font-bold text-xl text-gray-900">Tally Connect</span>
+          <span className="font-bold text-base text-gray-900">Tally Connect</span>
         </motion.div>
 
-        {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-8">
+        {/* Desktop Nav — reduced to text-xs */}
+        <nav className="hidden md:flex items-center gap-8 ml-2">
           {navItems.map((item, index) => (
             <motion.a
               key={item.id}
               onClick={() => onNavigate(item.id)}
-              className="text-sm font-medium text-gray-700 hover:text-cyan-600 transition-colors relative group cursor-pointer"
+              className="text-xs font-medium text-gray-700 hover:text-cyan-600 transition-colors relative group cursor-pointer"
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
@@ -185,8 +185,8 @@ export function Header({ onLoginClick, onNavigate }: HeaderProps) {
           ))}
         </nav>
 
-        {/* Right Side */}
-        <div className="hidden md:flex items-center">
+        {/* Right Side — login button and profile unchanged */}
+        <div className="hidden md:flex items-center justify-end w-40 flex-shrink-0">
           {isLoggedIn ? (
             <div className="relative" ref={dropdownRef}>
               <motion.button
@@ -214,9 +214,7 @@ export function Header({ onLoginClick, onNavigate }: HeaderProps) {
                           {getUserInitials()}
                         </div>
                         <div className="flex-1 min-w-0">
-                          {/* REDUCED: was no size class (defaulted large), now text-sm */}
                           <p className="font-semibold text-gray-900 text-sm truncate">{userName}</p>
-                          {/* REDUCED: was text-sm, now text-xs */}
                           <p className="text-xs text-gray-500 truncate">{userEmail}</p>
                         </div>
                       </div>
@@ -293,7 +291,7 @@ export function Header({ onLoginClick, onNavigate }: HeaderProps) {
                     onNavigate(item.id);
                     setMobileMenuOpen(false);
                   }}
-                  className="block w-full text-left text-gray-700 hover:text-cyan-600 transition-colors py-2 font-medium"
+                  className="block w-full text-left text-gray-700 hover:text-cyan-600 transition-colors py-2 font-medium text-xs"
                 >
                   {item.label}
                 </button>

@@ -93,7 +93,7 @@ export function FAQSection() {
               >
                 <AccordionItem
                   value={`item-${index}`}
-                  className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-2xl px-6 border border-gray-200 hover:border-cyan-300 transition-all"
+                  className="bg-gray-100 rounded-2xl px-6 border border-gray-200 hover:border-cyan-300 transition-all"
                 >
                   <AccordionTrigger className="text-left font-semibold text-gray-900 hover:text-cyan-600 transition-colors">
                     {faq.question}

@@ -1,5 +1,11 @@
 import { useState } from "react";
 import { createCustomerSupport } from "../api/customerSupport";
+import emailjs from "@emailjs/browser";
+
+const EMAILJS_SERVICE_ID = "tally_service1";
+const EMAILJS_USER_TEMPLATE_ID = "template_chn5yuz";
+const EMAILJS_ADMIN_TEMPLATE_ID = "template_dm77nkd";
+const EMAILJS_PUBLIC_KEY = "IFjcViXLpqqHwzIu7";
 
 // Maps UI select values to API enum values
 const mapInquiryType = (type: string) => {
@@ -60,9 +66,34 @@ export function DemoPage() {
 
     try {
       await createCustomerSupport(payload);
-      alert(
-        "Thank you! Our support team will get back to you within 24 hours.",
+
+      const templateParams = {
+        user_name: formData.name,
+        user_email: formData.email,
+        user_phone: formData.phone || "Not provided",
+        user_company: formData.company || "Not provided",
+        inquiry_type: mapInquiryType(formData.type),
+        subject: formData.subject,
+        message: formData.message,
+      };
+
+      // Send confirmation email to user
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_USER_TEMPLATE_ID,
+        templateParams,
+        EMAILJS_PUBLIC_KEY
       );
+
+      // Send notification email to admin (Mrunmayee)
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_ADMIN_TEMPLATE_ID,
+        templateParams,
+        EMAILJS_PUBLIC_KEY
+      );
+
+      alert("Thank you! Our support team will get back to you within 24 hours.");
       setFormData({
         name: "",
         email: "",
@@ -126,7 +157,7 @@ export function DemoPage() {
                 Email: support@tally.com
               </p>
               <p className="text-xs text-gray-600 mb-1">
-                Phone: +1 (800) 123-4567
+                Phone: +91 9892440788
               </p>
               <p className="text-xs text-gray-600">24/7 Support Available</p>
             </div>
@@ -141,7 +172,7 @@ export function DemoPage() {
                 Email: sales@tally.com
               </p>
               <p className="text-xs text-gray-600 mb-1">
-                Phone: +1 (800) 123-4568
+                Phone: +91 9892440788
               </p>
               <p className="text-xs text-gray-600">Mon-Fri: 9AM - 6PM PST</p>
             </div>
@@ -153,8 +184,7 @@ export function DemoPage() {
             >
               <h3 className="font-semibold text-base mb-3">Office Location</h3>
               <p className="text-xs text-gray-600">
-                Tally Headquarters 123 Business Ave San Francisco, CA 94105
-                United States
+                5th Floor, Lodha Supremus - II, Phase - II, Unit No, A. 507, Road No. 22, Wagle Industrial Estate, Thane West, Maharashtra 400604
               </p>
             </div>
           </div>
