@@ -67,7 +67,7 @@ export function Footer({ onNavigate, onLegalPage, onContact }: FooterProps) {
               </div>
               <div className="flex items-center gap-3 text-gray-400">
                 <MapPin className="w-4 h-4 text-cyan-500" />
-                <span>San Francisco, CA</span>
+                <span>5th Floor, Lodha Supremus - II, Phase - II, Unit No. A-533/A-507, Road No. 22, Wagle Industrial Estate, Thane West, Maharashtra, 400604, India</span>
               </div>
             </div>
           </div>
