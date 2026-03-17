@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Zap, Clock, HeadphonesIcon } from "lucide-react";
-import heroImage from "../../assets/bimage1.png";
+import heroImage from "../../assets/bimage1a.jpg";
 
 export function HeroSection({ goToDemo }: { goToDemo: () => void }) {
   return (
@@ -63,35 +63,11 @@ export function HeroSection({ goToDemo }: { goToDemo: () => void }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
-            className="text-xl text-white/90 max-w-3xl mx-auto leading-relaxed"
+            className="text-sm text-white/90 max-w-3xl mx-auto leading-relaxed"
           >
             Streamline operations, boost productivity, and scale faster with
             Tally Connect — trusted by SMEs and enterprises across industries.
           </motion.p>
-        </motion.div>
-
-        {/* CTA Buttons */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.6 }}
-          className="flex items-center justify-center gap-4 mb-16"
-        >
-          <motion.button
-            onClick={goToDemo}
-            whileHover={{ scale: 1.05, y: -2 }}
-            whileTap={{ scale: 0.95 }}
-            className="px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-xl font-semibold shadow-xl hover:shadow-2xl transition-all flex items-center gap-2 group"
-          >
-            Get a Demo
-          </motion.button>
-          <motion.button
-            whileHover={{ scale: 1.05, y: -2 }}
-            whileTap={{ scale: 0.95 }}
-            className="px-8 py-4 bg-white/10 backdrop-blur-md text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all border border-white/30"
-          >
-            Learn More
-          </motion.button>
         </motion.div>
 
         {/* Stats */}
@@ -117,7 +93,7 @@ export function HeroSection({ goToDemo }: { goToDemo: () => void }) {
               <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center mb-4`}>
                 <stat.icon className="w-6 h-6 text-white" />
               </div>
-              <div className={`text-4xl font-bold mb-2 bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}>
+              <div className={`text-3xl font-bold mb-2 bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}>
                 {stat.value}
               </div>
               <div className="text-white/90 font-medium">{stat.label}</div>

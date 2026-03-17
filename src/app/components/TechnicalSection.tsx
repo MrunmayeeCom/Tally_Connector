@@ -48,8 +48,8 @@ export function TechnicalSection() {
   ];
 
   return (
-    <section id="technical" className="py-24 bg-gradient-to-br from-gray-50 to-cyan-50/30">
-      <div className="max-w-7xl mx-auto px-6">
+    <section id="technical" className="py-12 bg-gradient-to-br from-gray-50 to-cyan-50/30">
+      <div className="max-w-7xl mx-auto px-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -64,7 +64,7 @@ export function TechnicalSection() {
               Modern Technology
             </span>
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-sm text-gray-600 max-w-3xl mx-auto">
             Cutting-edge tech stack ensuring performance, reliability, and
             scalability
           </p>
@@ -79,17 +79,17 @@ export function TechnicalSection() {
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
               whileHover={{ y: -8, scale: 1.05 }}
-              className="bg-white rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all"
+              className="bg-white rounded-2xl p-5 shadow-lg hover:shadow-2xl transition-all"
             >
               <div
-                className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-4`}
+                className={`w-10 h-10 rounded-xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-3`}
               >
-                <feature.icon className="w-8 h-8 text-white" />
+                <feature.icon className="w-5 h-5 text-white" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">
+              <h3 className="text-sm font-bold text-gray-900 mb-1">
                 {feature.title}
               </h3>
-              <p className="text-gray-600">{feature.description}</p>
+              <p className="text-gray-600 text-xs">{feature.description}</p>
             </motion.div>
           ))}
         </div>
@@ -99,17 +99,16 @@ export function TechnicalSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="bg-gradient-to-br from-cyan-500 to-blue-600 rounded-3xl p-8 md:p-12 mb-12 text-white relative overflow-hidden"
+          className="bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl p-6 md:p-8 mb-0 text-white relative overflow-hidden"
         >
-          {/* Decorative elements */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
           <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2"></div>
           
           <div className="relative z-10">
-            <h3 className="text-3xl font-bold mb-4 text-center italic">
+            <h3 className="text-2xl font-bold mb-4 text-center italic">
               Enhanced User Experience
             </h3>
-            <div className="grid md:grid-cols-3 gap-6 mt-8">
+            <div className="grid md:grid-cols-3 gap-6 mt-4">
               {userExperience.map((feature, index) => (
                 <motion.div
                   key={feature.title}
@@ -118,13 +117,13 @@ export function TechnicalSection() {
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                   whileHover={{ scale: 1.05 }}
-                  className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20"
+                  className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20"
                 >
-                  <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center mb-4">
-                    <feature.icon className="w-6 h-6 text-white" />
+                  <div className="w-9 h-9 rounded-lg bg-white/20 flex items-center justify-center mb-3">
+                    <feature.icon className="w-5 h-5 text-white" />
                   </div>
-                  <h4 className="text-lg font-bold mb-2">{feature.title}</h4>
-                  <p className="text-white/90 text-sm">{feature.description}</p>
+                  <h4 className="text-sm font-bold mb-1">{feature.title}</h4>
+                  <p className="text-white/90 text-xs">{feature.description}</p>
                 </motion.div>
               ))}
             </div>

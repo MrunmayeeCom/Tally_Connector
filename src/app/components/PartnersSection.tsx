@@ -68,7 +68,7 @@ export function PartnersSection({ goToPartnerPage }: { goToPartnerPage: () => vo
         />
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 relative z-10">
+      <div className="max-w-7xl mx-auto px-10 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -79,7 +79,7 @@ export function PartnersSection({ goToPartnerPage }: { goToPartnerPage: () => vo
           <h2 className="text-5xl font-bold mb-6 italic">
             Find a Tally Connect Partner in your area!
           </h2>
-          <p className="text-xl text-white/90 max-w-3xl mx-auto mb-8">
+          <p className="text-sm text-white/90 max-w-3xl mx-auto mb-8">
             Connect with certified partners who can help you maximize your Tally
             Connect experience
           </p>
@@ -88,14 +88,14 @@ export function PartnersSection({ goToPartnerPage }: { goToPartnerPage: () => vo
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.95 }}
               onClick={goToPartnerPage}
-              className="px-8 py-4 bg-white text-blue-600 rounded-xl font-semibold shadow-xl hover:shadow-2xl transition-all"
+              className="px-6 py-3 bg-white text-blue-600 rounded-xl font-semibold text-sm shadow-xl hover:shadow-2xl transition-all"
             >
             Become a partner
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.95 }}
-              className="px-8 py-4 bg-white/10 backdrop-blur-sm text-white rounded-xl font-semibold border-2 border-white/30 hover:bg-white/20 transition-all"
+              className="px-6 py-3 bg-white/10 backdrop-blur-sm text-white text-sm rounded-xl font-semibold border-2 border-white/30 hover:bg-white/20 transition-all"
             >
               Partner directory
             </motion.button>
@@ -107,12 +107,12 @@ export function PartnersSection({ goToPartnerPage }: { goToPartnerPage: () => vo
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="bg-white rounded-3xl p-8 md:p-12 text-gray-900 mb-12"
+          className="bg-white rounded-2xl p-4 md:p-5 text-gray-900 mb-8 max-w-3xl mx-auto"
         >
-          <h3 className="text-3xl font-bold mb-6 text-center italic">
+          <h3 className="text-base font-bold mb-4 text-center">
             Tally Connect Partners can help you create and manage your business!
           </h3>
-          <p className="text-gray-700 leading-relaxed text-center max-w-4xl mx-auto">
+          <p className="text-gray-700 leading-relaxed text-center max-w-4xl mx-auto text-xs">
             Our partners are there to make your Tally Connect experience more
             pleasant and productive – from choosing a subscription plan to
             product implementation, customization, and employee training. Tally
@@ -129,9 +129,9 @@ export function PartnersSection({ goToPartnerPage }: { goToPartnerPage: () => vo
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.4 }}
-          className="bg-white/10 backdrop-blur-md rounded-3xl p-8 md:p-12 border border-white/20"
+          className="bg-white/10 backdrop-blur-md rounded-2xl p-6 md:p-8 border border-white/20"
         >
-          <h3 className="text-3xl font-bold mb-8 text-center italic">
+          <h3 className="text-base font-bold mb-6 text-center italic">
             Why Become a Tally Connect Partner?
           </h3>
           <div className="grid md:grid-cols-4 gap-6">
@@ -145,11 +145,11 @@ export function PartnersSection({ goToPartnerPage }: { goToPartnerPage: () => vo
                 whileHover={{ y: -8, scale: 1.05 }}
                 className="text-center"
               >
-                <div className="w-16 h-16 rounded-2xl bg-white/20 flex items-center justify-center mx-auto mb-4">
-                  <benefit.icon className="w-8 h-8 text-white" />
+                <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center mx-auto mb-3">
+                  <benefit.icon className="w-5 h-5 text-white" />
                 </div>
-                <h4 className="text-lg font-bold mb-2">{benefit.title}</h4>
-                <p className="text-white/90 text-sm">{benefit.description}</p>
+                <h4 className="text-sm font-bold mb-1">{benefit.title}</h4>
+                <p className="text-white/90 text-xs">{benefit.description}</p>
               </motion.div>
             ))}
           </div>
@@ -160,13 +160,13 @@ export function PartnersSection({ goToPartnerPage }: { goToPartnerPage: () => vo
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.6 }}
-          className="text-center mt-12"
+          className="text-center mt-10"
         >
         <motion.button
           whileHover={{ scale: 1.05, y: -2 }}
           whileTap={{ scale: 0.95 }}
           onClick={goToPartnerPage}
-          className="px-10 py-4 bg-white text-blue-600 rounded-xl font-semibold shadow-xl hover:shadow-2xl transition-all text-lg"
+          className="px-8 py-3 bg-white text-blue-600 rounded-xl font-semibold shadow-xl hover:shadow-2xl transition-all text-sm"
         >
         Become a Partner Today
         </motion.button>

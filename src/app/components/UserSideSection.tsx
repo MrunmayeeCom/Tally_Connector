@@ -9,7 +9,7 @@ import {
   Settings,
   Target,
 } from "lucide-react";
-import bgImage from "../../assets/bimage3.png";
+import bgImage from "../../assets/bimage3a.jpg";
 
 export function UserSideSection() {
   const features = [
@@ -131,7 +131,7 @@ export function UserSideSection() {
         <div className="absolute inset-0 bg-gradient-to-br from-blue-900/85 via-purple-900/85 to-cyan-900/85"></div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 relative z-10">
+      <div className="max-w-7xl mx-auto px-10 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -161,27 +161,27 @@ export function UserSideSection() {
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.05 }}
               whileHover={{ y: -8, scale: 1.02 }}
-              className="bg-white/10 backdrop-blur-md rounded-3xl p-6 shadow-lg hover:shadow-2xl transition-all border border-white/20"
+              className="bg-white/10 backdrop-blur-md rounded-2xl p-4 shadow-lg hover:shadow-2xl transition-all border border-white/20"
             >
               <div
-                className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-4`}
+                className={`w-10 h-10 rounded-xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-3`}
               >
-                <feature.icon className="w-7 h-7 text-white" />
+                <feature.icon className="w-5 h-5 text-white" />
               </div>
-              <h3 className="text-lg font-bold text-white mb-2">
+              <h3 className="text-sm font-bold text-white mb-1">
                 {feature.title}
               </h3>
-              <p className="text-white/80 text-sm mb-4">
+              <p className="text-white/80 text-xs mb-3">
                 {feature.description}
               </p>
-              <ul className="space-y-2">
+              <ul className="space-y-1.5">
                 {feature.bullets.map((bullet) => (
                   <li
                     key={bullet}
-                    className="flex items-start gap-2 text-sm text-white/90"
+                    className="flex items-start gap-2 text-xs text-white/90"
                   >
                     <div
-                      className={`w-1.5 h-1.5 rounded-full bg-gradient-to-r ${feature.color} mt-1.5 flex-shrink-0`}
+                      className={`w-1.5 h-1.5 rounded-full bg-gradient-to-r ${feature.color} mt-1 flex-shrink-0`}
                     ></div>
                     <span>{bullet}</span>
                   </li>

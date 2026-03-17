@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, LayoutDashboard, Download, LogOut } from "lucide-react";
+import { Menu, X, LayoutDashboard, Download, LogOut, BookOpen } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 
 interface HeaderProps {
@@ -29,11 +29,9 @@ export function Header({ onLoginClick, onNavigate }: HeaderProps) {
 
   useEffect(() => {
     checkLoginStatus();
-
     const handleLoginStatusChange = () => checkLoginStatus();
     window.addEventListener("userLoginStatusChanged", handleLoginStatusChange);
     window.addEventListener("storage", handleLoginStatusChange);
-
     return () => {
       window.removeEventListener("userLoginStatusChanged", handleLoginStatusChange);
       window.removeEventListener("storage", handleLoginStatusChange);
@@ -106,6 +104,12 @@ export function Header({ onLoginClick, onNavigate }: HeaderProps) {
     setMobileMenuOpen(false);
   };
 
+  const handleTutorialsClick = () => {
+    window.location.href = "/#tutorials";
+    setDropdownOpen(false);
+    setMobileMenuOpen(false);
+  };
+
   const handleLogout = () => {
     localStorage.removeItem("user");
     setIsLoggedIn(false);
@@ -134,12 +138,7 @@ export function Header({ onLoginClick, onNavigate }: HeaderProps) {
 
   const getUserInitials = () => {
     if (!userName) return "U";
-    return userName
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase()
-      .slice(0, 2);
+    return userName.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
   };
 
   return (
@@ -149,32 +148,29 @@ export function Header({ onLoginClick, onNavigate }: HeaderProps) {
       transition={{ duration: 0.6 }}
       className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-gray-200"
     >
-      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-6 py-2.5 flex items-center justify-between gap-4">
         {/* Logo */}
         <motion.div
-          className="flex items-center gap-2 cursor-pointer"
+          className="flex items-center gap-2 cursor-pointer w-40 flex-shrink-0"
           whileHover={{ scale: 1.05 }}
           transition={{ type: "spring", stiffness: 400 }}
-          onClick={() => {
-            onNavigate("/");
-            window.scrollTo({ top: 0, behavior: "smooth" });
-          }}
+          onClick={() => { onNavigate("/"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
         >
           <div className="flex gap-1">
             <div className="w-2 h-2 rounded-full bg-cyan-500"></div>
             <div className="w-2 h-2 rounded-full bg-blue-600"></div>
             <div className="w-2 h-2 rounded-full bg-[#002855]"></div>
           </div>
-          <span className="font-bold text-xl text-gray-900">Tally Connect</span>
+          <span className="font-bold text-base text-gray-900">Tally Connect</span>
         </motion.div>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="hidden md:flex items-center gap-8 ml-2">
           {navItems.map((item, index) => (
             <motion.a
               key={item.id}
               onClick={() => onNavigate(item.id)}
-              className="text-sm font-medium text-gray-700 hover:text-cyan-600 transition-colors relative group cursor-pointer"
+              className="text-xs font-medium text-gray-700 hover:text-cyan-600 transition-colors relative group cursor-pointer"
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
@@ -186,7 +182,7 @@ export function Header({ onLoginClick, onNavigate }: HeaderProps) {
         </nav>
 
         {/* Right Side */}
-        <div className="hidden md:flex items-center">
+        <div className="hidden md:flex items-center justify-end w-40 flex-shrink-0">
           {isLoggedIn ? (
             <div className="relative" ref={dropdownRef}>
               <motion.button
@@ -207,16 +203,14 @@ export function Header({ onLoginClick, onNavigate }: HeaderProps) {
                     transition={{ duration: 0.2 }}
                     className="absolute right-0 mt-3 w-72 bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden"
                   >
-                    {/* Dropdown Header */}
+                    {/* User Info */}
                     <div className="p-4 border-b border-gray-100 bg-gradient-to-br from-gray-50 to-white">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-cyan-600 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
                           {getUserInitials()}
                         </div>
                         <div className="flex-1 min-w-0">
-                          {/* REDUCED: was no size class (defaulted large), now text-sm */}
                           <p className="font-semibold text-gray-900 text-sm truncate">{userName}</p>
-                          {/* REDUCED: was text-sm, now text-xs */}
                           <p className="text-xs text-gray-500 truncate">{userEmail}</p>
                         </div>
                       </div>
@@ -240,6 +234,16 @@ export function Header({ onLoginClick, onNavigate }: HeaderProps) {
                             <Download size={18} className="text-cyan-600 flex-shrink-0" />
                             <span className="font-medium text-sm">Download Agent</span>
                           </button>
+
+                          {/* ── Watch Tutorials ── */}
+                          <button
+                            onClick={handleTutorialsClick}
+                            className="w-full flex items-center gap-3 px-4 py-3 text-gray-800 hover:bg-gray-50 rounded-lg transition-colors text-left"
+                          >
+                            <BookOpen size={18} className="text-blue-600 flex-shrink-0" />
+                            <span className="font-medium text-sm">Watch Tutorials</span>
+                          </button>
+
                           <div className="my-2 border-t border-gray-100" />
                         </>
                       )}
@@ -268,10 +272,7 @@ export function Header({ onLoginClick, onNavigate }: HeaderProps) {
         </div>
 
         {/* Mobile Hamburger */}
-        <button
-          className="md:hidden text-gray-700"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        >
+        <button className="md:hidden text-gray-700" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
           {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
       </div>
@@ -289,11 +290,8 @@ export function Header({ onLoginClick, onNavigate }: HeaderProps) {
               {navItems.map((item) => (
                 <button
                   key={item.id}
-                  onClick={() => {
-                    onNavigate(item.id);
-                    setMobileMenuOpen(false);
-                  }}
-                  className="block w-full text-left text-gray-700 hover:text-cyan-600 transition-colors py-2 font-medium"
+                  onClick={() => { onNavigate(item.id); setMobileMenuOpen(false); }}
+                  className="block w-full text-left text-gray-700 hover:text-cyan-600 transition-colors py-2 font-medium text-xs"
                 >
                   {item.label}
                 </button>
@@ -334,6 +332,15 @@ export function Header({ onLoginClick, onNavigate }: HeaderProps) {
                         >
                           <Download size={16} />
                           Download Agent
+                        </button>
+
+                        {/* ── Watch Tutorials (mobile) ── */}
+                        <button
+                          onClick={handleTutorialsClick}
+                          className="w-full flex items-center justify-center gap-2 py-2.5 text-gray-800 border border-blue-600 rounded-lg font-medium text-sm hover:bg-gray-50 transition-colors"
+                        >
+                          <BookOpen size={16} />
+                          Watch Tutorials
                         </button>
                       </>
                     )}
