@@ -11,7 +11,7 @@ export function FAQSection() {
     {
       question: "How does the auto-sync feature work?",
       answer:
-        "Our intelligent auto-sync agent connects directly with your Tally Prime installation and automatically syncs data every 2 minutes (varies by plan). This ensures your dashboard always displays the most up-to-date information without manual intervention.",
+        "Our intelligent auto-sync agent connects directly with your Tally Prime installation and automatically syncs data every 5 minutes. This ensures your dashboard always displays the most up-to-date information without manual intervention.",
     },
     {
       question: "Can I control what data users can see?",
@@ -36,7 +36,7 @@ export function FAQSection() {
     {
       question: "How do I get started with Tally Connect?",
       answer:
-        "Getting started is easy! Simply sign up for an account, choose your plan, install our auto-sync agent, and connect it to your Tally Prime installation. Our setup wizard will guide you through the entire process.",
+        "Getting started is easy! Simply sign up for an account, choose your plan, install our auto-sync agent (agent.exe), and connect it to your Tally Prime installation. Our setup wizard will guide you through the entire process.",
     },
     {
       question: "What happens if the sync fails?",
@@ -93,7 +93,7 @@ export function FAQSection() {
               >
                 <AccordionItem
                   value={`item-${index}`}
-                  className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-2xl px-6 border border-gray-200 hover:border-cyan-300 transition-all"
+                  className="bg-gray-100 rounded-2xl px-6 border border-gray-200 hover:border-cyan-300 transition-all"
                 >
                   <AccordionTrigger className="text-left font-semibold text-gray-900 hover:text-cyan-600 transition-colors">
                     {faq.question}

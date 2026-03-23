@@ -13,8 +13,12 @@ export default defineConfig({
   resolve: {
     alias: {
       // Alias @ to the src directory
-      '@': path.resolve(__dirname, './src'),
+      '@': path.resolve(new URL('.', import.meta.url).pathname, 'src')
     },
+  },
+
+    server: {
+    allowedHosts: ['.ngrok-free.dev']
   },
 
   // File types to support raw imports. Never add .css, .tsx, or .ts files to this.

@@ -26,11 +26,11 @@ export function FeaturesSection({ onKnowMore }: FeaturesSectionProps) {
       icon: Zap,
       title: "Lightning Fast",
       description:
-        "Auto-sync every 2 minutes ensures your data is always up-to-date.",
+        "Auto-sync every 5 minutes ensures your data is always up-to-date.",
       bullets: [
-        "Opening Balance & Outstanding",
-        "Due Dates & Reminders",
-        "Pending Bills",
+        "Sync every 5 minutes",
+        "Incremental data updates" ,
+        "Reliable and consistent data flow",
       ],
       color: "from-green-500 to-emerald-500",
       bgColor: "from-green-50 to-emerald-50",
@@ -57,7 +57,6 @@ export function FeaturesSection({ onKnowMore }: FeaturesSectionProps) {
         "Profile Management",
         "Advanced Filters",
         "Search Functionality",
-        "Custom Themes",
       ],
       color: "from-purple-500 to-pink-500",
       bgColor: "from-purple-50 to-pink-50",
@@ -65,7 +64,8 @@ export function FeaturesSection({ onKnowMore }: FeaturesSectionProps) {
   ];
 
   return (
-    <section id="features" className="py-24 bg-white relative overflow-hidden">
+    <>
+    <section id="features" className="pt-24 pb-10 bg-white relative overflow-hidden">
       <div className="max-w-7xl mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -81,13 +81,13 @@ export function FeaturesSection({ onKnowMore }: FeaturesSectionProps) {
               Modern Businesses
             </span>
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-sm text-gray-600 max-w-3xl mx-auto">
             Everything you need to manage and analyze your Tally data
             efficiently
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 px-8">
           {features.map((feature, index) => (
             <motion.div
               key={feature.title}
@@ -100,11 +100,11 @@ export function FeaturesSection({ onKnowMore }: FeaturesSectionProps) {
             >
               <div className="relative z-10">
                 <div
-                  className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}
+                  className={`w-10 h-10 rounded-xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}
                 >
-                  <feature.icon className="w-8 h-8 text-white" />
+                  <feature.icon className="w-5 h-5 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">
+                <h3 className="text-sm font-bold text-gray-900 mb-2">
                   {feature.title}
                 </h3>
                 <p className="text-gray-600 mb-4 text-sm">
@@ -138,10 +138,9 @@ export function FeaturesSection({ onKnowMore }: FeaturesSectionProps) {
           transition={{ duration: 0.6, delay: 0.4 }}
           className="text-center mt-12"
         >
-          <p className="text-gray-600 mb-6">
+          <p className="text-sm text-gray-600 mb-6">
             Discover how Tally Connect can transform your business
           </p>
-          {/* Added onClick={onKnowMore} */}
           <motion.button
             onClick={onKnowMore}
             whileHover={{ scale: 1.05, y: -2 }}
@@ -152,6 +151,10 @@ export function FeaturesSection({ onKnowMore }: FeaturesSectionProps) {
           </motion.button>
         </motion.div>
       </div>
+
     </section>
+    {/* Divider between Features and Pricing — outside section so it sits flush */}
+    <hr className="border-t-2 border-black" />
+    </>
   );
 }
