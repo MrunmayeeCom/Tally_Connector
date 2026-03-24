@@ -88,7 +88,7 @@ export function Header({ onLoginClick, onNavigate }: HeaderProps) {
   };
 
   const handleDashboardClick = () => {
-    window.open("https://tally-connect-yu2q.onrender.com", "_blank");
+    window.open("https://dashboard.tally-connect.com", "_blank");
     setDropdownOpen(false);
     setMobileMenuOpen(false);
   };
