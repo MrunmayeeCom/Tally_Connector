@@ -178,7 +178,7 @@ export function DemoPage() {
                 <h3 className="font-semibold text-base mb-3">Sales Inquiries</h3>
                 <p className="text-xs text-gray-600 mb-1">Email: info@averlonworld.com</p>
                 <p className="text-xs text-gray-600 mb-1">Phone: +91 9892440788</p>
-                <p className="text-xs text-gray-600">Mon-Fri: 9AM - 6PM PST</p>
+                <p className="text-xs text-gray-600">Mon-Fri: 9:30AM - 6:30PM PST</p>
               </div>
 
               <div className="bg-white p-5 rounded-xl shadow-md border border-transparent hover:-translate-y-1 hover:shadow-xl hover:border-purple-400 transition-all duration-300">
