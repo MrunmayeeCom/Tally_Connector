@@ -20,7 +20,58 @@ interface LoginModalProps {
 }
 
 type View = "signin" | "forgotpassword" | "emailsent";
+// ── PASSWORD VALIDATION ───────────────────────────────────────────────────────
+function validatePassword(p: string) {
+  return {
+    valid: /[A-Z]/.test(p) && /[a-z]/.test(p) && /[0-9]/.test(p) && p.length >= 8,
+    hasMinLength: p.length >= 8,
+    hasUppercase: /[A-Z]/.test(p),
+    hasLowercase: /[a-z]/.test(p),
+    hasNumber: /[0-9]/.test(p),
+  };
+}
 
+function PasswordStrength({ password }: { password: string }) {
+  const validation = validatePassword(password);
+  const checks = [
+    { label: "8+ chars", ok: validation.hasMinLength },
+    { label: "Uppercase", ok: validation.hasUppercase },
+    { label: "Lowercase", ok: validation.hasLowercase },
+    { label: "Number", ok: validation.hasNumber },
+  ];
+  const score = checks.filter(c => c.ok).length;
+  const barColor = score <= 1 ? "#f87171" : score === 2 ? "#fb923c" : score === 3 ? "#facc15" : "#4ade80";
+  const label = score <= 1 ? "Weak" : score === 2 ? "Fair" : score === 3 ? "Good" : "Strong";
+
+  if (!password) return null;
+
+  return (
+    <div className="mt-2 space-y-2">
+      <div className="flex items-center gap-2">
+        <div className="flex flex-1 gap-1">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-1 flex-1 rounded-full transition-all duration-300"
+              style={{ background: i <= score ? barColor : "#e5e7eb" }} />
+          ))}
+        </div>
+        <span className="text-[10px] font-semibold" style={{ color: barColor }}>{label}</span>
+      </div>
+      <div className="flex flex-wrap gap-1">
+        {checks.map((c) => (
+          <span key={c.label}
+            className="inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded font-medium transition-all duration-200"
+            style={{
+              background: c.ok ? "rgba(34,197,94,0.1)" : "rgba(209,213,219,0.5)",
+              color: c.ok ? "#16a34a" : "#6b7280",
+            }}
+          >
+            {c.ok ? "✓" : "○"} {c.label}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
 // ── CORNER POPUP ──────────────────────────────────────────────────────────────
 function LoginSuccessPopup({ name, onClose }: { name: string; onClose: () => void }) {
   useEffect(() => {
@@ -103,7 +154,7 @@ export function LoginModal({
   const [showPopup, setShowPopup] = useState(false);
   const [loggedInName, setLoggedInName] = useState("");
   const [showCreatedBanner, setShowCreatedBanner] = useState(false);
-
+  const passwordValid = validatePassword(adminPassword).valid;
   const handleOpenChange = (val: boolean) => {
     if (!val) {
       setAdminEmail("");
@@ -266,7 +317,8 @@ export function LoginModal({
                           required
                           minLength={6}
                           autoComplete="new-password"
-                          className="w-full pl-10 pr-11 py-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                           className="w-full pl-10 pr-11 py-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all [&::-ms-reveal]:hidden [&:: -webkit-credentials-auto-fill-button]:hidden"
+
                         />
                         <button
                           type="button"
@@ -276,13 +328,14 @@ export function LoginModal({
                           {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
                       </div>
+                      {isSignUp && <PasswordStrength password={adminPassword} />}
                     </div>
 
                     {/* ── Submit button — smaller, centered text, no icon ── */}
                     <div className="flex justify-center pt-1">
                       <motion.button
                         type="submit"
-                        disabled={loading}
+                       disabled={loading || (isSignUp && !passwordValid)}
                         whileHover={{ scale: 1.03 }}
                         whileTap={{ scale: 0.97 }}
                         className="px-10 py-2.5 text-sm bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-semibold text-center shadow-md hover:shadow-lg transition-all disabled:opacity-60 disabled:cursor-not-allowed"

@@ -1872,9 +1872,9 @@ export default function TutorialPage() {
         </div>
       )}
 
-      {/*<div ref={footerRef}>
+      <div ref={footerRef}>
         <Footer />
-      </div>*/}
+      </div>
     </div>
   )
 }

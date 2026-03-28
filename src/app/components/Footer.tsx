@@ -1,4 +1,6 @@
 import { motion } from "framer-motion";
+import tallyLogo from "../../assets/tallylogo.png";
+import { useNavigate } from "react-router-dom";
 import {
   Mail,
   Phone,
@@ -31,7 +33,7 @@ export function Footer({ onNavigate, onLegalPage, onContact, onPressPage }: Foot
   ];
 
   return (
-    <footer className="bg-gradient-to-br from-gray-900 to-gray-800 text-white pt-20 pb-8">
+    <footer className="bg-gradient-to-br from-[#1a3a6b] to-[#060d1a] text-white pt-20 pb-8">
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-12 mb-12">
           {/* Brand */}
@@ -40,13 +42,12 @@ export function Footer({ onNavigate, onLegalPage, onContact, onPressPage }: Foot
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="flex items-center gap-2 mb-4"
+              className="flex items-center gap-2 mb-4 cursor-pointer flex-shrink-0"
+              whileHover={{ scale: 1.05 }}
+              transition={{ type: "spring", stiffness: 400 }}
+              onClick={() => { onNavigate("/"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
             >
-              <div className="flex gap-1">
-                <div className="w-2 h-2 rounded-full bg-cyan-500"></div>
-                <div className="w-2 h-2 rounded-full bg-blue-600"></div>
-                <div className="w-2 h-2 rounded-full bg-[#002855]"></div>
-              </div>
+              <img src={tallyLogo} alt="Tally Connect Logo" className="h-6 w-auto object-contain" />
               <span className="font-bold text-xl">Tally Connect</span>
             </motion.div>
             <p className="text-gray-400 mb-6 leading-relaxed">
@@ -163,7 +164,7 @@ export function Footer({ onNavigate, onLegalPage, onContact, onPressPage }: Foot
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-gray-700 pt-8 flex items-center justify-center">
+        <div className="border-t border-[#1e3a5f] pt-8 flex items-center justify-center">
           <p className="text-gray-400 text-sm">
             © 2026 Tally Connect. All rights reserved. Powered by Averlon.
           </p>

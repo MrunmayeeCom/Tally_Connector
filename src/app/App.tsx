@@ -21,6 +21,7 @@ import TutorialVideo from "./components/TutorialVideo";
 import PressPage from "./components/PressPage";
 import { useState, useEffect, useRef } from 'react'
 import gsap from 'gsap'
+import {Routes, Route, useNavigate} from "react-router-dom"
 
 function Loader() {
   const wrapRef    = useRef<HTMLDivElement>(null)
@@ -97,7 +98,7 @@ export default function App() {
   const [loginModalOpen, setLoginModalOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState("");
  const [selectedBillingCycle, setSelectedBillingCycle] = useState<"monthly" | "quarterly" | "half-yearly" | "yearly">("monthly");
-
+const [agentUpdate, setAgentUpdate] = useState<string | null>(null);
   const handleNavigate = (section: string) => {
     setCurrentPage("home");
     setTimeout(() => {
@@ -113,12 +114,7 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  useEffect(() => {
-    const hash = window.location.hash.replace("#", "");
-    if (hash === "tutorials") {
-      setCurrentPage("tutorials");
-    }
-  }, []);
+  
 
   useEffect(() => {
     const t = setTimeout(() => setLoading(false), 3200)
@@ -126,87 +122,78 @@ export default function App() {
   }, [])
 
   return (
-    <>
-      {loading && <Loader />}
-      <div className="min-h-screen bg-white font-[Inter]">
-        <Header
-          onLoginClick={() => setLoginModalOpen(true)}
-          onNavigate={handleNavigate}
-        />
+  <>
+    {loading && <Loader />}
+    {agentUpdate && (
+      <AgentUpdatePopup fileUrl={agentUpdate} onDismiss={() => setAgentUpdate(null)} />
+    )}
 
-        <LoginModal
-          open={loginModalOpen}
-          onOpenChange={setLoginModalOpen}
-          onAdminLogin={(type, name) => {
-            console.log(type, name);
-          }}
-        />
-
-        <main>
-          {currentPage === "home" && (
-            <>
-              <HeroSection goToDemo={() => setCurrentPage("demo")} />
-              <FeaturesSection onKnowMore={() => {
-                setCurrentPage("demo");
-                window.scrollTo({ top: 0, behavior: "smooth" });
-              }} />
-              <PricingSection
-                onPlanSelect={(plan, billingCycle) => {
-                  setLoginModalOpen(true);
+    <Routes>
+      <Route path="/tutorials" element={<Tutorial_Page />} />
+      <Route path="/*" element={
+        <div className="min-h-screen bg-white font-[Inter]">
+          <Header
+            onLoginClick={() => setLoginModalOpen(true)}
+            onNavigate={handleNavigate}
+          />
+          <LoginModal
+            open={loginModalOpen}
+            onOpenChange={setLoginModalOpen}
+            onAdminLogin={(type, name) => { console.log(type, name); }}
+          />
+          <main>
+            {currentPage === "home" && (
+              <>
+                <HeroSection goToDemo={() => setCurrentPage("demo")} />
+                <FeaturesSection onKnowMore={() => { setCurrentPage("demo"); window.scrollTo({ top: 0, behavior: "smooth" }); }} />
+                <PricingSection
+                  onPlanSelect={(plan, billingCycle) => { setLoginModalOpen(true); }}
+                  onContactSales={() => { setCurrentPage("demo"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                  onBuyNow={(plan, billingCycle) => {
+                    setSelectedPlan(plan);
+                    setSelectedBillingCycle(billingCycle);
+                    setCurrentPage("checkout");
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                />
+                <UserSideSection />
+                <AdminPanelSection />
+                <TechnicalSection />
+                <PartnersSection goToPartnerPage={() => setCurrentPage("partner")} />
+                <FAQSection />
+              </>
+            )}
+            {currentPage === "partner" && <BecomePartner />}
+            {currentPage === "demo" && <DemoPage />}
+            {currentPage === "privacy" && <PrivacyPolicy onBack={() => { setCurrentPage("home"); window.scrollTo({ top: 0, behavior: "smooth" }); }} />}
+            {currentPage === "terms" && <TermsOfService onBack={() => { setCurrentPage("home"); window.scrollTo({ top: 0, behavior: "smooth" }); }} />}
+            {currentPage === "cookies" && <CookiePolicy onBack={() => { setCurrentPage("home"); window.scrollTo({ top: 0, behavior: "smooth" }); }} />}
+            {currentPage === "gdpr" && <GDPRCompliance />}
+            {currentPage === "press" && <PressPage />}
+            {currentPage === "checkout" && (
+              <CheckoutPage
+                selectedPlan={selectedPlan}
+                initialBillingCycle={selectedBillingCycle}
+                onBack={() => {
+                  setCurrentPage("home");
+                  setTimeout(() => {
+                    const el = document.getElementById("pricing");
+                    if (el) el.scrollIntoView({ behavior: "smooth" });
+                  }, 200);
                 }}
-                onContactSales={() => {
-                  setCurrentPage("demo");
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                }}
-                onBuyNow={(plan, billingCycle) => {
-                  setSelectedPlan(plan);
-                  setSelectedBillingCycle(billingCycle);
-                  setCurrentPage("checkout");
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-                }}
+                onProceedToPayment={(billingCycle, formData) => { console.log("Proceeding to payment", billingCycle, formData); }}
               />
-              <UserSideSection />
-              <AdminPanelSection />
-              <TechnicalSection />
-              <PartnersSection goToPartnerPage={() => setCurrentPage("partner")} />
-              <FAQSection />
-            </>
-          )}
-
-          {currentPage === "partner" && <BecomePartner />}
-          {currentPage === "demo" && <DemoPage />}
-          {currentPage === "tutorials" && <Tutorial_Page />}
-          {currentPage === "privacy" && <PrivacyPolicy onBack={() => { setCurrentPage("home"); window.scrollTo({ top: 0, behavior: "smooth" }); }} />}
-          {currentPage === "terms" && <TermsOfService onBack={() => { setCurrentPage("home"); window.scrollTo({ top: 0, behavior: "smooth" }); }} />}
-          {currentPage === "cookies" && <CookiePolicy onBack={() => { setCurrentPage("home"); window.scrollTo({ top: 0, behavior: "smooth" }); }} />}
-          {currentPage === "gdpr" && <GDPRCompliance />}
-          {currentPage === "press" && <PressPage />}
-
-          {currentPage === "checkout" && (
-            <CheckoutPage
-              selectedPlan={selectedPlan}
-              initialBillingCycle={selectedBillingCycle}
-              onBack={() => {
-                setCurrentPage("home");
-                setTimeout(() => {
-                  const el = document.getElementById("pricing");
-                  if (el) el.scrollIntoView({ behavior: "smooth" });
-                }, 200);
-              }}
-              onProceedToPayment={(billingCycle, formData) => {
-                console.log("Proceeding to payment", billingCycle, formData);
-              }}
-            />
-          )}
-        </main>
-
-        <Footer
-          onNavigate={handleNavigate}
-          onLegalPage={(page) => { setCurrentPage(page); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-          onContact={handleContactClick}
-          onPressPage={() => { setCurrentPage("press"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-        />
-      </div>
-    </>
-  );
+            )}
+          </main>
+          <Footer
+            onNavigate={handleNavigate}
+            onLegalPage={(page) => { setCurrentPage(page); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+            onContact={handleContactClick}
+            onPressPage={() => { setCurrentPage("press"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+          />
+        </div>
+      } />
+    </Routes>
+  </>
+);
 }
