@@ -48,6 +48,14 @@ const BILLING_TABS: { label: string; value: BillingCycle; discount: string }[] =
   { label: "Yearly",      value: "yearly",      discount: "-20%" },
 ];
 
+// Map plan gradient class → solid accent for CSS-based use
+const PLAN_ACCENT: Record<string, { accent: string; bg: string; border: string; btnBg: string; btnShadow: string }> = {
+  "from-gray-600 to-gray-700":    { accent: "#4B5563", bg: "#F9FAFB", border: "#E5E7EB", btnBg: "#4B5563", btnShadow: "rgba(75,85,99,0.25)" },
+  "from-cyan-500 to-blue-600":    { accent: "#1A56DB", bg: "#EFF6FF", border: "#BFDBFE", btnBg: "#1A56DB", btnShadow: "rgba(26,86,219,0.28)" },
+  "from-blue-600 to-indigo-600":  { accent: "#4338CA", bg: "#EEF2FF", border: "#C7D2FE", btnBg: "#4338CA", btnShadow: "rgba(67,56,202,0.25)" },
+  "from-purple-600 to-pink-600":  { accent: "#7C3AED", bg: "#F5F3FF", border: "#DDD6FE", btnBg: "#7C3AED", btnShadow: "rgba(124,58,237,0.25)" },
+};
+
 export function PricingSection({ onPlanSelect, onContactSales, onBuyNow }: PricingSectionProps) {
   const [billingCycle, setBillingCycle] = useState<BillingCycle>("monthly");
   const [plans, setPlans] = useState<Plan[]>([]);
@@ -92,7 +100,7 @@ export function PricingSection({ onPlanSelect, onContactSales, onBuyNow }: Prici
     const loadPlans = async () => {
       try {
         const res = await fetch(
-          "https://lisence-system.onrender.com/api/license/public/licenses-by-product/695902cfc240b17f16c3d716",
+          "https://license-system-v6ht.onrender.com/api/license/public/licenses-by-product/695902cfc240b17f16c3d716",
           { headers: { "x-api-key": "my-secret-key-123" } }
         );
         const data = await res.json();
@@ -137,124 +145,390 @@ export function PricingSection({ onPlanSelect, onContactSales, onBuyNow }: Prici
 
   return (
     <>
-      {/* Gray scrollbar styles */}
       <style>{`
-        .gray-scrollbar::-webkit-scrollbar { width: 8px; }
-        .gray-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
-        .gray-scrollbar::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
-        .gray-scrollbar::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+        .pr-root {
+          font-family: 'Inter', sans-serif;
+          background: linear-gradient(160deg, #F8FAFC 0%, #EFF6FF 50%, #F0F4FF 100%);
+          padding: 64px 0 80px;
+          position: relative;
+          overflow: hidden;
+        }
+        .pr-root::before {
+          content: '';
+          position: absolute;
+          top: 0; left: 0; right: 0;
+          height: 4px;
+          background: linear-gradient(90deg, #1A56DB, #4338CA, #7C3AED);
+        }
+
+        .pr-container {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 0 40px;
+          position: relative;
+          z-index: 1;
+        }
+
+        /* ── HEADER ── */
+        .pr-header {
+          text-align: center;
+          margin-bottom: 36px;
+        }
+        .pr-eyebrow {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          background: #EFF6FF;
+          border: 1px solid #BFDBFE;
+          border-radius: 100px;
+          padding: 4px 12px;
+          font-size: 0.72rem;
+          font-weight: 700;
+          color: #1A56DB;
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
+          margin-bottom: 14px;
+        }
+        .pr-title {
+          font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+          font-weight: 800;
+          color: #0F172A;
+          letter-spacing: -0.03em;
+          line-height: 1.1;
+          margin-bottom: 28px;
+        }
+
+        /* ── BILLING TABS ── */
+        .pr-tabs {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          background: white;
+          border: 1px solid #E5E7EB;
+          border-radius: 12px;
+          padding: 5px;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+          flex-wrap: wrap;
+          justify-content: center;
+          max-width: 100%;
+        }
+        .pr-tab {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+          padding: 8px 18px;
+          border-radius: 8px;
+          font-size: 0.845rem;
+          font-weight: 600;
+          cursor: pointer;
+          font-family: 'Inter', sans-serif;
+          border: none;
+          transition: all 0.18s ease;
+          color: #64748B;
+          background: transparent;
+          flex: 1 1 calc(50% - 6px);
+          min-width: calc(50% - 6px);
+          box-sizing: border-box;
+        }
+        .pr-tab:hover { background: #F1F5F9; color: #374151; }
+        .pr-tab.active {
+          background: linear-gradient(145deg, #1A56DB, #0E3FA8);
+          color: white;
+          box-shadow: 0 3px 10px rgba(26,86,219,0.25);
+        }
+        .pr-tab-discount {
+          font-size: 0.72rem;
+          font-weight: 700;
+          padding: 2px 6px;
+          border-radius: 4px;
+          background: #DCFCE7;
+          color: #16A34A;
+        }
+        .pr-tab.active .pr-tab-discount {
+          background: rgba(255,255,255,0.2);
+          color: white;
+        }
+
+        /* ── LOADING ── */
+        .pr-loading { text-align: center; color: #94A3B8; font-size: 0.9rem; margin-bottom: 32px; }
+
+        /* ── GRID ── */
+        .pr-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 18px;
+          align-items: start;
+        }
+
+        /* ── CARD ── */
+        .pr-card {
+          background: white;
+          border: 1.5px solid #E5E7EB;
+          border-radius: 20px;
+          padding: 24px;
+          position: relative;
+          transition: all 0.22s ease;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .pr-card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 16px 40px rgba(0,0,0,0.1);
+        }
+        .pr-card.popular {
+          border-color: #93C5FD;
+          box-shadow: 0 4px 20px rgba(26,86,219,0.12);
+        }
+        .pr-popular-badge {
+          position: absolute;
+          top: -13px;
+          left: 50%;
+          transform: translateX(-50%);
+          background: linear-gradient(145deg, #1A56DB, #0E3FA8);
+          color: white;
+          padding: 4px 14px;
+          border-radius: 100px;
+          font-size: 0.72rem;
+          font-weight: 700;
+          white-space: nowrap;
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          box-shadow: 0 3px 10px rgba(26,86,219,0.3);
+          letter-spacing: 0.02em;
+        }
+
+        .pr-plan-chip {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 4px 10px;
+          border-radius: 7px;
+          font-size: 0.75rem;
+          font-weight: 700;
+          color: white;
+          margin-bottom: 10px;
+        }
+        .pr-plan-desc {
+          font-size: 0.8rem;
+          color: #64748B;
+          margin-bottom: 16px;
+          line-height: 1.55;
+        }
+        .pr-price-row {
+          margin-bottom: 4px;
+          display: flex;
+          align-items: baseline;
+          gap: 4px;
+        }
+        .pr-price {
+          font-size: 1.75rem;
+          font-weight: 800;
+          color: #0F172A;
+          letter-spacing: -0.04em;
+          line-height: 1;
+        }
+        .pr-price-period {
+          font-size: 0.77rem;
+          color: #94A3B8;
+          font-weight: 500;
+        }
+        .pr-discount-text {
+          font-size: 0.75rem;
+          color: #16A34A;
+          font-weight: 600;
+          margin-bottom: 16px;
+        }
+
+        .pr-btn {
+          width: 100%;
+          padding: 10px 0;
+          border-radius: 10px;
+          font-size: 0.875rem;
+          font-weight: 700;
+          cursor: pointer;
+          font-family: 'Inter', sans-serif;
+          border: none;
+          transition: all 0.18s ease;
+          margin-bottom: 18px;
+        }
+        .pr-btn-primary {
+          background: linear-gradient(145deg, #1A56DB, #0E3FA8);
+          color: white;
+          box-shadow: 0 3px 10px rgba(26,86,219,0.25);
+        }
+        .pr-btn-primary:hover { transform: translateY(-1px); box-shadow: 0 5px 16px rgba(26,86,219,0.35); }
+        .pr-btn-default {
+          background: #F1F5F9;
+          color: #374151;
+        }
+        .pr-btn-default:hover { background: #E5E7EB; }
+
+        .pr-features-label {
+          font-size: 0.72rem;
+          font-weight: 700;
+          color: #94A3B8;
+          letter-spacing: 0.05em;
+          text-transform: uppercase;
+          margin-bottom: 10px;
+        }
+        .pr-features-list {
+          max-height: 200px;
+          overflow-y: auto;
+          display: flex;
+          flex-direction: column;
+          gap: 7px;
+          padding-right: 4px;
+        }
+        .pr-features-list::-webkit-scrollbar { width: 4px; }
+        .pr-features-list::-webkit-scrollbar-track { background: #F1F5F9; border-radius: 10px; }
+        .pr-features-list::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 10px; }
+        .pr-feature-item {
+          display: flex;
+          align-items: flex-start;
+          gap: 8px;
+          font-size: 0.78rem;
+          color: #374151;
+          line-height: 1.4;
+        }
+        .pr-check {
+          flex-shrink: 0;
+          margin-top: 1px;
+          width: 14px; height: 14px;
+          border-radius: 50%;
+          display: flex; align-items: center; justify-content: center;
+          background: #DCFCE7;
+        }
+        .pr-check svg { color: #16A34A; }
+        .pr-card.popular .pr-check { background: #DBEAFE; }
+        .pr-card.popular .pr-check svg { color: #1A56DB; }
+
+        @media (max-width: 1024px) {
+          .pr-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 640px) {
+          .pr-tabs {
+              width: 100%;
+              max-width: 360px;
+            }
+          .pr-container { padding: 0 20px; }
+          .pr-root { padding: 48px 0 64px; }
+          .pr-grid { grid-template-columns: 1fr; }
+        }
       `}</style>
 
-      <section id="pricing" className="pt-10 pb-24 bg-gradient-to-br from-gray-50 to-blue-50/30">
-        <div className="max-w-7xl mx-auto px-10">
+      <section id="pricing" className="pr-root">
+        <div className="pr-container">
+
+          {/* ── HEADER ── */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            className="pr-header"
+            initial={{ opacity: 0, y: 18 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-12"
+            transition={{ duration: 0.5 }}
           >
-            <h2 className="text-5xl font-bold mb-8 text-gray-900">Pricing</h2>
-            <div className="flex items-center justify-center gap-2 flex-wrap">
+            <div className="pr-eyebrow">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+              </svg>
+              Pricing
+            </div>
+            <h2 className="pr-title">Pricing</h2>
+
+            {/* Billing tabs */}
+            <div className="pr-tabs">
               {BILLING_TABS.map((tab, index) => (
                 <motion.button
                   key={tab.value}
-                  initial={{ opacity: 0, y: 10 }}
+                  className={`pr-tab${billingCycle === tab.value ? " active" : ""}`}
+                  onClick={() => setBillingCycle(tab.value)}
+                  initial={{ opacity: 0, y: 8 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  whileHover={{ scale: 1.05 }}
-                  onClick={() => setBillingCycle(tab.value)}
-                  className={`px-6 py-2 rounded-lg font-medium text-sm transition-all ${
-                    billingCycle === tab.value
-                      ? "bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg"
-                      : "bg-white text-gray-700 hover:bg-gray-100"
-                  }`}
+                  transition={{ delay: index * 0.06 }}
                 >
                   {tab.label}
                   {tab.discount && (
-                    <span className={`ml-2 text-xs font-semibold ${billingCycle === tab.value ? "text-white" : "text-green-600"}`}>
-                      {tab.discount}
-                    </span>
+                    <span className="pr-tab-discount">{tab.discount}</span>
                   )}
                 </motion.button>
               ))}
             </div>
           </motion.div>
 
-          {loading && <p className="text-center text-gray-500 mb-8">Loading plans...</p>}
+          {loading && <p className="pr-loading">Loading plans...</p>}
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {plans.map((plan, index) => (
-              <motion.div
-                key={plan.licenseType}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                whileHover={{ y: -10, scale: 1.02 }}
-                className={`relative rounded-3xl p-6 bg-white shadow-xl hover:shadow-2xl transition-all ${
-                  plan.popular ? "ring-4 ring-cyan-500" : ""
-                }`}
-              >
-                {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                    <div className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-4 py-1 rounded-full text-xs font-semibold flex items-center gap-1 shadow-lg whitespace-nowrap">
-                      <Star className="w-4 h-4 fill-white" />
+          <div className="pr-grid">
+            {plans.map((plan, index) => {
+              const meta = PLAN_ACCENT[plan.color] || PLAN_ACCENT["from-gray-600 to-gray-700"];
+              return (
+                <motion.div
+                  key={plan.licenseType}
+                  className={`pr-card${plan.popular ? " popular" : ""}`}
+                  initial={{ opacity: 0, y: 28 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.45, delay: index * 0.08 }}
+                >
+                  {plan.popular && (
+                    <div className="pr-popular-badge">
+                      <Star size={11} fill="white" />
                       Most Popular
                     </div>
-                  </div>
-                )}
+                  )}
 
-                <div className="mb-4">
-                  <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-gradient-to-r ${plan.color} text-white text-xs font-semibold mb-2`}>
+                  {/* Plan chip */}
+                  <div
+                    className="pr-plan-chip"
+                    style={{ background: `linear-gradient(135deg, ${meta.accent}cc, ${meta.accent})` }}
+                  >
+                    <plan.icon size={12} />
                     {plan.name}
                   </div>
-                  <p className="text-gray-600 text-xs mb-3">{plan.description}</p>
-                  <div className="flex items-baseline gap-1">
-                    <span className={`text-2xl font-bold bg-gradient-to-r ${plan.color} bg-clip-text text-transparent`}>
+
+                  <p className="pr-plan-desc">{plan.description}</p>
+
+                  <div className="pr-price-row">
+                    <span className="pr-price">
                       {plan.isFree ? "Free" : `₹${getPrice(plan).toLocaleString()}`}
                     </span>
                     {!plan.isFree && (
-                      <span className="text-gray-600 text-xs">{getBillingText()}</span>
+                      <span className="pr-price-period">{getBillingText()}</span>
                     )}
                   </div>
                   {!plan.isFree && !plan.isEnterprise && getDiscountText() && (
-                    <p className="text-xs text-green-600 mt-1">{getDiscountText()}</p>
+                    <p className="pr-discount-text">{getDiscountText()}</p>
                   )}
-                </div>
+                  {(plan.isFree || plan.isEnterprise || !getDiscountText()) && (
+                    <div style={{ height: 20 }} />
+                  )}
 
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => handlePlanClick(plan)}
-                  className={`w-full py-2 rounded-xl font-semibold text-sm mb-4 transition-all ${
-                    plan.popular
-                      ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-lg hover:shadow-xl"
-                      : "bg-gray-100 text-gray-900 hover:bg-gray-200"
-                  }`}
-                >
-                  {plan.isFree
-                    ? "Get Started Free"
-                    : plan.isEnterprise
-                    ? "Contact Sales"
-                    : "Buy Now"}
-                </motion.button>
+                  <button
+                    className={`pr-btn ${plan.popular ? "pr-btn-primary" : "pr-btn-default"}`}
+                    onClick={() => handlePlanClick(plan)}
+                  >
+                    {plan.isFree ? "Get Started Free" : plan.isEnterprise ? "Contact Sales" : "Buy Now"}
+                  </button>
 
-                <div className="space-y-2">
-                  <p className="font-semibold text-gray-900 text-xs mb-2">Includes:</p>
-                  <div className="max-h-64 overflow-y-auto pr-2 space-y-2 gray-scrollbar">
+                  <div className="pr-features-label">Includes:</div>
+                  <div className="pr-features-list">
                     {plan.features.map((feature) => (
-                      <div key={feature.featureSlug} className="flex items-start gap-2 text-xs text-gray-700">
-                        <Check className={`w-3 h-3 mt-0.5 flex-shrink-0 bg-gradient-to-r ${plan.color} text-white rounded-full p-0.5`} />
+                      <div key={feature.featureSlug} className="pr-feature-item">
+                        <span className="pr-check">
+                          <Check size={9} strokeWidth={3} />
+                        </span>
                         <span>{feature.uiLabel}</span>
                       </div>
                     ))}
                   </div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              );
+            })}
           </div>
+
         </div>
       </section>
     </>
