@@ -156,7 +156,7 @@ export function Header({ onLoginClick, onNavigate }: HeaderProps) {
           transition={{ type: "spring", stiffness: 400 }}
           onClick={() => { onNavigate("/"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
         >
-          <img src={tallyLogo} alt="Tally Connect Logo"className="h-12 w-auto object-contain scale-150 origin-left" />
+          <img src={tallyLogo} alt="Tally Connect Logo"className="h-8 w-auto object-contain scale-150 origin-left" />
         </motion.div>
 
         {/* Desktop Nav */}

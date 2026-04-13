@@ -49,7 +49,7 @@ export function Footer({ onNavigate, onLegalPage, onContact, onPressPage }: Foot
               transition={{ type: "spring", stiffness: 400 }}
               onClick={() => { navigate("/"); window.scrollTo({ top: 0, behavior: "smooth" }); }} // ✅ Fixed
             >
-              <img src={tallyLogo} alt="Tally Connect Logo" className="h-24 w-auto object-contain" />
+              <img src={tallyLogo} alt="Tally Connect Logo" className="h-10 w-auto object-contain" />
               
             </motion.div>
             <p className="text-gray-400 mb-6 leading-relaxed">
