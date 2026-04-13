@@ -15,6 +15,8 @@ interface FooterProps {
 }
 
 export function Footer({ onNavigate, onLegalPage, onContact, onPressPage }: FooterProps) {
+  const navigate = useNavigate(); // ✅ Fixed: use useNavigate for route navigation
+
   const productLinks = [
     { label: "Features", id: "features" },
     { label: "Pricing", id: "pricing" },
@@ -23,7 +25,7 @@ export function Footer({ onNavigate, onLegalPage, onContact, onPressPage }: Foot
     { label: "Technical", id: "technical" },
   ];
 
-  const companyLinks = ["About Us", "Press", "Contact"];
+  const companyLinks = [ "Press", "Contact"];
 
   const legalLinks = [
     { label: "Privacy Policy", page: "privacy" },
@@ -33,7 +35,7 @@ export function Footer({ onNavigate, onLegalPage, onContact, onPressPage }: Foot
   ];
 
   return (
-    <footer className="bg-gradient-to-br from-[#1a3a6b] to-[#060d1a] text-white pt-20 pb-8">
+    <footer className="bg-gradient-to-br from-[#0d1b2a] to-[#0a1628] text-white pt-20 pb-8">
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-12 mb-12">
           {/* Brand */}
@@ -45,7 +47,7 @@ export function Footer({ onNavigate, onLegalPage, onContact, onPressPage }: Foot
               className="flex items-center gap-2 mb-4 cursor-pointer flex-shrink-0"
               whileHover={{ scale: 1.05 }}
               transition={{ type: "spring", stiffness: 400 }}
-              onClick={() => { onNavigate("/"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+              onClick={() => { navigate("/"); window.scrollTo({ top: 0, behavior: "smooth" }); }} // ✅ Fixed
             >
               <img src={tallyLogo} alt="Tally Connect Logo" className="h-6 w-auto object-contain" />
               <span className="font-bold text-xl">Tally Connect</span>
@@ -67,7 +69,7 @@ export function Footer({ onNavigate, onLegalPage, onContact, onPressPage }: Foot
                 <MapPin className="w-4 h-4 text-cyan-500" />
                 <span>
                   5th Floor, Lodha Supremus - II, Phase - II, Unit No.
-                  A-533/A-507, Road No. 22, Wagle Industrial Estate, Thane West,
+                  A-515, Road No. 22, Wagle Industrial Estate, Thane West,
                   Maharashtra, 400604, India
                 </span>
               </div>

@@ -7,7 +7,7 @@ interface SyncCustomerPayload {
   email: string;
   source: string;
   password: string;
-} 
+}
 
 interface LoginPayload {
   email: string;
@@ -78,12 +78,12 @@ export const loginCustomer = async (data: LoginPayload): Promise<LoginResponse> 
     return res.data;
   } catch (error: any) {
     console.error("loginCustomer error:", error);
-    
+
     // If it's a 401 error, throw a specific error
     if (error.response?.status === 401) {
       throw new Error("Invalid email or password");
     }
-    
+
     // For other errors, throw the original error
     throw error;
   }

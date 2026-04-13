@@ -23,7 +23,6 @@ export function Header({ onLoginClick, onNavigate }: HeaderProps) {
     { label: "Pricing", id: "pricing" },
     { label: "User Side", id: "user-side" },
     { label: "Admin Panel", id: "admin-panel" },
-    { label: "Technical", id: "technical" },
     { label: "Partners", id: "partners" },
     { label: "FAQ", id: "faq" },
   ];
@@ -106,7 +105,7 @@ export function Header({ onLoginClick, onNavigate }: HeaderProps) {
   };
 
   const handleTutorialsClick = () => {
-    window.location.href = "/tutorials";
+    onNavigate("tutorials");
     setDropdownOpen(false);
     setMobileMenuOpen(false);
   };

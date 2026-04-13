@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Dialog,
   DialogContent,
@@ -9,7 +9,7 @@ import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mail, Lock, CheckCircle, Eye, EyeOff, X } from "lucide-react";
 import { toast } from "sonner";
-import { syncCustomer, checkCustomerExists } from "../api/customerSync";
+import { syncCustomer, loginCustomer } from "../api/customerSync";
 import { createPortal } from "react-dom";
 
 interface LoginModalProps {
@@ -17,9 +17,11 @@ interface LoginModalProps {
   onOpenChange: (open: boolean) => void;
   onAdminLogin: (type: "admin" | "customer", name: string) => void;
   onLoginSuccess?: () => void;
+  onForgotPassword?: () => void;
 }
 
 type View = "signin" | "forgotpassword" | "emailsent";
+
 // ── PASSWORD VALIDATION ───────────────────────────────────────────────────────
 function validatePassword(p: string) {
   return {
@@ -39,8 +41,9 @@ function PasswordStrength({ password }: { password: string }) {
     { label: "Lowercase", ok: validation.hasLowercase },
     { label: "Number", ok: validation.hasNumber },
   ];
-  const score = checks.filter(c => c.ok).length;
-  const barColor = score <= 1 ? "#f87171" : score === 2 ? "#fb923c" : score === 3 ? "#facc15" : "#4ade80";
+  const score = checks.filter((c) => c.ok).length;
+  const barColor =
+    score <= 1 ? "#f87171" : score === 2 ? "#fb923c" : score === 3 ? "#facc15" : "#4ade80";
   const label = score <= 1 ? "Weak" : score === 2 ? "Fair" : score === 3 ? "Good" : "Strong";
 
   if (!password) return null;
@@ -50,15 +53,21 @@ function PasswordStrength({ password }: { password: string }) {
       <div className="flex items-center gap-2">
         <div className="flex flex-1 gap-1">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-1 flex-1 rounded-full transition-all duration-300"
-              style={{ background: i <= score ? barColor : "#e5e7eb" }} />
+            <div
+              key={i}
+              className="h-1 flex-1 rounded-full transition-all duration-300"
+              style={{ background: i <= score ? barColor : "#e5e7eb" }}
+            />
           ))}
         </div>
-        <span className="text-[10px] font-semibold" style={{ color: barColor }}>{label}</span>
+        <span className="text-[10px] font-semibold" style={{ color: barColor }}>
+          {label}
+        </span>
       </div>
       <div className="flex flex-wrap gap-1">
         {checks.map((c) => (
-          <span key={c.label}
+          <span
+            key={c.label}
             className="inline-flex items-center gap-1 text-[9px] px-1.5 py-0.5 rounded font-medium transition-all duration-200"
             style={{
               background: c.ok ? "rgba(34,197,94,0.1)" : "rgba(209,213,219,0.5)",
@@ -72,46 +81,49 @@ function PasswordStrength({ password }: { password: string }) {
     </div>
   );
 }
-// ── CORNER POPUP ──────────────────────────────────────────────────────────────
+
+// ── CORNER SUCCESS POPUP ──────────────────────────────────────────────────────
 function LoginSuccessPopup({ name, onClose }: { name: string; onClose: () => void }) {
+  const onCloseRef = useRef(onClose);
+  useEffect(() => { onCloseRef.current = onClose; }, [onClose]);
+
   useEffect(() => {
-    const timer = setTimeout(onClose, 4000);
+    const timer = setTimeout(() => onCloseRef.current(), 4000);
     return () => clearTimeout(timer);
-  }, [onClose]);
+  }, []);
 
   return createPortal(
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0, y: 20, scale: 0.95 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, y: 20, scale: 0.95 }}
-        transition={{ type: "spring", stiffness: 300, damping: 25 }}
-        className="fixed top-5 right-5 z-[9999] flex items-start gap-3 bg-white border border-gray-100 rounded-2xl shadow-2xl px-4 py-3.5 max-w-[280px]"
+    <motion.div
+      initial={{ opacity: 0, y: 24, scale: 0.93 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: 24, scale: 0.93 }}
+      transition={{ type: "spring", stiffness: 320, damping: 26 }}
+      className="fixed top-5 right-5 z-[99999] flex items-start gap-3 bg-white border border-gray-100 rounded-2xl shadow-2xl px-4 py-3.5 max-w-[280px]"
+    >
+      <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+        <CheckCircle className="w-4 h-4 text-green-600" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-semibold text-gray-900">You're logged in!</p>
+        <p className="text-xs text-gray-500 mt-0.5">
+          Welcome back,{" "}
+          <span className="font-medium text-blue-600">{name}</span> 👋
+        </p>
+      </div>
+      <button
+        onClick={onClose}
+        className="text-gray-300 hover:text-gray-500 transition-colors flex-shrink-0 mt-0.5"
       >
-        <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-          <CheckCircle className="w-4 h-4 text-green-600" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-gray-900">You're logged in!</p>
-          <p className="text-xs text-gray-500 mt-0.5">
-            Welcome back, <span className="font-medium text-blue-600">{name}</span> 👋
-          </p>
-        </div>
-        <button
-          onClick={onClose}
-          className="text-gray-300 hover:text-gray-500 transition-colors flex-shrink-0 mt-0.5"
-        >
-          <X className="w-3.5 h-3.5" />
-        </button>
-        <motion.div
-          initial={{ scaleX: 1 }}
-          animate={{ scaleX: 0 }}
-          transition={{ duration: 4, ease: "linear" }}
-          style={{ transformOrigin: "left" }}
-          className="absolute bottom-0 left-0 right-0 h-0.5 bg-green-400 rounded-b-2xl"
-        />
-      </motion.div>
-    </AnimatePresence>,
+        <X className="w-3.5 h-3.5" />
+      </button>
+      <motion.div
+        initial={{ scaleX: 1 }}
+        animate={{ scaleX: 0 }}
+        transition={{ duration: 4, ease: "linear" }}
+        style={{ transformOrigin: "left" }}
+        className="absolute bottom-0 left-0 right-0 h-0.5 bg-green-400 rounded-b-2xl"
+      />
+    </motion.div>,
     document.body,
   );
 }
@@ -136,12 +148,44 @@ function AccountCreatedBanner() {
   );
 }
 
+// ── WRONG PASSWORD BANNER ─────────────────────────────────────────────────────
+function WrongPasswordBanner({ onForgot }: { onForgot?: () => void }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -8, scale: 0.97 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: -8, scale: 0.97 }}
+      transition={{ type: "spring", stiffness: 300, damping: 24 }}
+      className="flex items-start gap-3 px-3.5 py-3 bg-red-50 border border-red-200 rounded-xl mb-5"
+    >
+      <div className="w-5 h-5 rounded-full bg-red-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+        <X className="w-3 h-3 text-white" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-xs font-semibold text-red-700 leading-snug">Incorrect password</p>
+        <p className="text-xs text-red-500 mt-0.5 leading-snug">
+          Double-check and try again, or{" "}
+          <button
+            type="button"
+            onClick={onForgot}
+            className="underline font-semibold hover:text-red-700 transition-colors"
+          >
+            reset your password
+          </button>
+          .
+        </p>
+      </div>
+    </motion.div>
+  );
+}
+
 // ── LOGIN MODAL ───────────────────────────────────────────────────────────────
 export function LoginModal({
   open,
   onOpenChange,
   onAdminLogin,
   onLoginSuccess,
+  onForgotPassword,
 }: LoginModalProps) {
   const [adminEmail, setAdminEmail] = useState("");
   const [adminPassword, setAdminPassword] = useState("");
@@ -154,7 +198,10 @@ export function LoginModal({
   const [showPopup, setShowPopup] = useState(false);
   const [loggedInName, setLoggedInName] = useState("");
   const [showCreatedBanner, setShowCreatedBanner] = useState(false);
+  const [showWrongPassword, setShowWrongPassword] = useState(false);
+
   const passwordValid = validatePassword(adminPassword).valid;
+
   const handleOpenChange = (val: boolean) => {
     if (!val) {
       setAdminEmail("");
@@ -166,6 +213,7 @@ export function LoginModal({
       setForgotEmail("");
       setShowPassword(false);
       setShowCreatedBanner(false);
+      setShowWrongPassword(false);
     }
     onOpenChange(val);
   };
@@ -190,33 +238,51 @@ export function LoginModal({
 
         setIsSignUp(false);
         setShowCreatedBanner(true);
+        setShowWrongPassword(false);
         setName("");
         setAdminEmail(createdEmail);
         setAdminPassword(createdPassword);
         setLoading(false);
+        toast.success("Account created! Sign in to continue.");
         return;
       }
 
       // ── SIGN IN flow ──
-      const exists = await checkCustomerExists(adminEmail);
-      if (!exists) {
-        toast.error("Account not found. Please create an account.");
-        setIsSignUp(true);
-        setShowCreatedBanner(false);
-        return;
+      try {
+        const loginResult = await loginCustomer({
+          email: adminEmail,
+          password: adminPassword,
+        });
+        const displayName = loginResult.customer?.name || adminEmail.split("@")[0];
+
+        localStorage.setItem("user", JSON.stringify({ name: displayName, email: adminEmail }));
+
+        // ✅ Dispatch with email + name in detail so agentUpdateService can read them
+        window.dispatchEvent(
+          new CustomEvent("userLoginStatusChanged", {
+            detail: { email: adminEmail, name: displayName },
+          })
+        );
+
+        setLoggedInName(displayName);
+        setShowPopup(true);
+
+        handleOpenChange(false);
+        onAdminLogin("admin", displayName);
+        onLoginSuccess?.();
+      } catch (err: any) {
+        if (err.message === "WRONG_PASSWORD") {
+          setShowWrongPassword(true);
+          toast.error("Incorrect password. Please try again.");
+        } else if (err.message === "NOT_FOUND") {
+          toast.error("Account not found");
+          setIsSignUp(true);
+          setShowCreatedBanner(false);
+          setShowWrongPassword(false);
+        } else {
+          toast.error(err.message || "Something went wrong");
+        }
       }
-
-      const displayName = name || adminEmail.split("@")[0];
-
-      localStorage.setItem("user", JSON.stringify({ name: displayName, email: adminEmail }));
-      window.dispatchEvent(new Event("userLoginStatusChanged"));
-      handleOpenChange(false);
-      onAdminLogin("admin", displayName);
-      onLoginSuccess?.();
-
-      setLoggedInName(displayName);
-      setShowPopup(true);
-
     } catch (err: any) {
       console.error(err);
       toast.error(err.message || "Something went wrong");
@@ -227,14 +293,22 @@ export function LoginModal({
 
   const handleSendReset = (e: React.FormEvent) => {
     e.preventDefault();
-    if (forgotEmail) setView("emailsent");
+    if (forgotEmail) {
+      setView("emailsent");
+      toast.success("Reset link sent! Check your inbox.");
+    }
   };
 
   return (
     <>
-      {showPopup && (
-        <LoginSuccessPopup name={loggedInName} onClose={() => setShowPopup(false)} />
-      )}
+      <AnimatePresence>
+        {showPopup && (
+          <LoginSuccessPopup
+            name={loggedInName}
+            onClose={() => setShowPopup(false)}
+          />
+        )}
+      </AnimatePresence>
 
       <Dialog open={open} onOpenChange={handleOpenChange}>
         <DialogContent className="sm:max-w-[420px] p-0 overflow-hidden border-none bg-white rounded-3xl shadow-2xl">
@@ -267,11 +341,21 @@ export function LoginModal({
                   </p>
 
                   <AnimatePresence>
+                    {showWrongPassword && !isSignUp && (
+                      <WrongPasswordBanner
+                        onForgot={() => {
+                          handleOpenChange(false);
+                          onForgotPassword?.();
+                        }}
+                      />
+                    )}
+                  </AnimatePresence>
+
+                  <AnimatePresence>
                     {showCreatedBanner && !isSignUp && <AccountCreatedBanner />}
                   </AnimatePresence>
 
                   <form onSubmit={handleAdminLogin} className="space-y-4">
-                    {/* Honeypot */}
                     <input type="email" name="fake_email" style={{ display: "none" }} autoComplete="username" />
                     <input type="password" name="fake_password" style={{ display: "none" }} autoComplete="current-password" />
 
@@ -306,19 +390,35 @@ export function LoginModal({
                     </div>
 
                     <div>
-                      <label className="block text-sm font-semibold text-gray-800 mb-1.5">Password</label>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label className="block text-sm font-semibold text-gray-800">Password</label>
+                        {!isSignUp && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              handleOpenChange(false);
+                              onForgotPassword?.();
+                            }}
+                            className="text-xs font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+                          >
+                            Forgot password?
+                          </button>
+                        )}
+                      </div>
                       <div className="relative">
                         <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                         <input
                           type={showPassword ? "text" : "password"}
                           placeholder="••••••••"
                           value={adminPassword}
-                          onChange={(e) => setAdminPassword(e.target.value)}
+                          onChange={(e) => {
+                            setAdminPassword(e.target.value);
+                            setShowWrongPassword(false);
+                          }}
                           required
                           minLength={6}
                           autoComplete="new-password"
-                           className="w-full pl-10 pr-11 py-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all [&::-ms-reveal]:hidden [&:: -webkit-credentials-auto-fill-button]:hidden"
-
+                          className="w-full pl-10 pr-11 py-3 text-sm bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all [&::-ms-reveal]:hidden [&::-webkit-credentials-auto-fill-button]:hidden"
                         />
                         <button
                           type="button"
@@ -331,11 +431,10 @@ export function LoginModal({
                       {isSignUp && <PasswordStrength password={adminPassword} />}
                     </div>
 
-                    {/* ── Submit button — smaller, centered text, no icon ── */}
                     <div className="flex justify-center pt-1">
                       <motion.button
                         type="submit"
-                       disabled={loading || (isSignUp && !passwordValid)}
+                        disabled={loading || (isSignUp && !passwordValid)}
                         whileHover={{ scale: 1.03 }}
                         whileTap={{ scale: 0.97 }}
                         className="px-10 py-2.5 text-sm bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl font-semibold text-center shadow-md hover:shadow-lg transition-all disabled:opacity-60 disabled:cursor-not-allowed"
@@ -350,7 +449,7 @@ export function LoginModal({
                           <span className="text-gray-500">Already have an account? </span>
                           <button
                             type="button"
-                            onClick={() => { setIsSignUp(false); setShowCreatedBanner(false); }}
+                            onClick={() => { setIsSignUp(false); setShowCreatedBanner(false); setShowWrongPassword(false); }}
                             className="font-semibold text-blue-600 hover:text-blue-700 transition-colors"
                           >
                             Sign in
@@ -361,7 +460,7 @@ export function LoginModal({
                           <span className="text-gray-500">Don't have an account? </span>
                           <button
                             type="button"
-                            onClick={() => { setIsSignUp(true); setShowCreatedBanner(false); }}
+                            onClick={() => { setIsSignUp(true); setShowCreatedBanner(false); setShowWrongPassword(false); }}
                             className="font-semibold text-blue-600 hover:text-blue-700 transition-colors"
                           >
                             Sign up

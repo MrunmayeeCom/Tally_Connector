@@ -4,7 +4,8 @@ import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowLeft, Building2, Mail, Phone, MapPin, CreditCard,
-  Users, ShieldCheck, RefreshCw, XCircle, CheckCircle, AlertCircle, X, Check,
+  Users, ShieldCheck, Lock, BadgeCheck, CheckCircle2, Gift, Check,
+  CheckCircle, AlertCircle, X,
 } from "lucide-react";
 import { purchaseLicense } from "../api/license";
 import { createOrder, verifyPayment } from "../api/payment";
@@ -13,7 +14,6 @@ import { getStoredUser } from "../api/auth";
 
 type BillingCycle = "monthly" | "quarterly" | "half-yearly" | "yearly";
 type ToastType = "success" | "error";
-
 interface Toast { id: number; message: string; type: ToastType; }
 
 interface CheckoutPageProps {
@@ -59,91 +59,62 @@ function ToastContainer({ toasts, onRemove }: { toasts: Toast[]; onRemove: (id: 
   );
 }
 
-// ── SUCCESS MODAL ─────────────────────────────────────────────────────────────
-function SuccessModal({ planName, onGoHome }: { planName: string; onGoHome: () => void }) {
+// ── ALREADY ACTIVE MODAL ──────────────────────────────────────────────────────
+function AlreadyActiveModal({ planName, isFree, onClose, onGoHome }: { planName: string; isFree: boolean; onClose: () => void; onGoHome: () => void; }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-      <div className="relative bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8 max-w-sm w-full shadow-2xl text-center">
-        <div className="flex justify-center mb-5">
-          <div className="w-20 h-20 rounded-full bg-green-500/20 border border-green-400/30 flex items-center justify-center animate-pulse">
-            <CheckCircle className="w-10 h-10 text-green-400" />
-          </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-4"
+      style={{ background: "rgba(15,23,42,0.55)", backdropFilter: "blur(8px)", animation: "gt-fade-in 0.2s ease" }}>
+      <div className="bg-white w-full max-w-sm text-center"
+        style={{ borderRadius: 24, boxShadow: "0 32px 80px rgba(0,0,0,0.2)", animation: "gt-slide-up 0.35s cubic-bezier(0.34,1.56,0.64,1)", borderTop: "4px solid transparent", backgroundImage: "linear-gradient(white,white),linear-gradient(90deg,#0d7a8a,#0a3d5c,#0f2044)", backgroundOrigin: "border-box", backgroundClip: "padding-box,border-box", padding: "40px 32px 32px" }}>
+        <div style={{ width: 72, height: 72, borderRadius: "50%", background: "linear-gradient(135deg,#ccfbf1,#99f6e4)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 18px", boxShadow: "0 0 0 12px rgba(13,122,138,0.08)", animation: "gt-pop-in 0.4s cubic-bezier(0.34,1.56,0.64,1) 0.1s both" }}>
+          <Check style={{ width: 32, height: 32, color: "#0d7a8a" }} />
         </div>
-        <h2 className="text-2xl font-bold text-white mb-2">You're All Set! 🎉</h2>
-        <p className="text-white/60 text-sm mb-2">Your <span className="text-pink-300 font-semibold">{planName}</span> plan is now active.</p>
-        <p className="text-white/40 text-xs mb-8">Start exploring all the features included in your plan.</p>
-        <button onClick={onGoHome} className="w-full py-3 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-semibold rounded-xl shadow-xl hover:shadow-2xl transition-all text-sm">
-          Go to Home Page
-        </button>
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "linear-gradient(135deg,#f0fdfa,#ccfbf1)", border: "1px solid #99f6e4", color: "#0d7a8a", fontSize: 12, fontWeight: 600, padding: "5px 14px", borderRadius: 100, marginBottom: 16 }}>
+          <Check style={{ width: 11, height: 11 }} /> {planName} Plan
+        </div>
+        <h3 style={{ fontSize: 22, fontWeight: 800, color: "#0f172a", letterSpacing: "-0.03em", marginBottom: 10, marginTop: 0 }}>Plan Already Active! ✅</h3>
+        <p style={{ fontSize: 14, color: "#64748b", lineHeight: 1.65, marginBottom: 6, marginTop: 0 }}>You already have an active <strong style={{ color: "#0d7a8a" }}>{planName}</strong> plan on your account.</p>
+        <p style={{ fontSize: 13, color: "#94a3b8", lineHeight: 1.6, marginBottom: 24, marginTop: 0 }}>Head to home to continue, or close this to upgrade your plan.</p>
+        <div style={{ display: "flex", gap: 10 }}>
+          {!isFree && (
+            <button onClick={onClose} style={{ flex: 1, padding: "11px", borderRadius: 12, border: "1.5px solid #e2e8f0", background: "#f1f5f9", color: "#475569", fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>Close</button>
+          )}
+          <button onClick={onGoHome} style={{ flex: 1, padding: "11px", borderRadius: 12, border: "none", background: "linear-gradient(135deg,#0d7a8a,#0a3d5c)", color: "white", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", boxShadow: "0 4px 14px rgba(13,122,138,0.3)" }}>Go to Home</button>
+        </div>
       </div>
     </div>
   );
 }
 
-// ── ALREADY ACTIVE MODAL ──────────────────────────────────────────────────────
-// Same pattern as GeoTrack: isFree passed in, Close button hidden for free plans
-function AlreadyActiveModal({
-  planName, isFree, onClose, onGoHome,
-}: {
-  planName: string; isFree: boolean; onClose: () => void; onGoHome: () => void;
-}) {
-  if (isFree) {
-    // FREE PLAN: clean white modal, only Go to Home
-    return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-        <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
-        <motion.div
-          initial={{ opacity: 0, scale: 0.88, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ type: "spring", stiffness: 280, damping: 22 }}
-          className="relative w-full max-w-sm text-center"
-          style={{ background: "#ffffff", borderRadius: 20, padding: "36px 28px 28px", boxShadow: "0 20px 60px rgba(0,0,0,0.15)", border: "1px solid #e5e7eb", borderTop: "3px solid #38bdf8" }}
-        >
-          <div style={{ width: 76, height: 76, borderRadius: "50%", background: "#e0f2fe", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 18px" }}>
-            <div style={{ width: 56, height: 56, borderRadius: "50%", background: "#bae6fd", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <Check style={{ width: 26, height: 26, color: "#0891b2" }} />
-            </div>
-          </div>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "#f0f9ff", border: "1px solid #bae6fd", color: "#0891b2", fontSize: 13, fontWeight: 600, padding: "5px 14px", borderRadius: 100, marginBottom: 16 }}>
-            <Check style={{ width: 12, height: 12 }} /> {planName} Plan
-          </div>
-          <h3 style={{ fontSize: 22, fontWeight: 800, color: "#111827", letterSpacing: "-0.03em", marginBottom: 10, marginTop: 0 }}>Plan Already Active! ✅</h3>
-          <p style={{ fontSize: 14, color: "#374151", lineHeight: 1.65, marginBottom: 6, marginTop: 0 }}>You already have an active <strong style={{ color: "#0891b2" }}>{planName}</strong> plan on your account.</p>
-          <p style={{ fontSize: 13, color: "#6b7280", lineHeight: 1.6, marginBottom: 28, marginTop: 0 }}>Head home to continue using all your features.</p>
-          <button onClick={onGoHome} style={{ width: "100%", padding: "13px", borderRadius: 12, border: "none", background: "linear-gradient(135deg, #0891b2, #6366f1)", color: "white", fontSize: 15, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", boxShadow: "0 4px 14px rgba(8,145,178,0.35)" }}>
-            Go to Home
-          </button>
-        </motion.div>
-      </div>
-    );
-  }
-
-  // PAID PLAN: dark glassmorphism, Close + Go to Home
+// ── SUCCESS MODAL ─────────────────────────────────────────────────────────────
+function SuccessModal({ planName, onGoHome }: { planName: string; onGoHome: () => void }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-      <motion.div
-        initial={{ opacity: 0, scale: 0.88, y: 20 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ type: "spring", stiffness: 280, damping: 22 }}
-        className="relative w-full max-w-sm text-center"
-        style={{ background: "rgba(50,25,90,0.72)", backdropFilter: "blur(28px)", border: "1px solid rgba(255,255,255,0.18)", borderRadius: 24, padding: "40px 32px 32px", boxShadow: "0 32px 80px rgba(0,0,0,0.4)", borderTop: "3px solid transparent", backgroundImage: "linear-gradient(rgba(50,25,90,0.72),rgba(50,25,90,0.72)),linear-gradient(90deg,#ec4899,#a855f7,#6366f1)", backgroundOrigin: "border-box", backgroundClip: "padding-box,border-box" }}
-      >
-        <div style={{ width: 72, height: 72, borderRadius: "50%", background: "rgba(168,85,247,0.2)", border: "1px solid rgba(168,85,247,0.3)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px", boxShadow: "0 0 0 12px rgba(168,85,247,0.07)" }}>
-          <Check style={{ width: 32, height: 32, color: "#c084fc" }} />
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-4"
+      style={{ background: "rgba(15,23,42,0.5)", backdropFilter: "blur(4px)", animation: "gt-fade-in 0.2s ease" }}>
+      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-sm text-center overflow-hidden" style={{ animation: "gt-slide-up 0.3s ease" }}>
+        <div className="px-6 pt-8 pb-6" style={{ background: "linear-gradient(135deg,#0d7a8a,#0a3d5c)" }}>
+          <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <CheckCircle2 className="h-9 w-9 text-white" />
+          </div>
+          <h2 className="text-xl font-bold text-white mb-1">You're All Set! 🎉</h2>
+          <p className="text-teal-100 text-sm">Your <span className="font-semibold text-cyan-200">{planName}</span> plan is now active</p>
         </div>
-        <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(168,85,247,0.15)", border: "1px solid rgba(168,85,247,0.3)", color: "#d8b4fe", fontSize: 12, fontWeight: 600, padding: "5px 14px", borderRadius: 100, marginBottom: 16 }}>
-          <Check style={{ width: 11, height: 11 }} /> {planName} Plan
+        <div className="px-6 py-5">
+          <div className="flex items-center justify-between bg-teal-50 border border-teal-200 rounded-xl px-4 py-3 mb-4">
+            <div className="text-left"><p className="text-sm font-bold text-teal-800">{planName} Plan</p><p className="text-xs text-teal-500 mt-0.5">Active now</p></div>
+            <div className="text-right"><p className="text-xl font-extrabold text-teal-600">₹0</p><p className="text-[10px] text-teal-400">forever</p></div>
+          </div>
+          <div className="space-y-2 mb-5 text-left">
+            {["No credit card required", "Instant access to all features", "Cancel anytime"].map(t => (
+              <div key={t} className="flex items-center gap-2 text-xs text-gray-500"><CheckCircle2 className="h-3.5 w-3.5 text-teal-400 shrink-0" />{t}</div>
+            ))}
+          </div>
+          <button onClick={onGoHome} className="w-full py-3 rounded-xl text-sm font-bold text-white transition-all shadow-md hover:shadow-lg hover:scale-[1.02]"
+            style={{ background: "linear-gradient(135deg,#0d7a8a,#0a3d5c)", fontFamily: "inherit" }}>
+            Go to Home →
+          </button>
         </div>
-        <h3 style={{ fontSize: 22, fontWeight: 800, color: "#ffffff", letterSpacing: "-0.03em", marginBottom: 10, marginTop: 0 }}>Plan Already Active! ✅</h3>
-        <p style={{ fontSize: 14, color: "#cbd5e1", lineHeight: 1.65, marginBottom: 6, marginTop: 0 }}>You already have an active <strong style={{ color: "#f9a8d4" }}>{planName}</strong> plan on your account.</p>
-        <p style={{ fontSize: 13, color: "#94a3b8", lineHeight: 1.6, marginBottom: 28, marginTop: 0 }}>Head home to continue, or close this to upgrade your plan.</p>
-        <div style={{ display: "flex", gap: 10 }}>
-          <button onClick={onClose} style={{ flex: 1, padding: "11px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.2)", background: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.7)", fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>Close</button>
-          <button onClick={onGoHome} style={{ flex: 1, padding: "11px", borderRadius: 12, border: "none", background: "linear-gradient(135deg,#ec4899,#a855f7)", color: "white", fontSize: 14, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", boxShadow: "0 4px 14px rgba(168,85,247,0.4)" }}>Go to Home</button>
-        </div>
-      </motion.div>
+      </div>
     </div>
   );
 }
@@ -154,15 +125,15 @@ export function CheckoutPage({ selectedPlan, initialBillingCycle, onBack, onProc
   const loggedInUser = getStoredUser();
 
   const [billingCycle, setBillingCycle] = useState<BillingCycle>(initialBillingCycle);
+  const [activating, setActivating]     = useState(false);
   const [formData, setFormData]         = useState({ companyName: "", email: "", phone: "", address: "", city: "", state: "", pincode: "", gstNumber: "" });
   const [lmsPlan, setLmsPlan]           = useState<{ licenseId: string; planName: string; pricePerUser: number; includedUsers: number; discountConfig: { monthly: number; quarterly: number; "half-yearly": number; yearly: number; }; } | null>(null);
-  const [loading, setLoading]           = useState(true);
-  const [showSuccessModal, setShowSuccessModal]   = useState(false);
-  const [activatedPlanName, setActivatedPlanName] = useState("");
+  const [loading, setLoading]                               = useState(true);
+  const [showSuccessModal, setShowSuccessModal]             = useState(false);
+  const [activatedPlanName, setActivatedPlanName]           = useState("");
   const [showAlreadyActiveModal, setShowAlreadyActiveModal] = useState(false);
   const [existingPlanName, setExistingPlanName]             = useState("Current");
 
-  // ── Same pattern as GeoTrack: isFree derived from lmsPlan price ──
   const isFree = lmsPlan?.pricePerUser === 0;
 
   const [toasts, setToasts] = useState<Toast[]>([]);
@@ -173,7 +144,6 @@ export function CheckoutPage({ selectedPlan, initialBillingCycle, onBack, onProc
   }, []);
   const removeToast = useCallback((id: number) => setToasts(prev => prev.filter(t => t.id !== id)), []);
 
-  // ── Check for existing active license on load (same pattern as GeoTrack) ──
   useEffect(() => {
     if (!loggedInUser?.email) return;
     const checkExisting = async () => {
@@ -185,22 +155,16 @@ export function CheckoutPage({ selectedPlan, initialBillingCycle, onBack, onProc
         if (res.ok) {
           const data = await res.json();
           if (data.activeLicense && data.activeLicense.status === "active") {
-            // licenseTypeId is the populated object (confirmed from API response)
             const lt = data.activeLicense.licenseTypeId || data.activeLicense.licenseType || {};
             const name = lt.name || "Current";
             const priceAmount = lt.price?.amount ?? null;
             const existingIsFree = Number(priceAmount) === 0;
             setExistingPlanName(name);
-            if (existingIsFree) {
-              setShowAlreadyActiveModal(true);
-            } else {
-              showToast(`${name} plan is currently active on your account.`, "success");
-            }
+            if (existingIsFree) { setShowAlreadyActiveModal(true); }
+            else { showToast(`${name} plan is currently active on your account.`, "success"); }
           }
         }
-      } catch (err) {
-        console.error("License check failed:", err);
-      }
+      } catch (err) { console.error("License check failed:", err); }
     };
     checkExisting();
   }, [loggedInUser?.email]);
@@ -217,9 +181,11 @@ export function CheckoutPage({ selectedPlan, initialBillingCycle, onBack, onProc
     if (!lmsPlan) { showToast("Plan not loaded. Please try again.", "error"); return; }
     try {
       if (isFree) {
+        setActivating(true);
         await purchaseLicense({ name: formData.companyName, email: loggedInUser.email, licenseId: lmsPlan.licenseId, billingCycle: "monthly", amount: 0, currency: "INR" });
         setActivatedPlanName(lmsPlan.planName);
         setShowSuccessModal(true);
+        setActivating(false);
         return;
       }
       const purchaseRes = await purchaseLicense({ name: formData.companyName, email: loggedInUser.email, licenseId: lmsPlan.licenseId, billingCycle, amount: getTotal(), currency: "INR" });
@@ -242,16 +208,15 @@ export function CheckoutPage({ selectedPlan, initialBillingCycle, onBack, onProc
           }
         },
         modal: { ondismiss: () => {} },
-        theme: { color: "#2563eb" },
+        theme: { color: "#0d7a8a" },
       });
       rzp.open();
     } catch (err: any) {
       showToast(err?.response?.data?.message || err?.message || "Something went wrong. Please try again.", "error");
-    }
+    } finally { setActivating(false); }
   };
 
   const handleInputChange = (field: string, value: string) => setFormData(prev => ({ ...prev, [field]: value }));
-  const getBillingText    = () => ({ monthly: "Monthly", quarterly: "Quarterly", "half-yearly": "Half-Yearly", yearly: "Yearly" }[billingCycle]);
   const getSavingsPercent = () => lmsPlan?.discountConfig?.[billingCycle] ?? 0;
   const getBillingPeriod  = () => ({ monthly: "1 month", quarterly: "3 months", "half-yearly": "6 months", yearly: "12 months" }[billingCycle]);
   const handleGoHome      = () => { window.location.href = "/"; };
@@ -284,145 +249,252 @@ export function CheckoutPage({ selectedPlan, initialBillingCycle, onBack, onProc
           if (uf.length > 0) { uf.sort((a, b) => a.priority !== b.priority ? a.priority - b.priority : b.value - a.value); userCount = uf[0].value; }
         }
         setLmsPlan({ licenseId: matched._id, planName: matched.licenseType.name, pricePerUser: matched.licenseType.price.amount, includedUsers: userCount, discountConfig: matched.licenseType.discountConfig || { monthly: 0, quarterly: 5, "half-yearly": 10, yearly: 20 } });
-      } catch (err) {
-        console.error("Failed to load checkout plan", err);
-      } finally {
-        setLoading(false);
-      }
+      } catch (err) { console.error("Failed to load checkout plan", err); }
+      finally { setLoading(false); }
     };
     loadPlanFromLMS();
   }, [selectedPlan]);
 
-  if (loading || !lmsPlan) {
-    return (
-      <div className="min-h-screen relative flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#1e2a4a] via-[#2d2870] to-[#9d2060]" />
-        <div className="absolute -top-40 -right-40 w-96 h-96 bg-pink-500/30 rounded-full blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-blue-500/30 rounded-full blur-3xl" />
-        <div className="relative z-10 text-center">
-          <div className="h-10 w-10 border-4 border-pink-400 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-white/70 text-sm">Loading checkout...</p>
-        </div>
+  if (loading || !lmsPlan) return (
+    <div className="min-h-screen bg-[#F5F7FA] flex items-center justify-center">
+      <div className="text-center">
+        <div className="h-10 w-10 border-4 border-teal-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+        <p className="text-gray-500 text-sm">Loading checkout...</p>
       </div>
-    );
-  }
+    </div>
+  );
 
-  const BILLING_CYCLES: BillingCycle[] = ["monthly", "quarterly", "half-yearly", "yearly"];
-  const CYCLE_LABELS: Record<BillingCycle, string> = { monthly: "Monthly", quarterly: "Quarterly", "half-yearly": "Half-Yearly", yearly: "Yearly" };
-  const inputClass = "w-full bg-white/10 border border-white/20 text-white placeholder-white/40 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-pink-400/60 focus:border-transparent transition-all";
-  const labelClass = "block text-xs font-semibold text-white/70 mb-1.5";
+  const cycles: BillingCycle[]                        = ["monthly", "quarterly", "half-yearly", "yearly"];
+  const cycleLabels: Record<BillingCycle, string>     = { monthly: "Monthly", quarterly: "Quarterly", "half-yearly": "Half-Yearly", yearly: "Yearly" };
+  const fieldCls = "w-full px-3 h-10 rounded-lg border border-gray-200 bg-gray-50 focus:bg-white text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-teal-400 transition-all";
+  const iconFieldCls = "w-full pl-9 pr-3 h-10 rounded-lg border border-gray-200 bg-gray-50 focus:bg-white text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:border-teal-400 transition-all";
 
   return (
     <>
       <ToastContainer toasts={toasts} onRemove={removeToast} />
 
-      <div className="relative min-h-screen font-[Inter] overflow-hidden">
+      <style>{`
+        @keyframes gt-fade-in  { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes gt-slide-up { from { opacity: 0; transform: translateY(20px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes gt-pop-in   { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+      `}</style>
 
-        {/* Already Active Modal — isFree from lmsPlan.pricePerUser === 0 */}
+      <div style={{ fontFamily: "'Inter', sans-serif" }} className="min-h-screen bg-[#F5F7FA]">
+
         {showAlreadyActiveModal && (
-          <AlreadyActiveModal
-            planName={existingPlanName}
-            isFree={isFree}
-            onClose={() => setShowAlreadyActiveModal(false)}
-            onGoHome={handleGoHome}
-          />
+          <AlreadyActiveModal planName={existingPlanName} isFree={isFree!} onClose={() => setShowAlreadyActiveModal(false)} onGoHome={handleGoHome} />
         )}
-
         {showSuccessModal && (
           <SuccessModal planName={activatedPlanName} onGoHome={handleGoHome} />
         )}
 
-        <div className="absolute inset-0 bg-gradient-to-br from-[#1e2a4a] via-[#2d2870] to-[#9d2060]" />
-        <div className="absolute -top-40 -right-40 w-96 h-96 bg-pink-500/30 rounded-full blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-blue-500/30 rounded-full blur-3xl" />
+        {/* ── Sticky Header Bar ── */}
+        <div className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between sticky top-0 z-10">
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: "linear-gradient(135deg,#0d7a8a,#0a3d5c)" }}>
+              <CreditCard className="h-4 w-4 text-white" />
+            </div>
+            <span className="font-semibold text-sm text-gray-800 tracking-tight">TallyConnect Checkout</span>
+          </div>
+          <div className="flex items-center gap-1 text-xs font-medium text-gray-400">
+            <span className="text-teal-600 flex items-center gap-1"><CheckCircle2 className="h-3.5 w-3.5" /> Select Plan</span>
+            <span className="mx-1 text-gray-300">›</span>
+            <span className="text-teal-600 flex items-center gap-1">
+              <span className="w-4 h-4 rounded-full text-white text-[10px] flex items-center justify-center" style={{ background: "linear-gradient(135deg,#0d7a8a,#0a3d5c)" }}>2</span>
+              Billing Details
+            </span>
+            <span className="mx-1 text-gray-300">›</span>
+            <span className="flex items-center gap-1 text-gray-400">
+              <span className="w-4 h-4 rounded-full bg-gray-200 text-gray-400 text-[10px] flex items-center justify-center">3</span>
+              {isFree ? "Activate" : "Payment"}
+            </span>
+          </div>
+        </div>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-6 pt-28 pb-12">
-          <button onClick={onBack} className="flex items-center gap-2 text-white/70 hover:text-white text-sm mb-8 transition-colors group">
-            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Back to Plans
+        <div className="max-w-6xl mx-auto px-4 py-8">
+          <button onClick={onBack} className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 mb-6 transition-colors">
+            <ArrowLeft className="h-4 w-4" /> Back to Plans
           </button>
-          <div className="text-center mb-10">
-            <h1 className="text-4xl font-bold text-white mb-2">Complete Your Order</h1>
-            <p className="text-white/60 text-sm">Seamlessly connect your Tally with modern business tools</p>
+
+          <div className="mb-7">
+            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">{isFree ? "Activate Your Free Plan" : "Complete Your Order"}</h1>
+            <p className="text-sm text-gray-500 mt-1">{isFree ? "Fill in your details to get started — no payment required" : "Just one step away from connecting your Tally with modern business tools"}</p>
           </div>
 
-          <div className="grid lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2">
-              <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-8 shadow-2xl">
-                <h2 className="text-xl font-bold text-white mb-1">Billing Information</h2>
-                <p className="text-white/50 text-xs mb-6">Enter your company and billing details</p>
-                <form onSubmit={handleSubmit} className="space-y-5">
+          {isFree && (
+            <div className="mb-6 flex items-center gap-3 bg-teal-50 border border-teal-200 rounded-xl px-5 py-4">
+              <Gift className="h-5 w-5 text-teal-500 shrink-0" />
+              <div>
+                <p className="text-sm font-semibold text-teal-700">You're activating the Free Plan</p>
+                <p className="text-xs text-teal-600 mt-0.5">No credit card required. Your plan will be activated instantly.</p>
+              </div>
+            </div>
+          )}
+
+          <div className="grid lg:grid-cols-[1fr_380px] gap-6 items-start">
+
+            {/* ── LEFT ── */}
+            <div className="flex flex-col gap-5">
+
+              {/* Step 1 – Selected Plan card */}
+              <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+                <div className="flex items-center gap-2 mb-4">
+                  <span className="w-5 h-5 rounded-full text-white text-[11px] font-bold flex items-center justify-center" style={{ background: "linear-gradient(135deg,#0d7a8a,#0a3d5c)" }}>1</span>
+                  <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Selected Plan</h2>
+                </div>
+                <div className="rounded-xl p-4 flex items-start justify-between gap-4 border bg-teal-50 border-teal-100">
                   <div>
-                    <label className={labelClass}>Company Name *</label>
-                    <div className="relative"><Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" /><input placeholder="Enter company name" value={formData.companyName} onChange={e => handleInputChange("companyName", e.target.value)} className={`${inputClass} pl-10`} required /></div>
+                    <p className="text-lg font-bold text-teal-700 mb-1">{lmsPlan.planName}</p>
+                    <div className="flex items-center gap-1.5 text-sm text-teal-500 mb-3"><Users className="h-3.5 w-3.5" /> Includes {lmsPlan.includedUsers} users</div>
+                    <div className="flex flex-wrap gap-x-4 gap-y-1">
+                      {["Tally ERP integration", "Real-time sync"].map(f => (
+                        <div key={f} className="flex items-center gap-1.5 text-xs text-teal-600"><CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-teal-400" />{f}</div>
+                      ))}
+                    </div>
                   </div>
+                  <div className="text-right shrink-0">
+                    {isFree
+                      ? <><div className="text-2xl font-bold text-teal-600">₹0</div><div className="text-xs text-teal-400">forever</div></>
+                      : <><div className="text-2xl font-bold text-teal-700">₹{lmsPlan.pricePerUser.toLocaleString("en-IN")}</div><div className="text-xs text-teal-400">/user/month</div></>
+                    }
+                  </div>
+                </div>
+              </div>
+
+              {/* Step 2 – Billing form */}
+              <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+                <div className="flex items-center gap-2 mb-5">
+                  <span className="w-5 h-5 rounded-full text-white text-[11px] font-bold flex items-center justify-center" style={{ background: "linear-gradient(135deg,#0d7a8a,#0a3d5c)" }}>2</span>
+                  <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Billing Information</h2>
+                </div>
+                <form onSubmit={handleSubmit}>
                   <div className="grid md:grid-cols-2 gap-4">
-                    <div><label className={labelClass}>Email Address *</label><div className="relative"><Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" /><input type="email" value={formData.email} readOnly className={`${inputClass} pl-10 opacity-60 cursor-not-allowed`} /></div></div>
-                    <div><label className={labelClass}>Phone Number *</label><div className="relative"><Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" /><input type="tel" placeholder="+91 98765 43210" value={formData.phone} onChange={e => handleInputChange("phone", e.target.value)} className={`${inputClass} pl-10`} required /></div></div>
+                    <div className="md:col-span-2 space-y-1.5">
+                      <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Company Name *</label>
+                      <div className="relative"><Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" /><input placeholder="Enter company name" value={formData.companyName} onChange={e => handleInputChange("companyName", e.target.value)} className={iconFieldCls} required /></div>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Email Address *</label>
+                      <div className="relative"><Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" /><input type="email" value={formData.email} readOnly className="w-full pl-9 pr-3 h-10 rounded-lg border border-gray-200 bg-gray-100 text-gray-400 text-sm cursor-not-allowed focus:outline-none" /></div>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Phone Number *</label>
+                      <div className="relative"><Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" /><input type="tel" placeholder="+91 98765 43210" value={formData.phone} onChange={e => handleInputChange("phone", e.target.value)} className={iconFieldCls} required /></div>
+                    </div>
+                    <div className="md:col-span-2 space-y-1.5">
+                      <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Address *</label>
+                      <div className="relative"><MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" /><input placeholder="Street address" value={formData.address} onChange={e => handleInputChange("address", e.target.value)} className={iconFieldCls} required /></div>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">City *</label>
+                      <input placeholder="City" value={formData.city} onChange={e => handleInputChange("city", e.target.value)} className={fieldCls} required />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">State *</label>
+                      <input placeholder="State" value={formData.state} onChange={e => handleInputChange("state", e.target.value)} className={fieldCls} required />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Pincode *</label>
+                      <input placeholder="400001" value={formData.pincode} onChange={e => handleInputChange("pincode", e.target.value)} className={fieldCls} required />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">GST Number <span className="normal-case font-normal text-gray-400">(Optional)</span></label>
+                      <input placeholder="22AAAAA0000A1Z5" value={formData.gstNumber} onChange={e => handleInputChange("gstNumber", e.target.value)} className={fieldCls} />
+                    </div>
                   </div>
-                  <div>
-                    <label className={labelClass}>Address *</label>
-                    <div className="relative"><MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" /><input placeholder="Street address" value={formData.address} onChange={e => handleInputChange("address", e.target.value)} className={`${inputClass} pl-10`} required /></div>
-                  </div>
-                  <div className="grid md:grid-cols-3 gap-4">
-                    <div><label className={labelClass}>City *</label><input placeholder="City" value={formData.city} onChange={e => handleInputChange("city", e.target.value)} className={inputClass} required /></div>
-                    <div><label className={labelClass}>State *</label><input placeholder="State" value={formData.state} onChange={e => handleInputChange("state", e.target.value)} className={inputClass} required /></div>
-                    <div><label className={labelClass}>Pincode *</label><input placeholder="400001" value={formData.pincode} onChange={e => handleInputChange("pincode", e.target.value)} className={inputClass} required /></div>
-                  </div>
-                  <div><label className={labelClass}>GST Number (Optional)</label><input placeholder="22AAAAA0000A1Z5" value={formData.gstNumber} onChange={e => handleInputChange("gstNumber", e.target.value)} className={inputClass} /></div>
-                  <div className="pt-2 flex justify-end">
-                    <button type="submit" className="flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-semibold rounded-xl shadow-xl hover:shadow-2xl transition-all text-sm">
-                      <CreditCard className="w-4 h-4" /> Proceed to Payment
+                  <div className="mt-6 flex justify-end">
+                    <button type="submit" disabled={activating}
+                      className="flex items-center gap-2 px-6 h-11 rounded-xl text-sm font-semibold text-white transition-all shadow-sm hover:shadow-md hover:scale-[1.02] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
+                      style={{ background: "linear-gradient(135deg,#0d7a8a,#0a3d5c)", fontFamily: "inherit" }}>
+                      {isFree
+                        ? <><Gift className="h-4 w-4" />{activating ? "Activating..." : "Activate Free Plan"}</>
+                        : <><CreditCard className="h-4 w-4" />{activating ? "Processing..." : "Proceed to Payment"}</>
+                      }
                     </button>
                   </div>
                 </form>
               </div>
+
+              {/* Security badges */}
+              <div className="flex items-center justify-center gap-6 py-3">
+                {[{ icon: <Lock className="h-3.5 w-3.5" />, label: "SSL Secured" }, { icon: <ShieldCheck className="h-3.5 w-3.5" />, label: "256-bit Encryption" }, { icon: <BadgeCheck className="h-3.5 w-3.5" />, label: "PCI Compliant" }].map(({ icon, label }) => (
+                  <div key={label} className="flex items-center gap-1.5 text-xs text-gray-400 font-medium">{icon}{label}</div>
+                ))}
+              </div>
             </div>
 
-            <div className="lg:col-span-1">
-              <div className="sticky top-6 bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-6 shadow-2xl space-y-5">
-                <h2 className="text-lg font-bold text-white">Order Summary</h2>
-                <div>
-                  <p className="text-xs text-white/50 mb-2">Selected Plan</p>
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="px-3 py-1 bg-pink-500/20 border border-pink-400/30 text-pink-300 rounded-full text-xs font-semibold">{lmsPlan.planName}</span>
-                    <span className="px-3 py-1 bg-purple-500/20 border border-purple-400/30 text-purple-300 rounded-full text-xs font-semibold">{getBillingText()}</span>
+            {/* ── RIGHT – Sticky Order Summary ── */}
+            <div className="sticky top-20">
+              <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                <div className="px-6 py-5" style={{ background: "linear-gradient(135deg,#0d7a8a,#0a3d5c)" }}>
+                  <p className="text-xs font-semibold uppercase tracking-widest mb-3 text-teal-200">Order Summary</p>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full">{lmsPlan.planName}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-xs text-white/50"><Users className="w-3.5 h-3.5" /><span>Includes {lmsPlan.includedUsers} users</span></div>
+                  <div className="flex items-center gap-1.5 mt-3 text-white/80 text-xs"><Users className="h-3.5 w-3.5" /> Includes {lmsPlan.includedUsers} users</div>
                 </div>
-                <div>
-                  <p className="text-xs text-white/50 mb-2">Billing Cycle</p>
-                  <div className="grid grid-cols-2 gap-1.5">
-                    {BILLING_CYCLES.map(cycle => {
-                      const pct = lmsPlan.discountConfig?.[cycle] ?? 0, active = billingCycle === cycle;
-                      return (
-                        <button key={cycle} type="button" onClick={() => setBillingCycle(cycle)}
-                          className={`text-xs py-1.5 px-2 rounded-lg font-medium transition-all ${active ? "bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow" : "bg-white/10 text-white/60 hover:bg-white/20"}`}>
-                          {CYCLE_LABELS[cycle]}{pct > 0 && <span className="ml-1 text-green-400">-{pct}%</span>}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-                <div className="border-t border-white/10" />
-                <div className="space-y-2.5 text-sm">
-                  <div className="flex justify-between"><span className="text-white/50">Price per user/month</span><span className="text-white">&#x20B9;{lmsPlan.pricePerUser.toLocaleString("en-IN")}</span></div>
-                  <div className="flex justify-between"><span className="text-white/50">Number of users</span><span className="text-white">x{lmsPlan.includedUsers}</span></div>
-                  <div className="flex justify-between"><span className="text-white/50">Billing period</span><span className="text-white">{getBillingPeriod()}</span></div>
-                  <div className="border-t border-white/10 pt-2.5 space-y-2">
-                    <div className="flex justify-between font-medium"><span className="text-white/50">Subtotal</span><span className="text-white">&#x20B9;{getSubtotal().toLocaleString("en-IN")}</span></div>
-                    {getSavingsPercent() > 0 && <div className="flex justify-between text-green-400 font-medium"><span>Discount ({getSavingsPercent()}%)</span><span>-&#x20B9;{getDiscount().toLocaleString("en-IN")}</span></div>}
-                    <div className="flex justify-between"><span className="text-white/50">GST (18%)</span><span className="text-white">&#x20B9;{getTax().toLocaleString("en-IN")}</span></div>
-                  </div>
-                </div>
-                <div className="border-t border-white/10" />
-                <div className="flex justify-between items-baseline">
-                  <span className="text-white font-semibold">Total Amount</span>
-                  <span className="text-2xl font-bold text-pink-300">&#x20B9;{getTotal().toLocaleString("en-IN")}</span>
-                </div>
-                <div className="space-y-1.5 pt-1">
-                  <div className="flex items-center gap-2 text-xs text-white/40"><ShieldCheck className="w-3.5 h-3.5 text-green-400" /> Secure payment processing</div>
-                  <div className="flex items-center gap-2 text-xs text-white/40"><RefreshCw className="w-3.5 h-3.5 text-blue-400" /> Money-back guarantee</div>
-                  <div className="flex items-center gap-2 text-xs text-white/40"><XCircle className="w-3.5 h-3.5 text-purple-400" /> Cancel anytime</div>
+
+                <div className="px-6 py-5 space-y-5">
+                  {!isFree && (
+                    <>
+                      <div>
+                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2.5">Billing Cycle</p>
+                        <div className="grid grid-cols-4 gap-1.5">
+                          {cycles.map(cycle => {
+                            const pct = lmsPlan?.discountConfig?.[cycle] ?? 0, isActive = billingCycle === cycle;
+                            return (
+                              <button key={cycle} type="button" onClick={() => setBillingCycle(cycle)}
+                                style={{ fontFamily: "inherit", ...(isActive ? { background: "linear-gradient(135deg,#0d7a8a,#0a3d5c)", borderColor: "#0d7a8a" } : {}) }}
+                                className={`rounded-lg py-2 px-1 text-center transition-all text-[11px] font-semibold border ${isActive ? "text-white shadow-sm" : "bg-gray-50 border-gray-200 text-gray-500 hover:border-teal-300 hover:text-teal-600"}`}>
+                                {cycleLabels[cycle]}
+                                {pct > 0 && <span className={`block text-[10px] mt-0.5 font-medium ${isActive ? "text-teal-200" : "text-green-500"}`}>-{pct}%</span>}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                      <div className="border-t border-gray-100" />
+                    </>
+                  )}
+
+                  {isFree ? (
+                    <div className="space-y-4">
+                      <div className="rounded-xl bg-teal-50 border border-teal-200 px-4 py-5 text-center">
+                        <p className="text-xs text-teal-600 font-semibold uppercase tracking-wide mb-2">Total Due Today</p>
+                        <p className="text-5xl font-bold text-teal-600">₹0</p>
+                        <p className="text-xs text-teal-500 mt-2">No credit card required</p>
+                      </div>
+                      <div className="space-y-1.5">
+                        {["No payment required", "Instant activation", "Cancel anytime"].map(t => (
+                          <p key={t} className="text-xs text-gray-400 flex items-center gap-1.5"><CheckCircle2 className="h-3.5 w-3.5 text-teal-500 shrink-0" />{t}</p>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="space-y-2.5">
+                        <div className="flex justify-between items-center text-sm"><span className="text-gray-500">Price per user/month</span><span className="font-medium text-gray-800">₹{lmsPlan.pricePerUser.toLocaleString("en-IN")}</span></div>
+                        <div className="flex justify-between items-center text-sm"><span className="text-gray-500">Number of users</span><span className="font-medium text-gray-800">×{lmsPlan.includedUsers}</span></div>
+                        <div className="flex justify-between items-center text-sm"><span className="text-gray-500">Billing period</span><span className="font-semibold text-gray-800">{getBillingPeriod()}</span></div>
+                      </div>
+                      <div className="border-t border-gray-100" />
+                      <div className="space-y-2.5">
+                        <div className="flex justify-between items-center text-sm"><span className="text-gray-500">Subtotal</span><span className="font-medium text-gray-800">₹{getSubtotal().toLocaleString("en-IN")}</span></div>
+                        {getSavingsPercent() > 0 && <div className="flex justify-between items-center text-sm"><span className="text-green-600 font-medium">Discount ({getSavingsPercent()}%)</span><span className="font-semibold text-green-600">-₹{getDiscount().toLocaleString("en-IN")}</span></div>}
+                        <div className="flex justify-between items-center text-sm"><span className="text-gray-500">GST (18%)</span><span className="font-medium text-gray-800">₹{getTax().toLocaleString("en-IN")}</span></div>
+                      </div>
+                      <div className="border-t border-gray-100" />
+                      <div className="rounded-xl px-4 py-3.5 flex items-center justify-between" style={{ background: "linear-gradient(135deg,#0f2044,#0a3d5c)" }}>
+                        <span className="text-sm font-semibold text-gray-300">Total Amount</span>
+                        <span className="text-2xl font-bold text-white">₹{getTotal().toLocaleString("en-IN")}</span>
+                      </div>
+                      <div className="space-y-1.5">
+                        {["Secure payment processing", "Money-back guarantee", "Cancel anytime"].map(t => (
+                          <p key={t} className="text-xs text-gray-400 flex items-center gap-1.5"><CheckCircle2 className="h-3.5 w-3.5 text-teal-500 shrink-0" />{t}</p>
+                        ))}
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
@@ -432,3 +504,4 @@ export function CheckoutPage({ selectedPlan, initialBillingCycle, onBack, onProc
     </>
   );
 }
+
