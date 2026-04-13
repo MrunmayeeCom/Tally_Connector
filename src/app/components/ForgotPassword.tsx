@@ -9,7 +9,7 @@ const MIDDLEWARE_API_KEY  = "averlon-mail-2026!";
 
 // Base URL of your app — the reset link will be:
 //   {APP_BASE_URL}/reset-password?token={token}&email={email}
-const APP_BASE_URL = "http://localhost:5173"; // e.g. "https://hire2onboard.com"
+const APP_BASE_URL = window.location.origin; // e.g. "https://hire2onboard.com"
 
 // ─────────────────────────────────────────
 //  Types

@@ -151,13 +151,12 @@ export function Header({ onLoginClick, onNavigate }: HeaderProps) {
       <div className="max-w-7xl mx-auto px-6 py-2.5 flex items-center justify-between gap-4">
         {/* Logo */}
         <motion.div
-          className="flex items-center gap-2 cursor-pointer flex-shrink-0"
+          className="flex items-center gap-2 cursor-pointer flex-shrink-0 overflow-visible"
           whileHover={{ scale: 1.05 }}
           transition={{ type: "spring", stiffness: 400 }}
           onClick={() => { onNavigate("/"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
         >
-          <img src={tallyLogo} alt="Tally Connect Logo" className="h-6 w-auto object-contain" />
-          <span className="font-bold text-base text-gray-900 whitespace-nowrap">Tally Connect</span>
+          <img src={tallyLogo} alt="Tally Connect Logo"className="h-12 w-auto object-contain scale-150 origin-left" />
         </motion.div>
 
         {/* Desktop Nav */}
