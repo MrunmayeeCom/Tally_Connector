@@ -24,7 +24,7 @@ const checkActiveLicense = async (email) => {
   try {
     console.log('[AgentUpdate] Checking license for:', email);
     const response = await fetch(
-      `https://lisence-system.onrender.com/api/external/actve-license/${email}?productId=${PRODUCT_ID}`,
+      `https://license-system-v6ht.onrender.com/api/external/actve-license/${email}?productId=${PRODUCT_ID}`,
       { headers: { 'x-api-key': LMS_API_KEY } }
     );
     console.log('[AgentUpdate] License API status:', response.status);

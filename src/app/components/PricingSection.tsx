@@ -100,7 +100,7 @@ export function PricingSection({ onPlanSelect, onContactSales, onBuyNow }: Prici
     const loadPlans = async () => {
       try {
         const res = await fetch(
-          "https://lisence-system.onrender.com/api/license/public/licenses-by-product/695902cfc240b17f16c3d716",
+          "https://license-system-v6ht.onrender.com/api/license/public/licenses-by-product/695902cfc240b17f16c3d716",
           { headers: { "x-api-key": "my-secret-key-123" } }
         );
         const data = await res.json();

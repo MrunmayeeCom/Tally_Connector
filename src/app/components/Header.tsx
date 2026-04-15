@@ -70,7 +70,7 @@ export function Header({ onLoginClick, onNavigate }: HeaderProps) {
   const checkActiveLicense = async (email: string) => {
     try {
       const response = await fetch(
-        `https://lisence-system.onrender.com/api/external/actve-license/${email}?productId=695902cfc240b17f16c3d716`,
+        `https://license-system-v6ht.onrender.com/api/external/actve-license/${email}?productId=695902cfc240b17f16c3d716`,
         { headers: { "x-api-key": "my-secret-key-123" } }
       );
       if (response.ok) {
