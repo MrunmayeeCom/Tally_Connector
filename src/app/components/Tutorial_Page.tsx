@@ -182,7 +182,7 @@ const tutorialSections: Section[] = [
     sectionColor: '#DC2626',
     steps: [
       {
-        number: 1,
+        number: 6,
         title: 'Error: No Active Licence',
         description: 'The agent posts login credentials and immediately receives a 403 rejection. No data sync can begin until this is resolved.',
         icon: AlertTriangle,
@@ -194,7 +194,7 @@ const tutorialSections: Section[] = [
         ],
       },
       {
-        number: 2,
+        number: 7,
         title: 'Error: Company Already Registered',
         description: 'Authentication succeeds but the sync fails with a 500 error when the agent tries to register the Tally company.',
         icon: AlertTriangle,
@@ -206,7 +206,7 @@ const tutorialSections: Section[] = [
         ],
       },
       {
-        number: 3,
+        number: 8,
         title: 'Error: Invalid Credentials',
         description: 'The agent is rejected at the login step because the email or password entered in the terminal does not match any Admin account.',
         icon: AlertTriangle,
@@ -218,7 +218,7 @@ const tutorialSections: Section[] = [
         ],
       },
       {
-        number: 4,
+        number: 9,
         title: 'Error: Backend Not Reachable',
         description: 'The agent gets no response at all — status and data are both undefined. The target server address is unreachable.',
         icon: AlertTriangle,
@@ -230,7 +230,7 @@ const tutorialSections: Section[] = [
         ],
       },
       {
-        number: 5,
+        number: 10,
         title: 'Success: Agent Running Correctly',
         description: 'When everything is configured correctly the agent authenticates, detects Tally companies, and begins streaming ledger data into the terminal.',
         icon: CheckCircle,
@@ -253,7 +253,7 @@ const tutorialSections: Section[] = [
     sectionColor: '#C17D2A',
     steps: [
       {
-        number: 6,
+        number: 11,
         title: 'Dashboard — Live KPIs & Charts',
         description: 'The Dashboard provides a real-time financial snapshot with KPI cards for Receivables, Payables, Pending Bills, and Cleared Bills. Monthly Income vs Expense bar charts and Outstanding Trends give you complete visibility at a glance.',
         icon: HardDrive,
@@ -267,7 +267,7 @@ const tutorialSections: Section[] = [
         ],
       },
       {
-        number: 7,
+        number: 12,
         title: 'Quick Links & Upcoming Due Dates',
         description: 'Quick Links gives you single-click access to every core module directly from the Dashboard. The Upcoming Due Dates panel lists pending payments with party name, amount, and days remaining so nothing is missed.',
         icon: HardDrive,
@@ -280,7 +280,7 @@ const tutorialSections: Section[] = [
         ],
       },
       {
-        number: 8,
+        number: 13,
         title: 'Dashboard Summary Report',
         description: 'Click "Export Report" to generate a structured PDF of your key financial metrics for the selected period. The report includes monthly income and expense breakdowns, outstanding party balances, and the full upcoming payments schedule.',
         icon: FileText,
@@ -302,7 +302,7 @@ const tutorialSections: Section[] = [
     sectionColor: '#7B5EA7',
     steps: [
       {
-        number: 9,
+        number: 14,
         title: 'Ledger List',
         description: 'The Ledger List displays all party ledgers with their type, opening balance, outstanding amount, and overdue days in one consolidated view. Filter by ledger type, search by party name, and export or drill into any record directly from the toolbar.',
         icon: BookOpen,
@@ -316,7 +316,7 @@ const tutorialSections: Section[] = [
         ],
       },
       {
-        number: 10,
+        number: 15,
         title: 'Ledger Account Details',
         description: 'The Account Details view presents a complete summary and itemised transaction history for any selected party. Switch between Vouchers, Invoices, Bills, and Ageing tabs for a thorough ledger analysis.',
         icon: BookOpen,
@@ -330,7 +330,7 @@ const tutorialSections: Section[] = [
         ],
       },
       {
-        number: 11,
+        number: 16,
         title: 'Add New Bill',
         description: 'Click "+ Add Bill" to manually record a bill against any ledger by entering the reference, dates, and amount. The entry is reflected immediately in the ledger history upon saving.',
         icon: FilePlus,
@@ -343,7 +343,7 @@ const tutorialSections: Section[] = [
         ],
       },
       {
-        number: 12,
+        number: 17,
         title: 'Ledger List Report',
         description: 'Export a formatted PDF of all party ledgers including their balances and overdue day counts. The report is print-ready and designed for audits, compliance reviews, or sharing with stakeholders.',
         icon: FileText,
@@ -365,7 +365,7 @@ const tutorialSections: Section[] = [
     sectionColor: '#A855A0',
     steps: [
       {
-        number: 13,
+        number: 18,
         title: 'Voucher Explorer',
         description: 'The Voucher Explorer consolidates all financial transactions in a single, filterable view with type, reference, party, amount, and status columns. Filter by voucher type, search by reference number or party name, and export or create vouchers directly from the toolbar.',
         icon: FileText,
@@ -379,7 +379,7 @@ const tutorialSections: Section[] = [
         ],
       },
       {
-        number: 14,
+        number: 19,
         title: 'Create New Voucher',
         description: 'Click "+ New Voucher", select the type and date, link a ledger, choose Debit or Credit, and enter the amount before saving. Use "+ Add Line" to include multiple entries for complex vouchers such as journal postings.',
         icon: FilePlus,
@@ -393,7 +393,7 @@ const tutorialSections: Section[] = [
         ],
       },
       {
-        number: 15,
+        number: 20,
         title: 'Voucher List Report',
         description: 'Export a structured PDF of all vouchers showing Date, Type, Reference Number, Party, Amount, and Status for the selected period. The report spans all transaction types and is ready for submission or archiving.',
         icon: FileText,
@@ -415,7 +415,7 @@ const tutorialSections: Section[] = [
     sectionColor: '#3D6DB5',
     steps: [
       {
-        number: 16,
+        number: 21,
         title: 'Sales & Purchase Order Book',
         description: 'The Order Book tracks all Sales and Purchase orders with their status, party details, order amount, and due date in a single view. Filter by order type, search by order number or party, and export the full order list at any time.',
         icon: ShoppingCart,
@@ -438,7 +438,7 @@ const tutorialSections: Section[] = [
     sectionColor: '#C2547A',
     steps: [
       {
-        number: 17,
+        number: 22,
         title: 'Monthly Summary of Vouchers',
         description: 'The Monthly Summary provides a high-level financial performance view with KPI cards for Turnover, Expense, Profit, and Margin percentage. A bar chart and profit trend line complement the month-wise breakdown table displayed below.',
         icon: BarChart2,
@@ -452,7 +452,7 @@ const tutorialSections: Section[] = [
         ],
       },
       {
-        number: 18,
+        number: 23,
         title: 'Monthly Summary Report',
         description: 'Export a clean, consolidated PDF showing all 12 months with Turnover, Expense, Profit, and Margin percentage in one structured table. Ideal for management reviews, board presentations, or formal financial records.',
         icon: BarChart2,
@@ -474,7 +474,7 @@ const tutorialSections: Section[] = [
     sectionColor: '#6B4FC4',
     steps: [
       {
-        number: 19,
+        number: 24,
         title: 'Inventory Overview',
         description: 'The Inventory module displays all stock items with opening, inward, outward, and closing quantities alongside unit rate and total value. KPI cards surface Total Items, Stock Value, Low Stock Alerts, and Stock Movement at a glance.',
         icon: Package,
@@ -488,7 +488,7 @@ const tutorialSections: Section[] = [
         ],
       },
       {
-        number: 20,
+        number: 25,
         title: 'Inventory Report',
         description: 'Export a formatted PDF of all stock items showing quantity movements, unit rate, and total value per item. Suitable for supplier reviews, stock audits, or internal inventory management records.',
         icon: Package,
@@ -510,7 +510,7 @@ const tutorialSections: Section[] = [
     sectionColor: '#3A8C96',
     steps: [
       {
-        number: 21,
+        number: 26,
         title: 'User Management Overview',
         description: 'The User Management panel lists all registered users with their name and email address. Each user card provides direct options to configure permissions, resend login credentials, or remove platform access.',
         icon: Users,
@@ -524,7 +524,7 @@ const tutorialSections: Section[] = [
         ],
       },
       {
-        number: 22,
+        number: 27,
         title: 'Create a New User',
         description: 'Click "+ Create User", fill in the Full Name, Email, Company, and a temporary password, then click "Create" to provision the account immediately. An invitation is sent automatically to the new user.',
         icon: UserPlus,
@@ -537,7 +537,7 @@ const tutorialSections: Section[] = [
         ],
       },
       {
-        number: 23,
+        number: 28,
         title: 'Column Visibility — Single User',
         description: 'Open Configure for a user, select a Layout tab for the target module, and toggle individual columns on or off to control what that user sees. Click "Save" to apply the visibility settings immediately.',
         icon: Settings,
@@ -551,7 +551,7 @@ const tutorialSections: Section[] = [
         ],
       },
       {
-        number: 24,
+        number: 29,
         title: 'Data Record Visibility — Single User',
         description: 'Open Configure for a user, select a Selection tab, and toggle individual records on or off to restrict which data that user can view. Click "Save" to apply the record-level access settings immediately.',
         icon: Settings,
@@ -565,7 +565,7 @@ const tutorialSections: Section[] = [
         ],
       },
       {
-        number: 25,
+        number: 30,
         title: 'Bulk User Selection',
         description: 'Tick the checkbox on any user card to activate Bulk Selection mode for batch configuration. The action button updates dynamically to "Bulk Configure (N)" reflecting the exact number of users currently selected.',
         icon: Users,
@@ -579,7 +579,7 @@ const tutorialSections: Section[] = [
         ],
       },
       {
-        number: 26,
+        number: 31,
         title: 'Bulk Configuration',
         description: 'Click "Bulk Configure (N)" to open the bulk settings panel, then select a Layout or Selection tab to configure visibility. Click "Apply to N Users" to push identical settings to all selected accounts simultaneously.',
         icon: Settings,
@@ -595,7 +595,7 @@ const tutorialSections: Section[] = [
     ],
   },
   {
-    sectionId: 11,
+    sectionId: 10,
     sectionTitle: 'Settings',
     sectionTag: 'Section 10',
     sectionDescription: 'Update your profile details and manage notification preferences to stay informed on platform events that matter to you.',
@@ -1426,7 +1426,7 @@ export default function TutorialPage() {
               {/* Logo (mobile top) */}
               {isMobile && (
                 <motion.div initial={{ opacity: 0, x: -40 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.7, delay: 0.05 }} style={{ display: 'flex', alignItems: 'start', justifyContent: 'flex-start', marginBottom: '0.5rem' }}>
-                  <img src={logoImage} alt="Tally Logo" style={{ width: '6rem', height: 'auto', objectFit: 'contain' }} />
+                  <img src={logoImage} alt="Tally Logo" style={{ width: '10rem', height: 'auto', objectFit: 'contain' }} />
                 </motion.div>
               )}
 
@@ -1440,7 +1440,7 @@ export default function TutorialPage() {
                 {/* Logo (desktop) */}
                 {!isMobile && (
                   <motion.div initial={{ opacity: 0, x: -40 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.7, delay: 0.05 }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', marginBottom: '1.5rem' }}>
-                    <img src={logoImage} alt="Tally Logo" style={{ width: isTablet ? '6rem' : '8rem', height: 'auto', objectFit: 'contain' }} />
+                    <img src={logoImage} alt="Tally Logo" style={{ width: isTablet ? '9rem' : '13rem', height: 'auto', objectFit: 'contain' }} />
                   </motion.div>
                 )}
 
@@ -1834,7 +1834,7 @@ export default function TutorialPage() {
         </motion.p>
         <motion.div initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
           <motion.button
-            onClick={() => window.location.href = 'https://dashboard.tally-connect.com'}
+            onClick={() => window.location.href = 'https://tally-connect-yu2q.onrender.com'}
             whileHover={{ scale: 1.04, y: -2, boxShadow: '0 16px 40px rgba(15,23,42,0.35)' }}
             whileTap={{ scale: 0.97 }}
             style={{ display: 'inline-flex', alignItems: 'center', gap: '0.75rem', padding: isMobile ? '1rem 2rem' : '1.05rem 2.4rem', background: `linear-gradient(135deg, ${BRAND.dark} 0%, #1e3a5f 50%, ${BRAND.mid} 100%)`, color: 'white', borderRadius: '14px', border: 'none', fontSize: isMobile ? '15px' : '16px', fontWeight: 700, cursor: 'pointer', boxShadow: '0 8px 28px rgba(15,23,42,0.28), 0 0 0 1px rgba(255,255,255,0.08) inset', fontFamily: '"Inter", sans-serif', position: 'relative', overflow: 'hidden', letterSpacing: '-0.01em' }}
@@ -1872,9 +1872,9 @@ export default function TutorialPage() {
         </div>
       )}
 
-      {/* <div ref={footerRef}>
+      {/*<div ref={footerRef}>
         <Footer />
-      </div> */}
+      </div>*/}
     </div>
   )
 }
