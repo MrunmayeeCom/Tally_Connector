@@ -69,9 +69,17 @@ export function UserSideSection() {
     },
     {
       icon: Settings,
-      title: "Settings & Profile",
-      description: "Personalize your experience and manage security.",
-      bullets: ["Profile Management", "Password Security", "Company Name Visibility", "User Preferences"],
+      title: "Data Recovery & Rollback",
+      description: "Maintain complete visibility and control over deleted data.",
+      bullets: ["Centralized deletion history", "Track activity for audit and review", "Restore deleted data anytime", "Ensure secure and reliable recovery"],
+      
+
+
+
+
+
+
+
       chipBg: "linear-gradient(135deg, #2DD4BFbb, #0891B2bb)",
       checkColor: "#5EEAD4",
       dotColor: "rgba(94,234,212,0.7)",

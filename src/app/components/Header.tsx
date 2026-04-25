@@ -70,7 +70,7 @@ export function Header({ onLoginClick, onNavigate }: HeaderProps) {
   const checkActiveLicense = async (email: string) => {
     try {
       const response = await fetch(
-        `https://license-system-v6ht.onrender.com/api/external/actve-license/${email}?productId=695902cfc240b17f16c3d716`,
+        `https://lisence-system.onrender.com/api/external/actve-license/${email}?productId=695902cfc240b17f16c3d716`,
         { headers: { "x-api-key": "my-secret-key-123" } }
       );
       if (response.ok) {
@@ -95,7 +95,7 @@ export function Header({ onLoginClick, onNavigate }: HeaderProps) {
 
   const handleDownloadAgent = () => {
     const link = document.createElement("a");
-    link.href = "/DownloadAgent.zip";
+    link.href = "https://raw.githubusercontent.com/MrunmayeeCom/tally_agent/main/DownloadAgent.zip";
     link.download = "DownloadAgent.zip";
     document.body.appendChild(link);
     link.click();
@@ -151,12 +151,13 @@ export function Header({ onLoginClick, onNavigate }: HeaderProps) {
       <div className="max-w-7xl mx-auto px-6 py-2.5 flex items-center justify-between gap-4">
         {/* Logo */}
         <motion.div
-          className="flex items-center gap-2 cursor-pointer flex-shrink-0 overflow-visible"
+          className="flex items-center gap-2 cursor-pointer flex-shrink-0"
           whileHover={{ scale: 1.05 }}
           transition={{ type: "spring", stiffness: 400 }}
           onClick={() => { onNavigate("/"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
         >
-          <img src={tallyLogo} alt="Tally Connect Logo"className="h-8 w-auto object-contain scale-150 origin-left" />
+          <img src={tallyLogo} alt="Tally Connect Logo" className="h-6 w-auto object-contain" />
+          <span className="font-bold text-base text-gray-900 whitespace-nowrap">Tally Connect</span>
         </motion.div>
 
         {/* Desktop Nav */}

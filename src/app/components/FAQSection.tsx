@@ -41,7 +41,7 @@ export function FAQSection() {
   {
     question: "Can I create vouchers and bills without opening Tally?",
     answer:
-      "Yes! You can create, edit, and delete vouchers and bills directly from Tally Connect. Whatever you submit gets pushed straight into Tally Prime automatically — no need to open the desktop app at all.",
+      "Yes! You can create, vouchers and bills directly from Tally Connect. Whatever you submit gets pushed straight into Tally Prime automatically — no need to open the desktop app at all.",
   },
   {
     question: "What if my internet or Tally goes offline?",

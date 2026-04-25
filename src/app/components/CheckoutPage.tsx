@@ -149,7 +149,7 @@ export function CheckoutPage({ selectedPlan, initialBillingCycle, onBack, onProc
     const checkExisting = async () => {
       try {
         const res = await fetch(
-          `https://license-system-v6ht.onrender.com/api/external/actve-license/${loggedInUser.email}?productId=695902cfc240b17f16c3d716`,
+          `https://lisence-system.onrender.com/api/external/actve-license/${loggedInUser.email}?productId=695902cfc240b17f16c3d716`,
           { headers: { "x-api-key": "my-secret-key-123" } }
         );
         if (res.ok) {
@@ -228,7 +228,7 @@ export function CheckoutPage({ selectedPlan, initialBillingCycle, onBack, onProc
   useEffect(() => {
     const loadPlanFromLMS = async () => {
       try {
-        const res  = await fetch("https://license-system-v6ht.onrender.com/api/license/public/licenses-by-product/695902cfc240b17f16c3d716", { headers: { "x-api-key": "my-secret-key-123" } });
+        const res  = await fetch("https://lisence-system.onrender.com/api/license/public/licenses-by-product/695902cfc240b17f16c3d716", { headers: { "x-api-key": "my-secret-key-123" } });
         const data = await res.json();
         const matched = data.licenses.find((lic: any) => lic?.licenseType?._id === selectedPlan);
         if (!matched) throw new Error("Selected plan not found in LMS");
@@ -277,9 +277,10 @@ export function CheckoutPage({ selectedPlan, initialBillingCycle, onBack, onProc
         @keyframes gt-fade-in  { from { opacity: 0; } to { opacity: 1; } }
         @keyframes gt-slide-up { from { opacity: 0; transform: translateY(20px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
         @keyframes gt-pop-in   { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        body:has(.checkout-page-wrapper) header { display: none !important; }
       `}</style>
 
-      <div style={{ fontFamily: "'Inter', sans-serif" }} className="min-h-screen bg-[#F5F7FA]">
+      <div style={{ fontFamily: "'Inter', sans-serif" }} className="min-h-screen bg-[#F5F7FA] checkout-page-wrapper">
 
         {showAlreadyActiveModal && (
           <AlreadyActiveModal planName={existingPlanName} isFree={isFree!} onClose={() => setShowAlreadyActiveModal(false)} onGoHome={handleGoHome} />
