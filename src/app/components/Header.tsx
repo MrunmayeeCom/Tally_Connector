@@ -157,7 +157,6 @@ export function Header({ onLoginClick, onNavigate }: HeaderProps) {
           onClick={() => { onNavigate("/"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
         >
           <img src={tallyLogo} alt="Tally Connect Logo" className="h-6 w-auto object-contain" />
-          <span className="font-bold text-base text-gray-900 whitespace-nowrap">Tally Connect</span>
         </motion.div>
 
         {/* Desktop Nav */}
