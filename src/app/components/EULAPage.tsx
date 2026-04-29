@@ -13,7 +13,7 @@ export default function LicenseAgreementPage() {
       content: (
         <div className="space-y-2">
           <p>This End-User License Agreement (<span className="font-semibold text-[#1e3a8a]">"EULA"</span>) is a legal agreement between you and <span className="font-semibold text-[#1e3a8a]">Averlon Solutions</span>.</p>
-          <p>This EULA governs your acquisition and use of our InteGrow software directly from Averlon Solutions or through an authorized reseller or distributor.</p>
+          <p>This EULA governs your acquisition and use of our Tally Connect software directly from Averlon Solutions or through an authorized reseller or distributor.</p>
           <p>Please read this EULA carefully before installing or using the software. By installing and/or using the Software, you confirm your acceptance and agree to be bound by this agreement.</p>
           <p>If you are entering into this agreement on behalf of a company or other legal entity, you represent that you have the authority to bind such entity.</p>
         </div>
@@ -29,7 +29,7 @@ export default function LicenseAgreementPage() {
       ),
       content: (
         <div className="space-y-3">
-          <p>Averlon Solutions grants you a <span className="font-semibold text-[#1e3a8a]">non-transferable, non-exclusive license</span> to use the InteGrow software within your Bitrix24 environment.</p>
+          <p>Averlon Solutions grants you a <span className="font-semibold text-[#1e3a8a]">non-transferable, non-exclusive license</span> to use the Tally Connect software within your Bitrix24 environment.</p>
           <p className="font-medium text-slate-700">You are permitted to:</p>
           <ul className="space-y-2">
             {[
@@ -99,7 +99,7 @@ export default function LicenseAgreementPage() {
         </svg>
       ),
       content: (
-        <p>InteGrow integrates with third-party services including <span className="font-semibold text-[#1e3a8a]">IndiaMART, Bitrix24, Zoho, HubSpot, and Salesforce</span>. Averlon Solutions is not responsible for the availability, accuracy, or performance of these external services.</p>
+        <p>Tally Connect integrates with third-party services including <span className="font-semibold text-[#1e3a8a]">IndiaMART, Bitrix24, Zoho, HubSpot, and Salesforce</span>. Averlon Solutions is not responsible for the availability, accuracy, or performance of these external services.</p>
       ),
     },
     {
@@ -189,7 +189,7 @@ export default function LicenseAgreementPage() {
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4" style={{ letterSpacing: "-0.02em" }}>
             End-User License Agreement
           </h1>
-          <p className="text-white/60 text-sm">Last updated: March 2026 · InteGrow by Averlon Solutions</p>
+          <p className="text-white/60 text-sm">Last updated: March 2026 · Tally Connect by Averlon Solutions</p>
         </div>
       </div>
 
@@ -237,7 +237,7 @@ export default function LicenseAgreementPage() {
           }}
         >
           <p className="text-white/60 text-xs">
-            By using InteGrow, you agree to this End-User License Agreement. · © 2026 Averlon Solutions. All rights reserved.
+            By using Tally Connect, you agree to this End-User License Agreement. · © 2026 Averlon Solutions. All rights reserved.
           </p>
         </div>
       </div>
