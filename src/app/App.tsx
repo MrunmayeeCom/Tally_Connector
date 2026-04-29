@@ -12,6 +12,7 @@ import BecomePartner from "./components/BecomePartner";
 import { DemoPage } from "./components/DemoPage";
 import { CheckoutPage } from "./components/CheckoutPage";
 import { PrivacyPolicy } from "./components/PrivacyPolicy";
+import  LicenseAgreementPage  from "./components/EULAPage.js";
 import { TermsOfService } from "./components/TermsOfService";
 import { CookiePolicy } from "./components/CookiePolicy";
 import Tutorial_Page from "./components/Tutorial_Page";
@@ -32,6 +33,7 @@ const PATH_TO_PAGE: Record<string, string> = {
   "/contact":         "demo",
   "/demo":            "demo",
   "/privacy":         "privacy",
+  "/license-agreement": "eula",
   "/terms":           "terms",
   "/cookies":         "cookies",
   "/gdpr":            "gdpr",
@@ -48,6 +50,7 @@ const PAGE_TO_PATH: Record<string, string> = {
   home:           "/",
   demo:           "/contact",
   privacy:        "/privacy",
+  eula:           "/license-agreement",
   terms:          "/terms",
   cookies:        "/cookies",
   gdpr:           "/gdpr",
@@ -181,7 +184,7 @@ export default function App() {
   };
 
   const handleNavigate = (section: string) => {
-    const pages = ["tutorials", "demo", "partner", "privacy", "terms", "cookies", "gdpr", "press", "checkout"];
+    const pages = ["tutorials", "demo", "partner", "privacy", "eula", "terms", "cookies", "gdpr", "press", "checkout"];
     if (pages.includes(section)) {
       navigateTo(section, true);
       return;
@@ -288,6 +291,7 @@ export default function App() {
           {currentPage === "terms"     && <TermsOfService onBack={() => navigateTo("home", true)} />}
           {currentPage === "cookies"   && <CookiePolicy   onBack={() => navigateTo("home", true)} />}
           {currentPage === "gdpr"      && <GDPRCompliance onBack={() => navigateTo("home", true)} />}
+          {currentPage === "eula"      && <LicenseAgreementPage onBack={() => navigateTo("home", true)} />}
           {currentPage === "press"     && <PressPage />}
 
           {currentPage === "checkout" && (

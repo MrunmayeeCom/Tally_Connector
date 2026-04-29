@@ -31,6 +31,7 @@ export function Footer({ onNavigate, onLegalPage, onContact, onPressPage }: Foot
     { label: "Privacy Policy", page: "privacy" },
     { label: "Terms of Service", page: "terms" },
     { label: "Cookie Policy", page: "cookies" },
+    { label: "EULA", page: "license-agreement" },
     { label: "GDPR", page: "gdpr" },
   ];
 
