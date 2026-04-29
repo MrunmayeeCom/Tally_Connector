@@ -13,9 +13,9 @@ export default function LicenseAgreementPage() {
       content: (
         <div className="space-y-2">
           <p>This End-User License Agreement (<span className="font-semibold text-[#1e3a8a]">"EULA"</span>) is a legal agreement between you and <span className="font-semibold text-[#1e3a8a]">Averlon Solutions</span>.</p>
-          <p>This EULA governs your acquisition and use of our Tally Connect software directly from Averlon Solutions or through an authorized reseller or distributor.</p>
-          <p>Please read this EULA carefully before installing or using the software. By installing and/or using the Software, you confirm your acceptance and agree to be bound by this agreement.</p>
-          <p>If you are entering into this agreement on behalf of a company or other legal entity, you represent that you have the authority to bind such entity.</p>
+          <p>This agreement governs the use of our <span className="font-semibold text-[#1e3a8a]">Tally Middleware Integration Software</span>, created to connect Tally ERP with Bitrix24 and supported business systems.</p>
+          <p>By installing or using the Software, you agree to be bound by the terms of this agreement.</p>
+          <p>If accepted on behalf of a company, you confirm that you have authority to bind that entity.</p>
         </div>
       ),
     },
@@ -29,13 +29,13 @@ export default function LicenseAgreementPage() {
       ),
       content: (
         <div className="space-y-3">
-          <p>Averlon Solutions grants you a <span className="font-semibold text-[#1e3a8a]">non-transferable, non-exclusive license</span> to use the Tally Connect software within your Bitrix24 environment.</p>
+          <p>Averlon Solutions grants you a <span className="font-semibold text-[#1e3a8a]">non-transferable, non-exclusive license</span> to use the Software in your authorized business environment.</p>
           <p className="font-medium text-slate-700">You are permitted to:</p>
           <ul className="space-y-2">
             {[
-              "Install and use the Software within your Bitrix24 account",
-              "Configure integrations with IndiaMART and supported CRM systems",
-              "Use the Software in accordance with your subscription plan",
+              "Install and use the Software on licensed devices",
+              "Connect Tally ERP with Bitrix24 and approved services",
+              "Use the Software as per your subscription plan",
             ].map((item) => (
               <li key={item} className="flex items-start gap-3">
                 <span className="mt-1 w-5 h-5 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center shrink-0">
@@ -50,7 +50,7 @@ export default function LicenseAgreementPage() {
     },
     {
       number: "03",
-      title: "Prohibited Activities",
+      title: "Restrictions",
       icon: (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="12" cy="12" r="10" /><line x1="15" y1="9" x2="9" y2="15" /><line x1="9" y1="9" x2="15" y2="15" />
@@ -59,11 +59,11 @@ export default function LicenseAgreementPage() {
       content: (
         <ul className="space-y-2">
           {[
-            "Modify, reverse engineer, decompile, or disassemble the Software",
-            "Copy, distribute, resell, or commercially exploit the Software",
-            "Allow unauthorized third-party access to the Software",
-            "Use the Software in violation of applicable laws or regulations",
-            "Use the Software in a way that breaches this agreement",
+            "Modify, reverse engineer, decompile, or tamper with the Software",
+            "Copy, distribute, lease, or resell the Software",
+            "Allow unauthorized third-party access",
+            "Use the Software unlawfully or fraudulently",
+            "Use the Software in violation of this agreement",
           ].map((item) => (
             <li key={item} className="flex items-start gap-3">
               <span className="mt-1 w-5 h-5 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center shrink-0">
@@ -85,8 +85,8 @@ export default function LicenseAgreementPage() {
       ),
       content: (
         <div className="space-y-2">
-          <p>Averlon Solutions retains <span className="font-semibold text-[#1e3a8a]">full ownership</span> of the Software, including all intellectual property rights, source code, and any updates or modifications.</p>
-          <p>This agreement does not grant you ownership of the Software but only a limited right to use it.</p>
+          <p>Averlon Solutions retains <span className="font-semibold text-[#1e3a8a]">full ownership</span> of the Software, including all intellectual property rights, source code, APIs, connectors, and future updates.</p>
+          <p>This agreement grants only a right to use the Software, not ownership.</p>
         </div>
       ),
     },
@@ -99,7 +99,7 @@ export default function LicenseAgreementPage() {
         </svg>
       ),
       content: (
-        <p>Tally Connect integrates with third-party services including <span className="font-semibold text-[#1e3a8a]">IndiaMART, Bitrix24, Zoho, HubSpot, and Salesforce</span>. Averlon Solutions is not responsible for the availability, accuracy, or performance of these external services.</p>
+        <p>The Software may integrate with <span className="font-semibold text-[#1e3a8a]">Tally ERP, Bitrix24, cloud servers, databases, APIs, and supported CRMs</span>. Averlon Solutions is not responsible for outages, API changes, or third-party service interruptions.</p>
       ),
     },
     {
@@ -111,7 +111,7 @@ export default function LicenseAgreementPage() {
         </svg>
       ),
       content: (
-        <p>This EULA is effective from the date you first use the Software and continues until terminated. It may terminate immediately if you <span className="font-semibold text-[#1e3a8a]">fail to comply</span> with any terms. Upon termination, you must stop all use of the Software.</p>
+        <p>This agreement remains effective until terminated. It may terminate immediately if you fail to comply with its terms. Upon termination, all use of the Software must stop.</p>
       ),
     },
     {
@@ -123,7 +123,7 @@ export default function LicenseAgreementPage() {
         </svg>
       ),
       content: (
-        <p>Averlon Solutions shall <span className="font-semibold text-[#1e3a8a]">not be liable</span> for any indirect, incidental, or consequential damages, including loss of data or business interruption, arising from the use of the Software.</p>
+        <p>Averlon Solutions shall <span className="font-semibold text-[#1e3a8a]">not be liable</span> for indirect or consequential damages including data loss, sync failures, downtime, or business interruption arising from use of the Software.</p>
       ),
     },
     {
@@ -135,7 +135,7 @@ export default function LicenseAgreementPage() {
         </svg>
       ),
       content: (
-        <p>This EULA shall be governed by and construed in accordance with the <span className="font-semibold text-[#1e3a8a]">laws of India</span>.</p>
+        <p>This EULA shall be governed by the <span className="font-semibold text-[#1e3a8a]">laws of India</span>. Jurisdiction shall be Thane, Maharashtra.</p>
       ),
     },
     {
@@ -149,6 +149,7 @@ export default function LicenseAgreementPage() {
       content: (
         <div className="space-y-1">
           <p className="font-semibold text-[#1e3a8a]">Averlon Solutions</p>
+          <p>Tally Middleware Division</p>
           <p>5th Floor, Unit No.515, Lodha Supremus II Road No 22, Wagle Estate MIDC, Thane, Maharashtra 400604, India</p>
         </div>
       ),
@@ -162,7 +163,7 @@ export default function LicenseAgreementPage() {
         </svg>
       ),
       content: (
-        <p>Email: <a href="mailto:info@averlonworld.com" className="font-semibold text-blue-600 hover:underline">info@averlonworld.com</a></p>
+        <p>Email: <a href="mailto:support@averlonworld.com" className="font-semibold text-blue-600 hover:underline">support@averlonworld.com</a></p>
       ),
     },
   ];
@@ -175,7 +176,6 @@ export default function LicenseAgreementPage() {
         fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
       }}
     >
-      {/* Hero Banner */}
       <div
         className="relative overflow-hidden py-16 px-6 text-center"
         style={{ background: "linear-gradient(135deg, #0f172a 0%, #0e4f6b 50%, #0f172a 100%)" }}
@@ -186,14 +186,17 @@ export default function LicenseAgreementPage() {
             <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
             Legal Document
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4" style={{ letterSpacing: "-0.02em" }}>
+
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
             End-User License Agreement
           </h1>
-          <p className="text-white/60 text-sm">Last updated: March 2026 · Tally Connect by Averlon Solutions</p>
+
+          <p className="text-white/60 text-sm">
+            Last updated: March 2026 · Tally Middleware by Averlon Solutions
+          </p>
         </div>
       </div>
 
-      {/* Content */}
       <div className="max-w-4xl mx-auto px-6 py-14 space-y-6">
         {sections.map((section) => (
           <div
@@ -213,13 +216,13 @@ export default function LicenseAgreementPage() {
               >
                 {section.icon}
               </div>
+
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-3">
-                  <span className="text-s font-bold text-blue-300" style={{ letterSpacing: "0.1em" }}>
-                    {section.number}
-                  </span>
+                  <span className="text-s font-bold text-blue-300">{section.number}</span>
                   <h2 className="text-base font-bold text-slate-900">{section.title}</h2>
                 </div>
+
                 <div className="text-sm text-slate-600 leading-relaxed">
                   {section.content}
                 </div>
@@ -228,7 +231,6 @@ export default function LicenseAgreementPage() {
           </div>
         ))}
 
-        {/* Footer note */}
         <div
           className="rounded-2xl p-6 text-center"
           style={{
@@ -237,7 +239,7 @@ export default function LicenseAgreementPage() {
           }}
         >
           <p className="text-white/60 text-xs">
-            By using Tally Connect, you agree to this End-User License Agreement. · © 2026 Averlon Solutions. All rights reserved.
+            By using Tally Middleware, you agree to this End-User License Agreement. · © 2026 Averlon Solutions. All rights reserved.
           </p>
         </div>
       </div>
