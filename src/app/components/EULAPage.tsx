@@ -13,7 +13,7 @@ export default function LicenseAgreementPage() {
       content: (
         <div className="space-y-2">
           <p>This End-User License Agreement (<span className="font-semibold text-[#1e3a8a]">"EULA"</span>) is a legal agreement between you and <span className="font-semibold text-[#1e3a8a]">Averlon Solutions</span>.</p>
-          <p>This agreement governs the use of our <span className="font-semibold text-[#1e3a8a]">Tally Middleware Integration Software</span>, created to connect Tally ERP with Bitrix24 and supported business systems.</p>
+          <p>This agreement governs the use of our <span className="font-semibold text-[#1e3a8a]">rajlaxmi_solutions_p.tally_bitrix_middleware</span>, created to connect Tally ERP with Bitrix24 and supported business systems.</p>
           <p>By installing or using the Software, you agree to be bound by the terms of this agreement.</p>
           <p>If accepted on behalf of a company, you confirm that you have authority to bind that entity.</p>
         </div>
@@ -239,7 +239,7 @@ export default function LicenseAgreementPage() {
           }}
         >
           <p className="text-white/60 text-xs">
-            By using Tally Middleware, you agree to this End-User License Agreement. · © 2026 Averlon Solutions. All rights reserved.
+            By using rajlaxmi_solutions_p.tally_bitrix_middleware, you agree to this End-User License Agreement. · © 2026 Averlon Solutions. All rights reserved.
           </p>
         </div>
       </div>
