@@ -22,7 +22,6 @@ export function Footer({ onNavigate, onLegalPage, onContact, onPressPage }: Foot
     { label: "Pricing", id: "pricing" },
     { label: "User Side", id: "user-side" },
     { label: "Admin Panel", id: "admin-panel" },
-    { label: "Technical", id: "technical" },
   ];
 
   const companyLinks = [ "Press", "Contact"];
@@ -31,8 +30,8 @@ export function Footer({ onNavigate, onLegalPage, onContact, onPressPage }: Foot
     { label: "Privacy Policy", page: "privacy" },
     { label: "Terms of Service", page: "terms" },
     { label: "Cookie Policy", page: "cookies" },
-    { label: "EULA", page: "license-agreement" },
     { label: "GDPR", page: "gdpr" },
+    { label: "EULA", page: "eula" },
   ];
 
   return (
@@ -50,8 +49,8 @@ export function Footer({ onNavigate, onLegalPage, onContact, onPressPage }: Foot
               transition={{ type: "spring", stiffness: 400 }}
               onClick={() => { navigate("/"); window.scrollTo({ top: 0, behavior: "smooth" }); }} // ✅ Fixed
             >
-              <img src={tallyLogo} alt="Tally Connect Logo" className="h-10 w-auto object-contain" />
-              
+              <img src={tallyLogo} alt="Tally Connect Logo" className="h-6 w-auto object-contain" />
+              <span className="font-bold text-xl">Tally Connect</span>
             </motion.div>
             <p className="text-gray-400 mb-6 leading-relaxed">
               Empowering businesses with strength, backed by reliability, and

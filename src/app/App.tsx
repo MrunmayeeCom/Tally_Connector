@@ -12,9 +12,9 @@ import BecomePartner from "./components/BecomePartner";
 import { DemoPage } from "./components/DemoPage";
 import { CheckoutPage } from "./components/CheckoutPage";
 import { PrivacyPolicy } from "./components/PrivacyPolicy";
-import  LicenseAgreementPage  from "./components/EULAPage.js";
 import { TermsOfService } from "./components/TermsOfService";
 import { CookiePolicy } from "./components/CookiePolicy";
+import { EULA } from "./components/EULA"; // ✅ Added
 import Tutorial_Page from "./components/Tutorial_Page";
 import GDPRCompliance from "./components/GDPR";
 import TutorialVideo from "./components/TutorialVideo";
@@ -33,10 +33,10 @@ const PATH_TO_PAGE: Record<string, string> = {
   "/contact":         "demo",
   "/demo":            "demo",
   "/privacy":         "privacy",
-  "/license-agreement": "eula",
   "/terms":           "terms",
   "/cookies":         "cookies",
   "/gdpr":            "gdpr",
+  "/eula":            "eula",       // ✅ Added
   "/partner":         "partner",
   "/tutorials":       "tutorials",
   "/press":           "press",
@@ -50,10 +50,10 @@ const PAGE_TO_PATH: Record<string, string> = {
   home:           "/",
   demo:           "/contact",
   privacy:        "/privacy",
-  eula:           "/license-agreement",
   terms:          "/terms",
   cookies:        "/cookies",
   gdpr:           "/gdpr",
+  eula:           "/eula",          // ✅ Added
   partner:        "/partner",
   tutorials:      "/tutorials",
   press:          "/press",
@@ -147,9 +147,6 @@ export default function App() {
   // ── Agent update state ────────────────────────────────────────────────────
   const [agentFileUrl, setAgentFileUrl] = useState<string | null>(null);
 
-  // Listen for login events — only place checkAndNotifyOnLogin is called.
-  // The event must be dispatched by your login handler with { detail: { email, name } }.
-  // If the middleware says email was already sent, url will be null → no popup.
   useEffect(() => {
     const onLogin = (e: Event) => {
       const { email, name } = (e as CustomEvent<{ email: string; name?: string }>).detail ?? {};
@@ -184,7 +181,7 @@ export default function App() {
   };
 
   const handleNavigate = (section: string) => {
-    const pages = ["tutorials", "demo", "partner", "privacy", "eula", "terms", "cookies", "gdpr", "press", "checkout"];
+    const pages = ["tutorials", "demo", "partner", "privacy", "terms", "cookies", "gdpr", "eula", "press", "checkout"]; // ✅ Added "eula"
     if (pages.includes(section)) {
       navigateTo(section, true);
       return;
@@ -229,13 +226,13 @@ export default function App() {
 
   return (
     <>
-    <Toaster richColors position="top-right" />56
+      <Toaster richColors position="top-right" />
       {loading && <Loader />}
       <div className="min-h-screen bg-white font-[Inter]">
         <Header
           onLoginClick={() => setLoginModalOpen(true)}
           onNavigate={(section) => {
-            const pages = ["tutorials", "demo", "partner", "privacy", "terms", "cookies", "gdpr", "press", "checkout"];
+            const pages = ["tutorials", "demo", "partner", "privacy", "terms", "cookies", "gdpr", "eula", "press", "checkout"]; // ✅ Added "eula"
             if (pages.includes(section)) {
               navigateTo(section, true);
             } else {
@@ -291,7 +288,7 @@ export default function App() {
           {currentPage === "terms"     && <TermsOfService onBack={() => navigateTo("home", true)} />}
           {currentPage === "cookies"   && <CookiePolicy   onBack={() => navigateTo("home", true)} />}
           {currentPage === "gdpr"      && <GDPRCompliance onBack={() => navigateTo("home", true)} />}
-          {currentPage === "eula"      && <LicenseAgreementPage onBack={() => navigateTo("home", true)} />}
+          {currentPage === "eula"      && <EULA           onBack={() => navigateTo("home", true)} />} {/* ✅ Added */}
           {currentPage === "press"     && <PressPage />}
 
           {currentPage === "checkout" && (

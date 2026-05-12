@@ -69,17 +69,9 @@ export function UserSideSection() {
     },
     {
       icon: Settings,
-      title: "Data Recovery & Rollback",
-      description: "Maintain complete visibility and control over deleted data.",
-      bullets: ["Centralized deletion history", "Track activity for audit and review", "Restore deleted data anytime", "Ensure secure and reliable recovery"],
-      
-
-
-
-
-
-
-
+      title: "Settings & Profile",
+      description: "Personalize your experience and manage security.",
+      bullets: ["Profile Management", "Password Security", "Company Name Visibility", "User Preferences"],
       chipBg: "linear-gradient(135deg, #2DD4BFbb, #0891B2bb)",
       checkColor: "#5EEAD4",
       dotColor: "rgba(94,234,212,0.7)",
@@ -303,7 +295,7 @@ export function UserSideSection() {
                 <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
                 <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
               </svg>
-              Features
+              User Side
             </div>
             <h2 className="us-title">
               Everything Users Need<br />
