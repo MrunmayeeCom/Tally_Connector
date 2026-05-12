@@ -50,7 +50,7 @@ export function Footer({ onNavigate, onLegalPage, onContact, onPressPage }: Foot
               onClick={() => { navigate("/"); window.scrollTo({ top: 0, behavior: "smooth" }); }} // ✅ Fixed
             >
               <img src={tallyLogo} alt="Tally Connect Logo" className="h-6 w-auto object-contain" />
-              <span className="font-bold text-xl">Tally Connect</span>
+              
             </motion.div>
             <p className="text-gray-400 mb-6 leading-relaxed">
               Empowering businesses with strength, backed by reliability, and
