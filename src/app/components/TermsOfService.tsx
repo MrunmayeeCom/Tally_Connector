@@ -160,9 +160,6 @@ export function TermsOfService({ onBack }: TermsOfServiceProps) {
         <SubHeading title="CRM and Client Management" />
         <Para html="Manage and organise client and customer databases enriched with data drawn from Tally ledgers. Features include client visit logging, meeting records, notes, and contact history linked directly to accounting counterparties." />
 
-        <SubHeading title="Employee Activity and Location Tracking" />
-        <Para html="Where enabled by the Customer Administrator, the platform supports GPS-based location tracking of field employees, activity logging, and productivity monitoring. This feature requires explicit user consent and is governed by the Employee Monitoring Disclosure in Section 5 and our Privacy Policy. Location tracking is entirely opt-in and will not activate without affirmative user consent." />
-
         <SubHeading title="Expense Tracking and Reporting" />
         <Para html="Field agents and employees can record work-related travel expenses including route details, transport mode, amounts, and receipt uploads. Data is exportable for integration with accounting or payroll systems." />
 
@@ -239,12 +236,7 @@ export function TermsOfService({ onBack }: TermsOfServiceProps) {
         />
 
         <SubHeading title="Account Security" />
-        <Para html="You are wholly responsible for all activities conducted under your account. This includes activities by authorised users, as well as unauthorised activities resulting from credential compromise where you failed to implement reasonable security measures. If you suspect any unauthorised access or security incident, notify us immediately at security@tallyconnect.in." />
-        <Note
-          type="warn"
-          title="Password Reset — No Self-Service Recovery"
-          body="Tally Connect does not currently offer self-service password recovery for standard users. A forgotten password requires a reset request to be submitted to and approved by the organisation's Administrator. Tally Connect is not liable for delays caused by Administrator non-response. Organisations should document a credential recovery process in their internal IT policy."
-        />
+        <Para html="You are wholly responsible for all activities conducted under your account. This includes activities by authorised users, as well as unauthorised activities resulting from credential compromise where you failed to implement reasonable security measures. If you suspect any unauthorised access or security incident, notify us immediately at info@averlonworld.com." />
 
         <SubHeading title="Agent Software (agent.exe) Activation" />
         <Para html="The Agent software is licensed to the Customer for installation on designated machines that host or have network access to the Tally ERP system. The Agent is activated using a device fingerprint and licence key tied to the Customer's subscription. Each licence key may be activated on a limited number of devices as specified in the subscription plan. Installing the Agent on additional devices without an upgraded licence constitutes a breach of these Terms." />
@@ -263,20 +255,6 @@ export function TermsOfService({ onBack }: TermsOfServiceProps) {
           title="Mandatory Employer Obligation"
           body="The Digital Personal Data Protection Act 2023, the Information Technology Act 2000, and applicable Indian labour law require employers to disclose monitoring practices to employees before deployment. This section sets out both the nature of monitoring available through Tally Connect and the obligations of the Customer as employer."
         />
-
-        <SubHeading title="Optional Monitoring Features" />
-        <Para html="When enabled by the Customer Administrator, Tally Connect may facilitate the following forms of employee monitoring:" />
-        <BulletList
-          items={[
-            "Real-time and historical GPS location tracking of field agents, recorded at configurable intervals",
-            "Movement activity classification — stationary, walking, or in a vehicle",
-            "Client visit and meeting documentation with GPS coordinates at start and end",
-            "Device battery level and network connectivity status at time of location capture",
-            "Expense submission records including route, distance, and receipt images",
-            "Productivity analytics derived from activity, meeting, and expense records",
-          ]}
-        />
-        <Para html="All location tracking features are <strong>disabled by default</strong>. They must be explicitly enabled by the Administrator and require separate, affirmative consent from each individual user before any data is collected. See Section 4 of the Privacy Policy for the full consent mechanism." />
 
         <SubHeading title="Customer's Obligations Before Enabling Monitoring" />
         <Para html="Before enabling any monitoring feature, the Customer (as employer and Data Controller) must:" />
@@ -323,7 +301,7 @@ export function TermsOfService({ onBack }: TermsOfServiceProps) {
             "Provide accurate, truthful information at registration and throughout use of the platform",
             "Keep login credentials confidential; do not share passwords or session tokens with others",
             "Use the platform only for legitimate, authorised business purposes within the scope of your role",
-            "Report suspected security incidents or credential compromise immediately to your Administrator and to security@tallyconnect.in",
+            "Report suspected security incidents or credential compromise immediately to your Administrator and to info@averlonworld.com",
             "Comply with your employer's internal policies governing use of Tally Connect",
             "Verify the accuracy of Tally data before relying on it for business, financial, or tax decisions",
           ]}
@@ -356,12 +334,9 @@ export function TermsOfService({ onBack }: TermsOfServiceProps) {
         <Para html="Tally Connect may be used solely for:" />
         <BulletList
           items={[
-            "Reading, displaying, and analysing data from the Customer's own Tally ERP system",
+            "Reading, displaying, and analysing data from the Customer's own Tally system",
             "Internal business reporting, financial review, and operational decision-making",
-            "CRM management, client visit documentation, and business relationship tracking",
-            "Employee activity management, expense tracking, and field workforce coordination — with lawful consent",
             "Document and file storage directly related to business operations",
-            "Third-party integrations explicitly supported by the platform",
           ]}
         />
 
@@ -398,96 +373,11 @@ export function TermsOfService({ onBack }: TermsOfServiceProps) {
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════════
-          SECTION 8 · THIRD-PARTY SERVICES
+          SECTION 8 · SUBSCRIPTION, PAYMENT & REFUNDS
       ══════════════════════════════════════════════════════════════════════ */}
       <div>
         <h3 className="text-base font-bold text-blue-900 mb-3">
-          8. Third-Party Services &amp; Integrations
-        </h3>
-        <hr className="border-gray-200 mb-4" />
-        <Para html="Tally Connect integrates with and relies upon the following third-party platforms. Each operates under its own terms of service and privacy policy, independent of Tally Connect." />
-
-        <div className="overflow-x-auto border border-gray-200 rounded-lg mb-4">
-          <table className="w-full text-xs border-collapse">
-            <thead>
-              <tr className="bg-blue-900 text-white">
-                <th className="text-left px-3 py-2 font-medium">Service</th>
-                <th className="text-left px-3 py-2 font-medium">Provider</th>
-                <th className="text-left px-3 py-2 font-medium">Purpose</th>
-                <th className="text-left px-3 py-2 font-medium">
-                  Data Involved
-                </th>
-              </tr>
-            </thead>
-            <tbody className="text-gray-600">
-              {[
-                [
-                  "Google Maps Platform (Maps SDK, Geocoding API)",
-                  "Google LLC",
-                  "Map display, address geocoding, location-based client filtering",
-                  "GPS coordinates, client addresses",
-                ],
-                [
-                  "Supabase",
-                  "Supabase Inc.",
-                  "Cloud database hosting (PostgreSQL) and file/document storage",
-                  "All platform-generated Customer Data",
-                ],
-                [
-                  "Cloud Hosting Infrastructure (e.g. AWS, Render, Railway)",
-                  "As configured",
-                  "Application server hosting and infrastructure",
-                  "Application data and system logs",
-                ],
-                [
-                  "Payment Gateway (e.g. Razorpay, Stripe)",
-                  "As configured",
-                  "Subscription billing and payment processing",
-                  "Billing details; card data processed by gateway only, not stored by us",
-                ],
-                [
-                  "Tally Prime / Tally ERP (via Agent & ODBC)",
-                  "Tally Solutions Pvt. Ltd. (Customer-deployed)",
-                  "Source of accounting, ledger, and financial data",
-                  "Ledger data, vouchers, inventory — from Customer's local installation",
-                ],
-                [
-                  "Email / SMTP Service",
-                  "As configured",
-                  "Transactional notifications, password reset, alerts",
-                  "User email addresses, notification content",
-                ],
-              ].map(([service, provider, purpose, data], i) => (
-                <tr key={i} className={i % 2 === 1 ? "bg-gray-50" : ""}>
-                  <td className="px-3 py-2 border-t border-gray-100 font-medium text-gray-700">
-                    {service}
-                  </td>
-                  <td className="px-3 py-2 border-t border-gray-100">
-                    {provider}
-                  </td>
-                  <td className="px-3 py-2 border-t border-gray-100">
-                    {purpose}
-                  </td>
-                  <td className="px-3 py-2 border-t border-gray-100">{data}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        <SubHeading title="Third-Party Service Responsibility" />
-        <Para html="Tally Connect selects processors that offer appropriate data protection commitments. However, we cannot guarantee the availability, security, or performance of third-party platforms and are not liable for any outage, breach, or failure originating from those services. Customers are advised to review the terms and privacy policies of each third-party service we integrate with." />
-
-        <SubHeading title="Payment Processing" />
-        <Para html="Subscription payments are processed by our designated payment gateway provider. Tally Connect does not store, transmit, or have direct access to your complete card details or payment credentials. All payment processing is subject to the gateway provider's PCI-DSS compliant infrastructure and terms of service." />
-      </div>
-
-      {/* ══════════════════════════════════════════════════════════════════════
-          SECTION 9 · SUBSCRIPTION, PAYMENT & REFUNDS
-      ══════════════════════════════════════════════════════════════════════ */}
-      <div>
-        <h3 className="text-base font-bold text-blue-900 mb-3">
-          9. Subscription, Payment &amp; Refunds
+          8. Subscription, Payment &amp; Refunds
         </h3>
         <hr className="border-gray-200 mb-4" />
 
@@ -500,7 +390,7 @@ export function TermsOfService({ onBack }: TermsOfServiceProps) {
             "All subscription fees are payable in Indian Rupees (INR) in advance, exclusive of applicable taxes (GST, TDS, etc.)",
             "Accepted payment methods include bank transfer, UPI, card payments via our payment gateway, or invoicing for enterprise plans",
             "The Customer is responsible for all applicable taxes, duties, and government levies on subscription fees",
-            "Prices may be revised with <strong>30 days' advance written notice</strong> prior to a renewal period",
+            "Prices may be revised with <strong>30 days' advance notice</strong> prior to a renewal period",
           ]}
         />
 
@@ -510,7 +400,6 @@ export function TermsOfService({ onBack }: TermsOfServiceProps) {
             "Subscriptions renew automatically at the end of each billing cycle unless cancelled in writing before the renewal date",
             "Renewal invoices are issued at least 7 days before the renewal date",
             "Failure to pay within <strong>7 days</strong> of the invoice due date constitutes a material breach and may result in service suspension",
-            "Late payments may attract interest at 1.5% per month on the outstanding balance",
           ]}
         />
 
@@ -518,7 +407,7 @@ export function TermsOfService({ onBack }: TermsOfServiceProps) {
         <BulletList
           items={[
             "Subscriptions are <strong>non-refundable once activated</strong>, including partial months or unused periods after cancellation",
-            "Cancellation may be submitted at any time in writing to support@tallyconnect.in",
+            "Cancellation may be submitted at any time in writing to info@averlonworld.com",
             "Service continues until the last day of the current paid billing cycle after cancellation",
             "In the event that Tally Connect terminates the service without cause, a pro-rata refund for the unused subscription period will be issued",
             "Trial periods, if offered, are non-renewable and convert to paid subscriptions at expiry unless cancelled",
@@ -530,11 +419,11 @@ export function TermsOfService({ onBack }: TermsOfServiceProps) {
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════════
-          SECTION 10 · SOFTWARE LICENCE
+          SECTION 9 · SOFTWARE LICENCE
       ══════════════════════════════════════════════════════════════════════ */}
       <div>
         <h3 className="text-base font-bold text-blue-900 mb-3">
-          10. Software Licence Agreement
+          9. Software Licence Agreement
         </h3>
         <hr className="border-gray-200 mb-4" />
 
@@ -570,11 +459,11 @@ export function TermsOfService({ onBack }: TermsOfServiceProps) {
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════════
-          SECTION 11 · INTELLECTUAL PROPERTY
+          SECTION 10 · INTELLECTUAL PROPERTY
       ══════════════════════════════════════════════════════════════════════ */}
       <div>
         <h3 className="text-base font-bold text-blue-900 mb-3">
-          11. Intellectual Property Rights
+          10. Intellectual Property Rights
         </h3>
         <hr className="border-gray-200 mb-4" />
 
@@ -600,11 +489,11 @@ export function TermsOfService({ onBack }: TermsOfServiceProps) {
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════════
-          SECTION 12 · DISCLAIMER OF WARRANTIES
+          SECTION 11 · DISCLAIMER OF WARRANTIES
       ══════════════════════════════════════════════════════════════════════ */}
       <div>
         <h3 className="text-base font-bold text-blue-900 mb-3">
-          12. Disclaimer of Warranties
+          11. Disclaimer of Warranties
         </h3>
         <hr className="border-gray-200 mb-4" />
         <Note
@@ -622,19 +511,17 @@ export function TermsOfService({ onBack }: TermsOfServiceProps) {
             "Uninterrupted, error-free, or secure operation of the platform or Agent software",
             "The suitability of platform data for accounting, tax filing, audit, payroll, or legal purposes",
             "Compatibility with all versions of Tally Prime or Tally ERP software",
-            "Continuous availability of third-party services (Google Maps, Supabase, payment gateways)",
-            "The accuracy of GPS location data, which is subject to device, environmental, and network limitations",
           ]}
         />
         <Para html="The Customer acknowledges that all use of the platform and reliance on displayed data is at the Customer's own risk and discretion." />
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════════
-          SECTION 13 · LIMITATION OF LIABILITY
+          SECTION 12 · LIMITATION OF LIABILITY
       ══════════════════════════════════════════════════════════════════════ */}
       <div>
         <h3 className="text-base font-bold text-blue-900 mb-3">
-          13. Limitation of Liability
+          12. Limitation of Liability
         </h3>
         <hr className="border-gray-200 mb-4" />
 
@@ -673,11 +560,11 @@ export function TermsOfService({ onBack }: TermsOfServiceProps) {
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════════
-          SECTION 14 · DATA OWNERSHIP & PORTABILITY
+          SECTION 13 · DATA OWNERSHIP & PORTABILITY
       ══════════════════════════════════════════════════════════════════════ */}
       <div>
         <h3 className="text-base font-bold text-blue-900 mb-3">
-          14. User Data Ownership &amp; Portability
+          13. User Data Ownership &amp; Portability
         </h3>
         <hr className="border-gray-200 mb-4" />
 
@@ -690,7 +577,7 @@ export function TermsOfService({ onBack }: TermsOfServiceProps) {
           items={[
             "Self-service dashboard export — available for all data categories from the Administrator panel",
             "API-based export — for programmatic access to data via authenticated GET endpoints",
-            "Bulk export request — contact support@tallyconnect.in for a complete data dump; delivery within 5 business days",
+            "Bulk export request — contact info@averlonworld.com for a complete data dump; delivery within 5 business days",
           ]}
         />
         <Note
@@ -701,11 +588,11 @@ export function TermsOfService({ onBack }: TermsOfServiceProps) {
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════════
-          SECTION 15 · AUDIT LOGS
+          SECTION 14 · AUDIT LOGS
       ══════════════════════════════════════════════════════════════════════ */}
       <div>
         <h3 className="text-base font-bold text-blue-900 mb-3">
-          15. Audit Logs, Data History &amp; Rollback
+          14. Audit Logs, Data History &amp; Rollback
         </h3>
         <hr className="border-gray-200 mb-4" />
 
@@ -715,7 +602,7 @@ export function TermsOfService({ onBack }: TermsOfServiceProps) {
           items={[
             "<strong>Who can access logs:</strong> System administrators (Tally Connect operations team) for platform security and compliance; Customer Administrators for activity within their organisation, subject to the permissions granted in their subscription plan",
             "<strong>Retention period:</strong> System audit logs are retained for 12 months from the date of generation, then permanently deleted",
-            "<strong>Customer audit rights:</strong> Customers on enterprise plans may request an audit log extract for their organisation. Submit requests to support@tallyconnect.in",
+            "<strong>Customer audit rights:</strong> Customers on enterprise plans may request an audit log extract for their organisation. Submit requests to info@averlonworld.com",
           ]}
         />
 
@@ -724,16 +611,16 @@ export function TermsOfService({ onBack }: TermsOfServiceProps) {
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════════
-          SECTION 16 · TERMINATION
+          SECTION 15 · TERMINATION
       ══════════════════════════════════════════════════════════════════════ */}
       <div>
         <h3 className="text-base font-bold text-blue-900 mb-3">
-          16. Suspension &amp; Termination
+          15. Suspension &amp; Termination
         </h3>
         <hr className="border-gray-200 mb-4" />
 
         <SubHeading title="Termination by the Customer" />
-        <Para html="The Customer may cancel the subscription at any time by written notice to support@tallyconnect.in. Cancellation takes effect at the end of the current paid billing cycle. No refund is issued for the unused period. The Customer should export all required data before the cancellation date." />
+        <Para html="The Customer may cancel the subscription at any time by written notice to info@averlonworld.com. Cancellation takes effect at the end of the current paid billing cycle. No refund is issued for the unused period. The Customer should export all required data before the cancellation date." />
 
         <SubHeading title="Termination or Suspension by Tally Connect" />
         <Para html="We may suspend or terminate access to the platform, with written notice, if:" />
@@ -764,11 +651,11 @@ export function TermsOfService({ onBack }: TermsOfServiceProps) {
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════════
-          SECTION 17 · GOVERNING LAW
+          SECTION 16 · GOVERNING LAW
       ══════════════════════════════════════════════════════════════════════ */}
       <div>
         <h3 className="text-base font-bold text-blue-900 mb-3">
-          17. Governing Law &amp; Jurisdiction
+          16. Governing Law &amp; Jurisdiction
         </h3>
         <hr className="border-gray-200 mb-4" />
 
@@ -814,11 +701,11 @@ export function TermsOfService({ onBack }: TermsOfServiceProps) {
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════════
-          SECTION 18 · GENERAL PROVISIONS
+          SECTION 17 · GENERAL PROVISIONS
       ══════════════════════════════════════════════════════════════════════ */}
       <div>
         <h3 className="text-base font-bold text-blue-900 mb-3">
-          18. General Provisions
+          17. General Provisions
         </h3>
         <hr className="border-gray-200 mb-4" />
 
