@@ -172,43 +172,11 @@ export function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
           body="Tally Connect reads financial data from your Tally system for display and reporting only. We do not create, modify, or delete data in your Tally ERP. All source financial data remains within your own infrastructure."
         />
 
-        <PPSubHeading title="Location Data (GPS Tracking — Conditional)" />
-        <PPPara html="This data is collected only when the Customer Administrator has enabled location tracking and the individual User has provided explicit, affirmative consent. No location data is collected by default." />
-        <PPBulletList
-          items={[
-            "GPS latitude and longitude coordinates, recorded at configurable intervals (default: every 2–5 minutes)",
-            "Accuracy radius (metres), timestamp, and timezone of each capture",
-            "Activity classification — stationary, walking, or in a vehicle (via Android Activity Recognition API)",
-            "Device battery level and network connectivity status at time of capture",
-            "Derived PIN code, obtained via reverse geocoding through the Google Maps API",
-          ]}
-        />
-
-        <PPSubHeading title="Meeting and Client Visit Records" />
-        <PPBulletList
-          items={[
-            "Meeting start and end timestamps and GPS coordinates at start and end",
-            "Meeting duration, status (In Progress / Completed / Cancelled), and client association",
-            "Notes, comments, and text entered during or after meetings",
-            "File attachments — photographs, PDFs, and documents (up to 10 MB per file)",
-          ]}
-        />
-
-        <PPSubHeading title="Expense Data" />
-        <PPBulletList
-          items={[
-            "From and to location descriptions, travel date, distance (km), and transport mode",
-            "Amount spent (INR), currency, and optional client or project association",
-            "Receipt images or PDF uploads (up to 5 MB each)",
-          ]}
-        />
-
         <PPSubHeading title="Client and Contact Data" />
         <PPBulletList
           items={[
             "Business name, address, city, state, PIN code, and country",
             "Contact email and phone number (where provided)",
-            "Geocoded coordinates (auto-generated from address via Google Maps API)",
             "Tally ERP ledger reference (GUID) for integrated accounts",
             "Notes, status, and activity history",
           ]}
@@ -272,10 +240,6 @@ export function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
               "Device Fingerprint, Licence Key",
             ],
             [
-              "PIN-code-based client filtering via Google Maps reverse geocoding",
-              "Location Data, Client PIN codes",
-            ],
-            [
               "Organisation-wide analytics and reports for Administrators",
               "All Customer Data (aggregated)",
             ],
@@ -320,11 +284,6 @@ export function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
           ]}
           rows={[
             [
-              "GPS location tracking",
-              "Explicit, informed consent of the User",
-              "Art. 6(1)(a) — Consent",
-            ],
-            [
               "Delivering the contracted SaaS service",
               "Contractual necessity — subscription agreement",
               "Art. 6(1)(b) — Contract performance",
@@ -359,50 +318,11 @@ export function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════════
-          SECTION 4 · LOCATION TRACKING CONSENT
+          SECTION 4 · DATA RETENTION
       ══════════════════════════════════════════════════════════════════════ */}
       <div>
         <h3 className="text-base font-bold text-blue-900 mb-3">
-          4. Location Tracking &amp; Consent
-        </h3>
-        <hr className="border-gray-200 mb-4" />
-        <PPNote
-          type="warn"
-          title="Consent is Mandatory Before Any Location Data is Collected"
-          body="Location tracking is disabled by default. It activates only after: (1) the Customer Administrator explicitly enables it for the organisation, AND (2) each individual User provides separate, affirmative, informed consent within the app. No location data of any kind is collected without both conditions being met."
-        />
-
-        <PPSubHeading title="What Users Are Told Before Consenting" />
-        <PPPara html="Before any consent is requested, each User is shown a plain-language disclosure explaining:" />
-        <PPBulletList
-          items={[
-            "What data is collected: GPS coordinates, accuracy, timestamp, activity classification, battery level",
-            "Collection frequency: configurable intervals, typically every 2–5 minutes during active tracking sessions",
-            "Who can see the data: the organisation's Administrator and authorised managers only",
-            "How long it is kept: 90 days from collection, then permanently deleted",
-            "The purpose: field workforce management, client visit verification, productivity reporting",
-            "That consent can be withdrawn at any time without penalty",
-          ]}
-        />
-
-        <PPSubHeading title="Withdrawing Consent" />
-        <PPPara html="Users may withdraw consent at any time by:" />
-        <PPBulletList
-          items={[
-            "Disabling location permissions for Tally Connect in Android Settings → Apps → Permissions",
-            "Using the location tracking toggle within the app's profile settings",
-            "Submitting a written request to the organisation's Administrator",
-          ]}
-        />
-        <PPPara html="Withdrawing consent restricts access to location-dependent features (map view, proximity meeting alerts, pincode-filtered clients). It does not delete historical data already collected. To request deletion of past location data, see Section 8 (Your Rights)." />
-      </div>
-
-      {/* ══════════════════════════════════════════════════════════════════════
-          SECTION 5 · DATA RETENTION
-      ══════════════════════════════════════════════════════════════════════ */}
-      <div>
-        <h3 className="text-base font-bold text-blue-900 mb-3">
-          5. Data Retention Policy
+          4. Data Retention Policy
         </h3>
         <hr className="border-gray-200 mb-4" />
         <PPPara html="We retain data only for as long as necessary to fulfil the purpose for which it was collected, subject to statutory obligations. The following retention schedules apply:" />
@@ -410,24 +330,9 @@ export function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
           heads={["Data Category", "Retention Period", "Basis / Reason"]}
           rows={[
             [
-              "GPS Location Logs",
-              "90 days",
-              "Operational necessity; privacy minimisation principle",
-            ],
-            [
               "Tally ERP Synced Financial Data (cached)",
               "Duration of subscription",
               "Service delivery; data cleared on account termination",
-            ],
-            [
-              "Meeting Records (metadata, notes)",
-              "2 years",
-              "Operational audit and client relationship management",
-            ],
-            [
-              "Meeting File Attachments",
-              "1 year",
-              "Storage cost and privacy minimisation",
             ],
             [
               "Expense Records (financial entries)",
@@ -460,11 +365,6 @@ export function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
               "Licence enforcement; deleted on licence cancellation",
             ],
             [
-              "Consent Records (location tracking)",
-              "5 years",
-              "Legal accountability under DPDP Act 2023",
-            ],
-            [
               "System Audit Logs",
               "12 months",
               "Security monitoring and incident response",
@@ -485,11 +385,11 @@ export function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════════
-          SECTION 6 · DATA SHARING
+          SECTION 5 · DATA SHARING
       ══════════════════════════════════════════════════════════════════════ */}
       <div>
         <h3 className="text-base font-bold text-blue-900 mb-3">
-          6. Data Sharing &amp; Third Parties
+          5. Data Sharing &amp; Third Parties
         </h3>
         <hr className="border-gray-200 mb-4" />
 
@@ -500,47 +400,9 @@ export function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
         <PPPara html="We share data only in the following circumstances:" />
         <PPBulletList
           items={[
-            "<strong>Authorised third-party processors</strong> who provide infrastructure services under binding Data Processing Agreements (see table below)",
             "<strong>The Customer (Data Controller)</strong> as required to provide the Service — all Customer Data remains accessible to and controllable by the Customer",
             "<strong>Legal demands</strong> — where required by a court order, government authority, regulatory body, or law enforcement. Where legally permitted, we will notify the Customer before disclosure",
             "<strong>Business transfer</strong> — in the event of a merger, acquisition, or sale of assets, Customer Data is transferred under the same privacy protections, with advance notice to affected Customers",
-          ]}
-        />
-
-        <PPSubHeading title="Third-Party Processors" />
-        <PPTable
-          heads={["Processor", "Data Shared", "Purpose", "Processing Location"]}
-          rows={[
-            [
-              "Google LLC (Google Maps Platform)",
-              "GPS coordinates, client addresses",
-              "Geocoding, reverse geocoding, map display",
-              "Global (covered by Google's DPA and SCCs)",
-            ],
-            [
-              "Supabase Inc.",
-              "All platform Customer Data",
-              "Cloud database (PostgreSQL) and file storage",
-              "Configurable region; India-region options available",
-            ],
-            [
-              "Cloud Hosting Provider (e.g., AWS, Render)",
-              "Application data and system logs",
-              "Server infrastructure and application hosting",
-              "As configured; India region preferred",
-            ],
-            [
-              "Payment Gateway (e.g., Razorpay, Stripe)",
-              "Billing details only",
-              "Subscription payment processing",
-              "Provider's PCI-DSS infrastructure; card data not stored by us",
-            ],
-            [
-              "Email / SMTP Service",
-              "Email addresses, notification content",
-              "Transactional emails, alerts, password resets",
-              "As per provider's DPA",
-            ],
           ]}
         />
 
@@ -549,11 +411,11 @@ export function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════════
-          SECTION 7 · DATA SECURITY
+          SECTION 6 · DATA SECURITY
       ══════════════════════════════════════════════════════════════════════ */}
       <div>
         <h3 className="text-base font-bold text-blue-900 mb-3">
-          7. Data Security Measures
+          6. Data Security Measures
         </h3>
         <hr className="border-gray-200 mb-4" />
         <PPPara html="We implement industry-standard technical and organisational security controls to protect your data, consistent with Rule 8 of the IT (SPDI) Rules 2011 and DPDP Act 2023 obligations:" />
@@ -632,11 +494,11 @@ export function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════════
-          SECTION 8 · YOUR RIGHTS
+          SECTION 7 · YOUR RIGHTS
       ══════════════════════════════════════════════════════════════════════ */}
       <div>
         <h3 className="text-base font-bold text-blue-900 mb-3">
-          8. Your Privacy Rights
+          7. Your Privacy Rights
         </h3>
         <hr className="border-gray-200 mb-4" />
         <PPPara html="Under the Digital Personal Data Protection Act 2023 and applicable Indian law, you have the following rights as a data principal. These rights are exercisable directly with Tally Connect or, in the first instance, through your employer (Customer) as Data Controller." />
@@ -698,14 +560,14 @@ export function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════════
-          SECTION 9 · CROSS-BORDER TRANSFERS
+          SECTION 8 · CROSS-BORDER TRANSFERS
       ══════════════════════════════════════════════════════════════════════ */}
       <div>
         <h3 className="text-base font-bold text-blue-900 mb-3">
-          9. Cross-Border Data Transfers
+          8. Cross-Border Data Transfers
         </h3>
         <hr className="border-gray-200 mb-4" />
-        <PPPara html="Tally Connect's operations are headquartered in India. However, certain third-party processors (including Google LLC and Supabase Inc.) may process data in servers located outside India. Where such international transfers occur, Tally Connect ensures the following safeguards are in place:" />
+        <PPPara html="Tally Connect's operations are headquartered in India. However, certain third-party processors may process data in servers located outside India. Where such international transfers occur, Tally Connect ensures the following safeguards are in place:" />
         <PPBulletList
           items={[
             "Transfers are made only to countries or processors providing an adequate level of data protection",
@@ -718,22 +580,22 @@ export function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════════
-          SECTION 10 · CHILDREN'S PRIVACY
+          SECTION 9 · CHILDREN'S PRIVACY
       ══════════════════════════════════════════════════════════════════════ */}
       <div>
         <h3 className="text-base font-bold text-blue-900 mb-3">
-          10. Children&apos;s Privacy
+          9. Children&apos;s Privacy
         </h3>
         <hr className="border-gray-200 mb-4" />
         <PPPara html="Tally Connect is a business-to-business enterprise platform designed exclusively for use by organisations and their adult employees. The platform is not intended for, directed at, or accessible to individuals under 18 years of age. We do not knowingly collect personal data from children. If we become aware that data of a person under 18 has been submitted to the platform, we will delete it promptly and notify the relevant Customer Administrator." />
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════════
-          SECTION 11 · COOKIES & DEVICE DATA
+          SECTION 10 · COOKIES & DEVICE DATA
       ══════════════════════════════════════════════════════════════════════ */}
       <div>
         <h3 className="text-base font-bold text-blue-900 mb-3">
-          11. Cookies &amp; Device Data
+          10. Cookies &amp; Device Data
         </h3>
         <hr className="border-gray-200 mb-4" />
 
@@ -748,11 +610,11 @@ export function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════════
-          SECTION 12 · POLICY CHANGES
+          SECTION 11 · POLICY CHANGES
       ══════════════════════════════════════════════════════════════════════ */}
       <div>
         <h3 className="text-base font-bold text-blue-900 mb-3">
-          12. Changes to This Privacy Policy
+          11. Changes to This Privacy Policy
         </h3>
         <hr className="border-gray-200 mb-4" />
         <PPPara html="We may update this Privacy Policy from time to time to reflect changes in our data practices, new platform features, or applicable legal requirements. When we make material changes, we will:" />
@@ -767,11 +629,11 @@ export function PrivacyPolicy({ onBack }: PrivacyPolicyProps) {
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════════
-          SECTION 13 · CONTACT & GRIEVANCES
+          SECTION 12 · CONTACT & GRIEVANCES
       ══════════════════════════════════════════════════════════════════════ */}
       <div>
         <h3 className="text-base font-bold text-blue-900 mb-3">
-          13. Contact Us &amp; Grievance Redressal
+          12. Contact Us &amp; Grievance Redressal
         </h3>
         <hr className="border-gray-200 mb-4" />
         <PPPara html="For any questions, concerns, or requests relating to this Privacy Policy or your personal data, please contact our designated Privacy Officer:" />
