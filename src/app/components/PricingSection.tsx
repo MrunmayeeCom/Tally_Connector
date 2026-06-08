@@ -569,7 +569,7 @@ const PLANS: Plan[] = [
     id: "quarterly",
     name: "Quarterly",
     description: "Flexible 3-month billing, 5% savings",
-    price: 420, // ₹1500 + 18% GST = ₹1770/yr ÷ 4 = ₹442.50 → 5% off = ₹420.38 ≈ ₹420
+    price: 375,
     billingLabel: "/user/quarter",
     savingsLabel: "Save 5%",
     popular: false,
@@ -609,7 +609,7 @@ const PLANS: Plan[] = [
     id: "half-yearly",
     name: "Half Yearly",
     description: "6-month plan with 10% savings",
-    price: 797, // ₹1500 + 18% GST = ₹1770/yr ÷ 2 = ₹885 → 10% off = ₹796.50 ≈ ₹797
+    price: 750,
     billingLabel: "/user/half-yearly",
     savingsLabel: "Save 10%",
     popular: false,
@@ -649,7 +649,7 @@ const PLANS: Plan[] = [
     id: "yearly",
     name: "Yearly",
     description: "Best value — full year at 20% off",
-    price: 1416, // ₹1500 + 18% GST = ₹1770 → 20% off = ₹1416
+    price: 1500,
     billingLabel: "/user/year",
     savingsLabel: "Save 20%",
     popular: false,
@@ -959,7 +959,7 @@ export function PricingSection({ onPlanSelect }: PricingSectionProps) {
             </div>
             <h2 className="pr-title">Simple, Transparent Pricing</h2>
             <p className="pr-subtitle">
-              ₹1,500 / user / year + 18% GST &nbsp;·&nbsp; Save more with longer
+              ₹1,500 / user / year (excl. GST) &nbsp;·&nbsp; Save more with longer
               commitments
             </p>
           </motion.div>
@@ -1029,7 +1029,7 @@ export function PricingSection({ onPlanSelect }: PricingSectionProps) {
           </div>
 
           <p className="pr-base-note">
-            All prices are GST-inclusive (18%). Billed in INR (₹) per user.
+            All prices exclude GST (18%). Billed in INR (₹) per user.
           </p>
         </div>
       </section>
